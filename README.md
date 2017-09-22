@@ -13,4 +13,4 @@ Readability levels are configurable, as are the syllable count for defining a lo
 
 Preflight can be run on demand from the context menu, or set to run as a before-save event (the save event is cancelled if the page fails any checks).
 
-The package currently supports content in RTE editors, including those nested in Grid or Archetype editors.
+The package currently supports content in RTE editors, including those nested in Grid or Archetype editors. 
