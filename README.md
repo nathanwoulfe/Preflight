@@ -1,5 +1,4 @@
-# Preflight
-## Pre-publishing checks for Umbraco
+# Preflight - Pre-publishing checks for Umbraco
 Preflight subjects your content to series of QA test prior to publishing:
 
 - Reading ease
