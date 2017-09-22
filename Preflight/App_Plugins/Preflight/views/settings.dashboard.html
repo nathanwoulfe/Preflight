@@ -1,0 +1,41 @@
+﻿<div ng-controller="preflight.dashboard.controller as vm" class="preflight">
+    <h3>Settings</h3>
+
+    <form name="contentForm"
+          ng-submit="save()"
+          novalidate
+          val-form-manager>
+
+        <umb-editor-view ng-if="!page.loading" footer="true">
+            <umb-editor-container class="form-horizontal">
+                <div ng-bind-html="vm.content"></div>
+                <umb-tabs-nav model="vm.tabs"></umb-tabs-nav>
+                <umb-tabs-content view="true">
+                    <umb-tab id="tab{{tab.id}}" ng-repeat="tab in vm.tabs" rel="{{tab.id}}">
+                        <div class="dash-inner-area" ng-if="tab.alias === 'tab101'">
+                            <umb-property ng-repeat="property in vm.settings | filter: { view: '!multipletextbox' }" property="property">
+                                <umb-editor model="property"></umb-editor>
+                            </umb-property>
+                        </div>
+                        <div class="dash-inner-area" ng-if="tab.alias === 'tab102'">
+                            <umb-property ng-repeat="property in vm.settings | filter: { view: 'multipletextbox' }" property="property">
+                                <umb-editor model="property"></umb-editor>
+                            </umb-property>
+                        </div>
+                    </umb-tab>
+                </umb-tabs-content>
+            </umb-editor-container>
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <button role="button" class="btn btn-success" ng-click="vm.saveSettings()">Save settings</button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+        </umb-editor-view>
+    </form>
+
+    <umb-overlay ng-if="vm.overlay.show"
+                 model="vm.overlay"
+                 view="vm.overlay.view"
+                 position="right">
+    </umb-overlay>
+</div>

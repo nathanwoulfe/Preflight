@@ -1,0 +1,12 @@
+﻿{
+    javascript: [
+        '~/App_Plugins/preflight/preflight.service.js',
+        '~/App_Plugins/preflight/controllers/preflight.dialog.controller.js',
+        '~/App_Plugins/preflight/controllers/preflight.dashboard.controller.js',
+        '~/App_Plugins/preflight/controllers/preflight.help.overlay.controller.js',
+        '~/App_Plugins/preflight/interceptors/preflight.save.interceptor.js',
+    ],
+	css: [
+		'~/App_Plugins/preflight/style.css'
+	]
+}

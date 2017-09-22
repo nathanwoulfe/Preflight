@@ -1,0 +1,51 @@
+﻿[
+  {
+    "alias": "readabilityTargetMin",
+    "label": "Readability target - minimum",
+    "description": "Readability result must be great than this value",
+    "view": "slider",
+    "value": 60
+  },
+  {
+    "alias": "readabilityTargetMax",
+    "label": "Readability target - maximum",
+    "description": "Readability result should be lower than this value",
+    "view": "slider",
+    "value": 70
+  },
+  {
+    "alias": "longWordSyllables",
+    "label": "Long word syllable count",
+    "description": "Words in text will be flagged as long, if their syllable count is equal to or greater than this value",
+    "view": "slider",
+    "value": 5
+  },
+  {
+    "alias": "whitelist",
+    "label": "Whitelisted words",
+    "description": "These words will be excluded from the readability check",
+    "view": "multipletextbox",
+    "value": "Umbraco,preflight,hippopotamus"
+  },
+  {
+    "alias": "blacklist",
+    "label": "Blacklisted words",
+    "description": "These words should never be used",
+    "view": "multipletextbox",
+    "value": "peen,donger"
+  },
+  {
+    "alias": "googleApiKey",
+    "label": "Google SafeBrowsing API key",
+    "description": "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites",
+    "view": "textbox",
+    "value": "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw"
+  },
+  {
+    "alias": "bindSaveHandler",
+    "label": "Run Preflight on save",
+    "description": "Set to true and Preflight will run on all saves, and alert users to any errors. Dialog will not display when content passes all checks.",
+    "view": "boolean",
+    "value": 0
+  }
+]

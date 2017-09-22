@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4F4557B7-9E15-4B39-9D6A-F74F43AA5803}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Preflight</RootNamespace>
+    <AssemblyName>Preflight</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="cms, Version=1.0.5921.28479, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\cms.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="interfaces, Version=1.0.5921.28476, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http">
+      <HintPath>..\..\..\Corporate Web\Usc.Web\bin\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="umbraco">
+      <HintPath>..\..\..\Corporate Web\Usc.Web\bin\umbraco.dll</HintPath>
+    </Reference>
+    <Reference Include="Umbraco.Core">
+      <HintPath>..\..\..\Corporate Web\Usc.Web\bin\Umbraco.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Actions\BeforeSaveEventHandler.cs" />
+    <Compile Include="Actions\CustomNotificationsHandler.cs" />
+    <Compile Include="Api\PreflightApiController.cs" />
+    <Compile Include="Helpers\ContentChecker.cs" />
+    <Compile Include="Helpers\Helpers.cs" />
+    <Compile Include="Helpers\KnownSettingAlias.cs" />
+    <Compile Include="Helpers\Uninstaller.cs" />
+    <Compile Include="Helpers\Installer.cs" />
+    <Compile Include="Models\SafeBrowsingRequestModel.cs" />
+    <Compile Include="Models\SafeBrowsingResponseModel.cs" />
+    <Compile Include="Models\SettingsModel.cs" />
+    <Compile Include="Startup\ContextMenuLoader.cs" />
+    <Compile Include="Helpers\KnownPropertyAlias.cs" />
+    <Compile Include="Helpers\MagicStrings.cs" />
+    <Compile Include="Models\BrokenLinkModel.cs" />
+    <Compile Include="Models\PreflightResponseModel.cs" />
+    <Compile Include="Startup\UmbracoStartup.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Models\ReadabilityResponseModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App_Plugins\Preflight\package.manifest" />
+    <None Include="App_Plugins\Preflight\settings.json" />
+    <None Include="App_Plugins\Preflight\style.scss" />
+    <None Include="compilerconfig.json" />
+    <None Include="compilerconfig.json.defaults">
+      <DependentUpon>compilerconfig.json</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Plugins\Preflight\controllers\preflight.dashboard.controller.js" />
+    <Content Include="App_Plugins\Preflight\controllers\preflight.help.overlay.controller.js" />
+    <Content Include="App_Plugins\Preflight\interceptors\preflight.save.interceptor.js" />
+    <Content Include="App_Plugins\Preflight\preflight.service.js" />
+    <Content Include="App_Plugins\Preflight\controllers\preflight.dialog.controller.js" />
+    <Content Include="App_Plugins\Preflight\style.css">
+      <DependentUpon>style.scss</DependentUpon>
+    </Content>
+    <Content Include="App_Plugins\Preflight\style.min.css">
+      <DependentUpon>style.css</DependentUpon>
+    </Content>
+    <Content Include="App_Plugins\Preflight\views\help.overlay.html" />
+    <Content Include="App_Plugins\Preflight\views\settings.dashboard.html" />
+    <Content Include="App_Plugins\Preflight\views\check.dialog.html" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y "$(TargetPath)" "C:\_DEV\UmbracoDev\UmbracoDev\bin"
+xcopy "$(ProjectDir)App_Plugins\*.*" "C:\_DEV\UmbracoDev\UmbracoDev\App_Plugins\" /Y /E</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
