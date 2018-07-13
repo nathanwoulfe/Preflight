@@ -4,7 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
+using Preflight.Services;
+using Preflight.Services.Interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -14,7 +17,14 @@ namespace Preflight.Api
     [PluginController("preflight")]
     public class ApiController : UmbracoAuthorizedApiController 
     { 
-        private static readonly IContentService ContentService = ApplicationContext.Current.Services.ContentService;
+        private readonly IContentService _contentService;
+        private readonly ISettingsService _settingsService;
+
+        public ApiController()
+        {
+            _settingsService = new SettingsService();
+            _contentService = ApplicationContext.Current.Services.ContentService;
+        }
 
         /// <summary>
         /// Get Preflight settings object
@@ -29,7 +39,7 @@ namespace Preflight.Api
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
-                    data = SettingsHelper.GetSettings()
+                    data = _settingsService.Get()
                 });
             }
             catch (Exception ex)
@@ -55,7 +65,7 @@ namespace Preflight.Api
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
-                    data = SettingsHelper.SaveSettings(settings)
+                    data = _settingsService.Save(settings)
                 });
             }
             catch (Exception ex)
@@ -79,9 +89,10 @@ namespace Preflight.Api
         {            
             try
             {
-                var content = ContentService.GetById(id);
                 var checker = new ContentChecker();
-                var response = checker.Check(content);
+
+                IContent content = _contentService.GetById(id);
+                PreflightResponseModel response = checker.Check(content);
 
                 return Ok(new
                 {

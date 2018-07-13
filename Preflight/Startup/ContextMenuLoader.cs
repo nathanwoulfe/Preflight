@@ -11,18 +11,15 @@ namespace Preflight.Startup
             TreeControllerBase.MenuRendering += TreeControllerBase_MenuRendering;
         }
 
-        void TreeControllerBase_MenuRendering(TreeControllerBase sender, MenuRenderingEventArgs e)
+        private static void TreeControllerBase_MenuRendering(TreeControllerBase sender, MenuRenderingEventArgs e)
         {
-            if (e.Menu == null) return;
-            
-            if (sender.TreeAlias == "content")
-            {
-                var i = new MenuItem("preflightCheck", "Preflight check");
-                i.LaunchDialogView("/App_Plugins/Preflight/Views/check.dialog.html", "Preflight check");
-                i.Icon = "paper-plane";
+            if (e.Menu == null || sender.TreeAlias != Constants.Trees.Content) return;
 
-                e.Menu.Items.Add(i);
-            }            
+            var i = new MenuItem("preflightCheck", "Preflight check");
+            i.LaunchDialogView("/App_Plugins/Preflight/backoffice/Views/check.dialog.html", "Preflight check");
+            i.Icon = "paper-plane";
+
+            e.Menu.Items.Add(i);
         }
     }
 }

@@ -1,0 +1,8 @@
+﻿{
+  javascript: [
+    "~/App_Plugins/preflight/backoffice/js/preflight.js"
+  ],
+  css: [
+    "~/App_Plugins/preflight/backoffice/css/styles.css"
+  ]
+}

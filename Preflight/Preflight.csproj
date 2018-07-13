@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4F4557B7-9E15-4B39-9D6A-F74F43AA5803}</ProjectGuid>
+    <ProjectGuid>{D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Preflight</RootNamespace>
@@ -35,9 +35,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\UmbracoDev\UmbracoDev\bin\cms.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+    <Reference Include="HtmlAgilityPack, Version=1.5.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="interfaces, Version=1.0.5921.28476, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -45,7 +45,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\UmbracoDev\UmbracoDev\bin\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -85,52 +85,54 @@
     <Compile Include="Actions\CustomNotificationsHandler.cs" />
     <Compile Include="Api\PreflightApiController.cs" />
     <Compile Include="Helpers\ContentChecker.cs" />
-    <Compile Include="Helpers\Helpers.cs" />
-    <Compile Include="Helpers\KnownSettingAlias.cs" />
-    <Compile Include="Helpers\Uninstaller.cs" />
-    <Compile Include="Helpers\Installer.cs" />
+    <Compile Include="Models\KnownSettingAlias.cs" />
+    <Compile Include="Services\Interfaces\ILinksService.cs" />
+    <Compile Include="Services\Interfaces\IReadabilityService.cs" />
+    <Compile Include="Services\Interfaces\ISettingsService.cs" />
+    <Compile Include="Services\LinksService.cs" />
+    <Compile Include="Services\ReadabilityService.cs" />
+    <Compile Include="Services\SettingsService.cs" />
+    <Compile Include="Startup\Uninstaller.cs" />
+    <Compile Include="Startup\Installer.cs" />
     <Compile Include="Models\SafeBrowsingRequestModel.cs" />
     <Compile Include="Models\SafeBrowsingResponseModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Startup\ContextMenuLoader.cs" />
-    <Compile Include="Helpers\KnownPropertyAlias.cs" />
+    <Compile Include="Models\KnownPropertyAlias.cs" />
     <Compile Include="Helpers\MagicStrings.cs" />
     <Compile Include="Models\BrokenLinkModel.cs" />
     <Compile Include="Models\PreflightResponseModel.cs" />
     <Compile Include="Startup\UmbracoStartup.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Models\ReadabilityResponseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App_Plugins\Preflight\dist.manifest" />
     <None Include="App_Plugins\Preflight\package.manifest" />
-    <None Include="App_Plugins\Preflight\settings.json" />
-    <None Include="App_Plugins\Preflight\style.scss" />
-    <None Include="compilerconfig.json" />
-    <None Include="compilerconfig.json.defaults">
-      <DependentUpon>compilerconfig.json</DependentUpon>
-    </None>
+    <None Include="App_Plugins\Preflight\backoffice\settings.json" />
+    <None Include="App_Plugins\Preflight\backoffice\css\styles.scss" />
+    <None Include="package.json" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Plugins\Preflight\controllers\preflight.dashboard.controller.js" />
-    <Content Include="App_Plugins\Preflight\controllers\preflight.help.overlay.controller.js" />
-    <Content Include="App_Plugins\Preflight\interceptors\preflight.save.interceptor.js" />
-    <Content Include="App_Plugins\Preflight\preflight.service.js" />
-    <Content Include="App_Plugins\Preflight\controllers\preflight.dialog.controller.js" />
-    <Content Include="App_Plugins\Preflight\style.css">
-      <DependentUpon>style.scss</DependentUpon>
-    </Content>
-    <Content Include="App_Plugins\Preflight\style.min.css">
-      <DependentUpon>style.css</DependentUpon>
-    </Content>
-    <Content Include="App_Plugins\Preflight\views\help.overlay.html" />
-    <Content Include="App_Plugins\Preflight\views\settings.dashboard.html" />
-    <Content Include="App_Plugins\Preflight\views\check.dialog.html" />
+    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.dashboard.controller.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.help.overlay.controller.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\interceptors\preflight.save.interceptor.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\resources\preflight.service.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.dialog.controller.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\views\help.overlay.html" />
+    <Content Include="App_Plugins\Preflight\backoffice\views\settings.dashboard.html" />
+    <Content Include="App_Plugins\Preflight\backoffice\views\check.dialog.html" />
+    <Content Include="Gruntfile.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Plugins\Preflight\lang\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(TargetPath)" "C:\_DEV\UmbracoDev\UmbracoDev\bin"
-xcopy "$(ProjectDir)App_Plugins\*.*" "C:\_DEV\UmbracoDev\UmbracoDev\App_Plugins\" /Y /E</PostBuildEvent>
+    <PostBuildEvent>RD /S /Q "$(ProjectDir)..\Preflight.Site\App_Plugins\Preflight"
+xcopy "$(TargetPath)" "$(ProjectDir)..\Preflight.Site\bin" /Y /I /D
+xcopy "$(ProjectDir)App_Plugins\*.*" "$(ProjectDir)..\Preflight.Site\App_Plugins" /A /K /Y /E</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,10 +1,15 @@
 ﻿using Preflight.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Preflight.Models;
+using Preflight.Services;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+
+using Constants = Preflight.Helpers.Constants;
 
 namespace Preflight.Actions
 {
@@ -18,16 +23,18 @@ namespace Preflight.Actions
         /// <summary>
         /// Event Handler that gets hit before an item is Saved. 
         /// </summary>
-        void Document_Saving(IContentService sender, SaveEventArgs<IContent> e)
+        private static void Document_Saving(IContentService sender, SaveEventArgs<IContent> e)
         {
-            var settings = SettingsHelper.GetSettings();
-            var onSave = Convert.ToInt32(settings.First(s => s.Alias == "bindSaveHandler").Value);
+            var settingsService = new SettingsService();
+
+            List<SettingsModel> settings = settingsService.Get();
+            int onSave = Convert.ToInt32(settings.First(s => s.Alias == "bindSaveHandler").Value);
 
             if (onSave == 0) return;
 
-            var content = e.SavedEntities.First();
+            IContent content = e.SavedEntities.First();
             var checker = new ContentChecker();
-            var result = checker.Check(content);
+            PreflightResponseModel result = checker.Check(content);
 
             // at least one property on the current document fails the preflight check
             if (!result.Failed) return;
@@ -36,7 +43,7 @@ namespace Preflight.Actions
             content.AdditionalData.Remove("CancellationReason");
             content.AdditionalData.Remove("PreflightResponse");
 
-            content.AdditionalData.Add("CancellationReason", "Content failed preflight checks");
+            content.AdditionalData.Add("CancellationReason", Constants.ContentFailedChecks);
             content.AdditionalData.Add("PreflightResponse", result);
             content.AdditionalData.Add("SaveCancelled", DateTime.Now);
 

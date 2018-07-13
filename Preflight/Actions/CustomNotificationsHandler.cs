@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +8,8 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.UI;
+
+using Constants = Preflight.Helpers.Constants;
 
 namespace Preflight.Actions
 {
@@ -40,19 +41,18 @@ namespace Preflight.Actions
                 return base.SendAsync(request, cancellationToken)
                     .ContinueWith(task =>
                     {
-                        var response = task.Result;
+                        HttpResponseMessage response = task.Result;
                         try
                         {
-                            var data = response.Content;
-                            var content = ((ObjectContent)(data)).Value as ContentItemDisplay;
+                            HttpContent data = response.Content;
 
-                            if (content != null && content.AdditionalData.ContainsKey("SaveCancelled") && content.AdditionalData.ContainsKey("PreflightResponse"))
+                            if (((ObjectContent)data).Value is ContentItemDisplay content && content.AdditionalData.ContainsKey("SaveCancelled") && content.AdditionalData.ContainsKey("PreflightResponse"))
                             {
                                 // if preflight response exists, ditch all other notifications
                                 content.Notifications.Clear();
                                 content.Notifications.Add(new Notification
                                 {
-                                    Header = "Failed content quality checks",
+                                    Header = Constants.ContentFailedChecks,
                                     Message = JsonConvert.SerializeObject(content.AdditionalData["PreflightResponse"]),
                                     NotificationType = SpeechBubbleIcon.Error
                                 });
