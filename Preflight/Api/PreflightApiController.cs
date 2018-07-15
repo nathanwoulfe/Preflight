@@ -1,5 +1,4 @@
-﻿using Preflight.Helpers;
-using Preflight.Models;
+﻿using Preflight.Models;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -19,11 +18,13 @@ namespace Preflight.Api
     { 
         private readonly IContentService _contentService;
         private readonly ISettingsService _settingsService;
+        private readonly ContentChecker _contentChecker;
 
         public ApiController()
         {
             _settingsService = new SettingsService();
             _contentService = ApplicationContext.Current.Services.ContentService;
+            _contentChecker = new ContentChecker();
         }
 
         /// <summary>
@@ -89,10 +90,8 @@ namespace Preflight.Api
         {            
             try
             {
-                var checker = new ContentChecker();
-
                 IContent content = _contentService.GetById(id);
-                PreflightResponseModel response = checker.Check(content);
+                PreflightResponseModel response = _contentChecker.Check(content);
 
                 return Ok(new
                 {

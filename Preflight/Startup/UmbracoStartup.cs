@@ -10,8 +10,6 @@ using Umbraco.Core;
 using Umbraco.Web;
 using Umbraco.Web.UI.JavaScript;
 
-using Constants = Preflight.Helpers.Constants;
-
 namespace Preflight.Startup
 {
     public class UmbracoStartup : ApplicationEventHandler
@@ -44,7 +42,7 @@ namespace Preflight.Startup
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="dictionary"></param>
-        private void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> dictionary)
+        private static void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> dictionary)
         {
             var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 

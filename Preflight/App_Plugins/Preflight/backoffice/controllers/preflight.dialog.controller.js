@@ -2,7 +2,7 @@
 
     function ctrl($scope, editorState, appState, preflightService) {
 
-        this.loading = true;
+        this.loaded = false;
 
         const currentNodeId = $scope.dialogOptions.currentNode ? $scope.currentNode.id : -1;
 
@@ -11,13 +11,17 @@
          */
         const checkProperties = () => {
 
-            this.failedReadability = this.properties.filter(p =>
-                p.readability.score < this.readabilityTargetMin || p.readability.score > this.readabilityTargetMax
-            );
+            if (this.checkReadability) {
+                this.blacklist = this.properties.filter(p => p.readability.blacklist.length);
 
-            this.brokenLinks = this.properties.filter(p => p.links.length);
+                this.failedReadability = this.properties.filter(p =>
+                    p.readability.score < this.readabilityTargetMin || p.readability.score > this.readabilityTargetMax
+                );
+            }
 
-            this.blacklist = this.properties.filter(p => p.readability.blacklist.length);
+            if (this.checkLinks) {
+                this.brokenLinks = this.properties.filter(p => p.links.length);
+            }
         };
 
         /**
@@ -30,17 +34,25 @@
                         if (resp.status === 200) {
                             this.properties = resp.data.properties;
 
-                            checkProperties();
+                            this.checkLinks = resp.data.checkLinks;
+                            this.checkReadability = resp.data.checkReadability;
+                            this.checkSafeBrowsing = resp.data.checkSafeBrowsing;
 
-                            this.loading = false;
+                            if (this.properties.length) {
+                                checkProperties();
+                            }
+
+                            this.loaded = true;
                         }
                     });
             } else {
                 this.properties = $scope.dialogOptions.results.properties;
 
-                checkProperties();
+                if (this.properties.length) {
+                    checkProperties();
+                }
 
-                this.loading = false;
+                this.loaded = true;
             }
         };
         

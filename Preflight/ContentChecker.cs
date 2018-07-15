@@ -6,7 +6,7 @@ using Preflight.Services;
 using Preflight.Services.Interfaces;
 using Umbraco.Core.Models;
 
-namespace Preflight.Helpers
+namespace Preflight
 {
     public class ContentChecker
     {
@@ -15,16 +15,31 @@ namespace Preflight.Helpers
 
         private readonly List<string> _added;
 
-        public ContentChecker() : this(new ReadabilityService(), new LinksService(), new List<string>())
+        private readonly List<SettingsModel> _settings;
+
+        private readonly bool _checkLinks;
+        private readonly bool _checkReadability;
+        private readonly bool _checkSafeBrowsing;
+
+        private readonly string _apiKey;
+
+        public ContentChecker() : this(new ReadabilityService(), new LinksService(), new SettingsService(), new List<string>())
         {
         }
 
-        private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, List<string> added)
+        private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, ISettingsService settingsService, List<string> added)
         {
             _readabilityService = readabilityService;
             _linksService = linksService;
 
             _added = added;
+
+            _settings = settingsService.Get();
+
+            _checkLinks = _settings.Any(s => s.Alias == Constants.CheckLinksAlias && s.Value.ToString() == "1");
+            _checkReadability = _settings.Any(s => s.Alias == Constants.CheckReadabilityAlias && s.Value.ToString() == "1");
+            _checkSafeBrowsing = _settings.Any(s => s.Alias == Constants.CheckSafeBrowsingAlias && s.Value.ToString() == "1");
+            _apiKey = _settings.First(s => s.Alias == KnownSettingAlias.GoogleApiKey).Value.ToString();
         }
 
         /// <summary>
@@ -39,7 +54,12 @@ namespace Preflight.Helpers
                             p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Archetype ||
                             p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Rte);
 
-            var response = new PreflightResponseModel();
+            var response = new PreflightResponseModel
+            {
+                CheckLinks = _checkLinks,
+                CheckReadability = _checkReadability,
+                CheckSafeBrowsing = _checkSafeBrowsing
+            };
 
             foreach (Property prop in props)
             {
@@ -89,15 +109,15 @@ namespace Preflight.Helpers
 
                 string val = value.ToString();
 
-                ReadabilityResponseModel readability = _readabilityService.Check(val);
-                List<BrokenLinkModel> links = _linksService.Check(val);
+                ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
+                List<BrokenLinkModel> links = _linksService.Check(val, _checkLinks, _checkSafeBrowsing, _apiKey);
 
                 response.Add(new PreflightPropertyResponseModel
                 {
                     Name = SetName(name),
                     Readability = readability,
                     Links = links,
-                    Failed = readability.Failed || links.Any()
+                    Failed = _checkReadability && readability.Failed || links.Any()
                 });
             }
 
@@ -118,15 +138,15 @@ namespace Preflight.Helpers
 
             string val = prop.Value.ToString();
 
-            ReadabilityResponseModel readability = _readabilityService.Check(val);
-            List<BrokenLinkModel> links = _linksService.Check(val);
+            ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
+            List<BrokenLinkModel> links = _linksService.Check(val, _checkLinks, _checkSafeBrowsing, _apiKey);
 
             return new PreflightPropertyResponseModel
             {
                 Name = prop.PropertyType.Name,
                 Readability = readability,
                 Links = links,
-                Failed = readability.Failed || links.Any()
+                Failed = _checkReadability && readability.Failed || links.Any()
             };
         }
 

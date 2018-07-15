@@ -3,13 +3,16 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
+using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.UI;
-
-using Constants = Preflight.Helpers.Constants;
+using Umbraco.Web.Editors;
+using System.Web.Mvc;
+using Umbraco.Web;
 
 namespace Preflight.Actions
 {
@@ -36,6 +39,11 @@ namespace Preflight.Actions
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            //var urlHelper =
+            //    new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+
+            //string url = urlHelper.GetUmbracoApiServiceBaseUrl<ContentController>(controller => controller.PostSave(null));
+
             if (request.RequestUri.AbsolutePath.ToLower() == "/umbraco/backoffice/umbracoapi/content/postsave")
             {
                 return base.SendAsync(request, cancellationToken)
@@ -45,8 +53,9 @@ namespace Preflight.Actions
                         try
                         {
                             HttpContent data = response.Content;
+                            ContentItemDisplay content = ((ObjectContent)data).Value as ContentItemDisplay;
 
-                            if (((ObjectContent)data).Value is ContentItemDisplay content && content.AdditionalData.ContainsKey("SaveCancelled") && content.AdditionalData.ContainsKey("PreflightResponse"))
+                            if (content != null && content.AdditionalData.ContainsKey("SaveCancelled") && content.AdditionalData.ContainsKey("PreflightResponse"))
                             {
                                 // if preflight response exists, ditch all other notifications
                                 content.Notifications.Clear();

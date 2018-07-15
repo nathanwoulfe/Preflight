@@ -1,4 +1,6 @@
-﻿namespace Preflight.Helpers
+﻿using System.Web;
+
+namespace Preflight
 {
     public class Constants
     {
@@ -6,6 +8,10 @@
         public const string AppSettingKey = "PreflightInstalled";
 
         public const string ContentFailedChecks = "Content failed Preflight checks";
+
+        public const string CheckLinksAlias = "checkLinks";
+        public const string CheckReadabilityAlias = "checkReadability";
+        public const string CheckSafeBrowsingAlias = "checkSafeBrowsing";
 
         public const string RteJsonPath = "$..controls[?(@.editor.alias == 'rte')]";
         public const string RteValueJsonPath = "$..value";
@@ -20,12 +26,13 @@
 
         public const string CacheKey = "Preflight_SafeBrowsing_";
 
-        public readonly char[] Vowels = { 'a', 'e', 'i', 'o', 'u', 'y' };
-        public readonly char[] WordDelimiters = { '.', '!', '?', ':', ';' };
-        public readonly string[] Endings = { "es", "ed" };
+        public const string SafeBrowsingUrl = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=";
 
-        public const string ApiPath = "/preflight/api/";
-        public const string SettingsFilePath = "~/App_Plugins/Preflight/backoffice/settings.json";
+        public static readonly char[] Vowels = { 'a', 'e', 'i', 'o', 'u', 'y' };
+        public static readonly char[] WordDelimiters = { '.', '!', '?', ':', ';' };
+        public static readonly string[] Endings = { "es", "ed" };
+
+        public static readonly string SettingsFilePath = HttpContext.Current.Server.MapPath("~/App_Plugins/Preflight/backoffice/settings.json");
 
     }
 }

@@ -1,5 +1,4 @@
-﻿using Preflight.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Preflight.Models;
@@ -8,8 +7,6 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-
-using Constants = Preflight.Helpers.Constants;
 
 namespace Preflight.Actions
 {
@@ -33,11 +30,12 @@ namespace Preflight.Actions
             if (onSave == 0) return;
 
             IContent content = e.SavedEntities.First();
+
             var checker = new ContentChecker();
             PreflightResponseModel result = checker.Check(content);
 
             // at least one property on the current document fails the preflight check
-            if (!result.Failed) return;
+            if (result.Failed == false) return;
 
             content.AdditionalData.Remove("SaveCancelled");
             content.AdditionalData.Remove("CancellationReason");

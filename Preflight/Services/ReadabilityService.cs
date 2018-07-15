@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Preflight.Helpers;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
 
@@ -10,42 +9,28 @@ namespace Preflight.Services
 {
     public class ReadabilityService : IReadabilityService
     {
-        private readonly ISettingsService _settingsService;
-        private readonly Constants _constants;
-
-        public ReadabilityService() : this(new SettingsService(), new Constants())
-        {
-        }
-
-        private ReadabilityService(ISettingsService settingsService, Constants constants)
-        {
-            _settingsService = settingsService;
-            _constants = constants;
-        }
-
-        /// <summary>
-        /// the formula is: RE = 206.835 – (1.015 x ASL) – (84.6 x ASW) 
-        /// where RE = the readability ease
-        /// and ASL = average sentence length
-        /// and ASW = average syllables per word
-        ///
-        /// aiming for a score of 60-70
-        ///
-        /// /li, /ol, closing headings should be treated as sentences
-        /// strip all HTML tags
-        /// split on delimiters to count sentences
-        /// split on spaces to count words                   
-        /// count worth length 
-        /// split on vowels to count syllables and adjust for endings etc
-        ///
-        /// three or fewer letters are single syllable
-        /// </summary>
-        /// <param name="text">The string to parse</param>
+        ///  <summary>
+        ///  the formula is: RE = 206.835 – (1.015 x ASL) – (84.6 x ASW) 
+        ///  where RE = the readability ease
+        ///  and ASL = average sentence length
+        ///  and ASW = average syllables per word
+        /// 
+        ///  aiming for a score of 60-70
+        /// 
+        ///  /li, /ol, closing headings should be treated as sentences
+        ///  strip all HTML tags
+        ///  split on delimiters to count sentences
+        ///  split on spaces to count words                   
+        ///  count worth length 
+        ///  split on vowels to count syllables and adjust for endings etc
+        /// 
+        ///  three or fewer letters are single syllable
+        ///  </summary>
+        ///  <param name="text">The string to parse</param>
+        /// <param name="settings"></param>
         /// <returns></returns>
-        public ReadabilityResponseModel Check(string text)
+        public ReadabilityResponseModel Check(string text, List<SettingsModel> settings)
         {
-            List<SettingsModel> settings = _settingsService.Get();
-
             int longWordLength = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.LongWordSyllables).Value);
             int readabilityMin = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.ReadabilityMin).Value);
             int readabilityMax = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.ReadabilityMax).Value);
@@ -62,9 +47,7 @@ namespace Preflight.Services
             text = Regex.Replace(text, Constants.CharsToRemove, "").Replace("&amp;", "&");
             text = Regex.Replace(text, Constants.DuplicateSpaces, " ");
 
-            char[] delimiters = new Constants().WordDelimiters;
-
-            List<string> sentences = text.Split(delimiters).Where(s => !string.IsNullOrEmpty(s) && s.Length > 3).ToList();
+            List<string> sentences = text.Split(Constants.WordDelimiters).Where(s => !string.IsNullOrEmpty(s) && s.Length > 3).ToList();
 
             // calc words/sentence
             double totalWords = 0;
@@ -97,7 +80,7 @@ namespace Preflight.Services
 
             double score = Math.Round(206.835 - (1.015 * asl) - (84.6 * asw), 0);
 
-            return new ReadabilityResponseModel()
+            return new ReadabilityResponseModel
             {
                 Score = score,
                 AverageSyllables = Math.Round(asw, 1),
@@ -113,7 +96,7 @@ namespace Preflight.Services
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
-        private int CountSyllables(string word)
+        private static int CountSyllables(string word)
         {
             string currentWord = word;
             var numVowels = 0;
@@ -128,7 +111,7 @@ namespace Preflight.Services
             {
                 var foundVowel = false;
 
-                foreach (char vowel in _constants.Vowels)
+                foreach (char vowel in Constants.Vowels)
                 {
                     //don't count diphthongs
                     if (vowel == character && lastWasVowel)
@@ -160,7 +143,7 @@ namespace Preflight.Services
             string lastTwoChars = currentWord.Substring(currentWord.Length - 2).ToLower();
             string lastThreeChars = currentWord.Substring(currentWord.Length - 3).ToLower();
 
-            if (_constants.Endings.Contains(lastTwoChars) && lastThreeChars != "ied" || lastTwoChars.First() != 'l' && lastTwoChars.Last() == 'e')
+            if (Constants.Endings.Contains(lastTwoChars) && lastThreeChars != "ied" || lastTwoChars.First() != 'l' && lastTwoChars.Last() == 'e')
             {
                 numVowels--;
             }

@@ -5,10 +5,9 @@
             response: response => {
                 try {
                     if (response.config.url.toLowerCase().indexOf('/umbracoapi/content/postsave') !== -1) {
-
                         if (response.data.notifications) {
 
-                            const notification = response.data.notifications.filter(f => f.header === Umbraco.Sys.ServerVariables.preflight.contentFailedCheck)[0];
+                            const notification = response.data.notifications.filter(f => f.header === Umbraco.Sys.ServerVariables.preflight.contentFailedChecks)[0];
 
                             if (notification) {
                                 const preflightResponse = JSON.parse(notification.message);

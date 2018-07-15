@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace Preflight.Startup
 {
-    public class Installer
+    public static class Installer
     {
         public static void AddSettingsSectionDashboard()
         {

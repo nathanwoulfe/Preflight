@@ -11,6 +11,15 @@ namespace Preflight.Models
         [JsonProperty("failed")]
         public bool Failed { get; set; }
 
+        [JsonProperty(Constants.CheckLinksAlias)]
+        public bool CheckLinks { get; set; }
+
+        [JsonProperty(Constants.CheckReadabilityAlias)]
+        public bool CheckReadability { get; set; }
+
+        [JsonProperty(Constants.CheckSafeBrowsingAlias)]
+        public bool CheckSafeBrowsing { get; set; }
+
         public PreflightResponseModel()
         {
             Properties = new List<PreflightPropertyResponseModel>();

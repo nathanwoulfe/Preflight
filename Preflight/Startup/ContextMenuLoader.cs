@@ -13,7 +13,7 @@ namespace Preflight.Startup
 
         private static void TreeControllerBase_MenuRendering(TreeControllerBase sender, MenuRenderingEventArgs e)
         {
-            if (e.Menu == null || sender.TreeAlias != Constants.Trees.Content) return;
+            if (e.Menu == null || sender.TreeAlias != Umbraco.Core.Constants.Trees.Content) return;
 
             var i = new MenuItem("preflightCheck", "Preflight check");
             i.LaunchDialogView("/App_Plugins/Preflight/backoffice/Views/check.dialog.html", "Preflight check");

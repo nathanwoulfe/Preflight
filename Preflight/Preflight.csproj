@@ -84,7 +84,7 @@
     <Compile Include="Actions\BeforeSaveEventHandler.cs" />
     <Compile Include="Actions\CustomNotificationsHandler.cs" />
     <Compile Include="Api\PreflightApiController.cs" />
-    <Compile Include="Helpers\ContentChecker.cs" />
+    <Compile Include="ContentChecker.cs" />
     <Compile Include="Models\KnownSettingAlias.cs" />
     <Compile Include="Services\Interfaces\ILinksService.cs" />
     <Compile Include="Services\Interfaces\IReadabilityService.cs" />
@@ -99,7 +99,7 @@
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Startup\ContextMenuLoader.cs" />
     <Compile Include="Models\KnownPropertyAlias.cs" />
-    <Compile Include="Helpers\MagicStrings.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Models\BrokenLinkModel.cs" />
     <Compile Include="Models\PreflightResponseModel.cs" />
     <Compile Include="Startup\UmbracoStartup.cs" />
