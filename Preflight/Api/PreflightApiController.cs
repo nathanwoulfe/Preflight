@@ -20,11 +20,16 @@ namespace Preflight.Api
         private readonly ISettingsService _settingsService;
         private readonly ContentChecker _contentChecker;
 
-        public ApiController()
+        public ApiController() : this(new SettingsService(), ApplicationContext.Current.Services.ContentService, new ContentChecker())
         {
-            _settingsService = new SettingsService();
-            _contentService = ApplicationContext.Current.Services.ContentService;
-            _contentChecker = new ContentChecker();
+        }
+
+        private ApiController(ISettingsService settingsService, IContentService contentService,
+            ContentChecker contentChecker)
+        {
+            _settingsService = settingsService;
+            _contentService = contentService;
+            _contentChecker = contentChecker;
         }
 
         /// <summary>

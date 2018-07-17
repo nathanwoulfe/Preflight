@@ -3,7 +3,7 @@
     <umb-load-indicator ng-if="!vm.loaded"></umb-load-indicator>
 
     <div class="umb-dialog-body with-footer">
-        <umb-pane ng-show="!vm.loading">
+        <umb-pane ng-show="vm.loaded">
             <div class="alert alert-warning" ng-if="dialogOptions.results.introText">
                 <span ng-bind="dialogOptions.results.introText"></span>
             </div>
@@ -12,57 +12,30 @@
                 <p>Enable checks on the Preflight dashboard in the settings section.</p>
             </div>
             <div ng-if="vm.checkLinks || vm.checkReadability || vm.checkSafeBrowsing">
-                <h5>Results</h5>
-                <div ng-show="!vm.failedReadability && !vm.brokenLinks">
-                    <p>Content on this page passes preflight checks.</p>
+                <div ng-show="!vm.failed" class="alert alert-success">
+                    <p>Content on this page passes preflight checks. Good job!</p>
                 </div>
-                <div ng-show="vm.failedReadability">
-                    <p>Content on this page fails the <a href="#" prevent-default ng-click="vm.readabilityHelp()" class="help-link">readability test <i class="icon icon-help-alt"></i></a>:</p>
+                <div class="alert alert-error" ng-show="vm.failedReadability || vm.brokenLinks || vm.blacklist">
                     <ul>
-                        <li ng-repeat="prop in vm.failedReadability track by $index">
-                            {{ prop.name }}: {{ prop.readability.score }} (target: {{ vm.readabilityTargetMin }}-{{ vm.readabilityTargetMax }})
-                            <div class="readability-result" ng-style="{ 'background' : vm.resultGradient() }">
-                                <div class="readability-bar" ng-style="{ 'left' : prop.readability.score + '%' }" data-val="{{ prop.readability.score }}"></div>
-                            </div>
-                        </li>
+                        <li ng-show="vm.failedReadability">Content on this page fails the <a href="#" prevent-default ng-click="vm.readabilityHelp()" class="help-link">readability test <i class="icon icon-help-alt"></i></a></li>
+                        <li ng-show="vm.brokenLinks">Content on this page contains broken or invalid links</li>
+                        <li ng-show="vm.blacklist">Content on this page contains blacklisted words</li>
                     </ul>
                 </div>
-                <div ng-show="vm.brokenLinks">
-                    <p>Content on this page contains broken or invalid links:</p>
-                    <ul>
-                        <li ng-repeat="prop in vm.brokenLinks track by $index">
-                            {{ prop.name }}:
-                            <ul>
-                                <li ng-repeat="link in prop.links">Link text: {{ link.text }} [<span class="broken-link-type" ng-class="{ 'unsafe' : link.unsafe }" ng-bind="link.status"></span>]</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <div ng-show="vm.blacklist">
-                    <p>Content on this page contains blacklisted words:</p>
-                    <ul>
-                        <li ng-repeat="prop in vm.blacklist track by $index">
-                            {{ prop.name }}:
-                            <ul>
-                                <li ng-repeat="v in prop.readability.blacklist" ng-bind="v"></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <h5>Detail</h5>
+
+                <h4>Detail</h4>
                 <div ng-repeat="prop in vm.properties track by $index">
-                    <a ng-click="prop.collapsed = !prop.collapsed" class="prop-label">
-                        <ins ng-class="{'icon-navigation-right': prop.collapsed, 'icon-navigation-down': !node.collapsed}" class="icon-navigation-down">&nbsp;</ins>
+                    <a ng-click="prop.collapsed = !prop.collapsed" class="prop-label" ng-class="{'active' : !prop.collapsed}">
+                        <ins ng-class="{'icon-navigation-right': prop.collapsed }" class="icon-navigation-down">&nbsp;</ins>
                         {{ prop.name }}
                     </a>
                     <div class="prop-results" ng-class="{'collapsed' : prop.collapsed}">
-
-                        <h6>Readability</h6>
+                        <h5>Readability</h5>
                         <ul>
                             <li>
-                                Flesch reading ease score: {{ prop.readability.score }}
+                                Flesch reading ease score: <span ng-bind="prop.readability.score" ng-class="{'failed' : vm.failedReadability}"></span> (target: {{ vm.readabilityTargetMin }}-{{ vm.readabilityTargetMax }})
                                 <div class="readability-result" ng-style="{ 'background' : vm.resultGradient() }">
-                                    <div class="readability-bar" ng-style="{ 'left' : prop.readability.score + '%' }" data-val="{{ prop.readability.score }}"></div>
+                                    <div class="readability-bar" ng-if="prop.readability.score < 100" ng-style="{ 'left' : prop.readability.score + '%' }" data-val="{{ prop.readability.score }}"></div>
                                 </div>
                             </li>
                             <li>Average syllables per word: {{ prop.readability.averageSyllables }}</li>
@@ -76,9 +49,15 @@
                             </li>
                         </ul>
                         <div ng-show="prop.links">
-                            <h6>Broken links</h6>
+                            <h5>Broken links</h5>
                             <ul>
-                                <li ng-repeat="link in prop.links track by $index">Link text: {{ link.text }}<br/>Target: {{ link.href }}<br/>Status: {{ link.status }}</li>
+                                <li ng-repeat="link in prop.links track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
+                            </ul>
+                        </div>
+                        <div ng-show="prop.readability.blacklist">
+                            <h5>Blacklisted terms</h5>
+                            <ul>
+                                <li ng-repeat="term in prop.readability.blacklist track by $index" ng-bind="term"></li>
                             </ul>
                         </div>
                     </div>

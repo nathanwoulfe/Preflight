@@ -46,7 +46,6 @@ namespace Preflight.Models
 
         public PreflightPropertyResponseModel()
         {
-            Links = new List<BrokenLinkModel>();
             Collapsed = true;
             Failed = false;
         }

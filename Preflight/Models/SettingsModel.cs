@@ -18,5 +18,8 @@ namespace Preflight.Models
 
         [JsonProperty("value")]
         public object Value { get; set; }
+
+        [JsonProperty("tab")]
+        public string Tab { get; set; }
     }
 }

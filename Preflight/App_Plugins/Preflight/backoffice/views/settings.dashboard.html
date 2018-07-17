@@ -13,12 +13,22 @@
                 <umb-tabs-content view="true">
                     <umb-tab id="tab{{tab.id}}" ng-repeat="tab in vm.tabs track by $index" rel="{{tab.id}}">
                         <div class="dash-inner-area" ng-if="tab.alias === 'tab101'">
-                            <umb-property ng-repeat="property in vm.settings | filter: { view: '!multipletextbox' }" property="property">
+                            <umb-property ng-repeat="property in vm.settings | filter: { tab: 'settings' }" property="property">
                                 <umb-editor model="property"></umb-editor>
                             </umb-property>
                         </div>
                         <div class="dash-inner-area" ng-if="tab.alias === 'tab102'">
-                            <umb-property ng-repeat="property in vm.settings | filter: { view: 'multipletextbox' }" property="property">
+                            <umb-property ng-repeat="property in vm.settings | filter: { tab: 'lists' }" property="property">
+                                <umb-editor model="property"></umb-editor>
+                            </umb-property>
+                        </div>
+                        <div class="dash-inner-area" ng-if="tab.alias === 'tab103'">
+                            <umb-property ng-repeat="property in vm.settings | filter: { tab: 'autoreplace' }" property="property">
+                                <umb-editor model="property"></umb-editor>
+                            </umb-property>
+                        </div>
+                        <div class="dash-inner-area" ng-if="tab.alias === 'tab104'">
+                            <umb-property ng-repeat="property in vm.settings | filter: { tab: 'tests' }" property="property">
                                 <umb-editor model="property"></umb-editor>
                             </umb-property>
                         </div>

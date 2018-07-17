@@ -3,6 +3,7 @@
     "alias": "readabilityTargetMin",
     "label": "Readability target - minimum",
     "description": "Readability result must be great than this value",
+    "tab": "settings",
     "view": "slider",
     "value": 60
   },
@@ -10,6 +11,7 @@
     "alias": "readabilityTargetMax",
     "label": "Readability target - maximum",
     "description": "Readability result should be lower than this value",
+    "tab": "settings",
     "view": "slider",
     "value": 70
   },
@@ -17,13 +19,23 @@
     "alias": "longWordSyllables",
     "label": "Long word syllable count",
     "description": "Words in text will be flagged as long, if their syllable count is equal to or greater than this value",
+    "tab": "settings",
     "view": "slider",
     "value": 5
+  },
+  {
+    "alias": "googleApiKey",
+    "label": "Google SafeBrowsing API key",
+    "description": "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites",
+    "tab": "settings",
+    "view": "textbox",
+    "value": "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw"
   },
   {
     "alias": "whitelist",
     "label": "Whitelisted words",
     "description": "These words will be excluded from the readability check",
+    "tab": "lists",
     "view": "multipletextbox",
     "value": "Umbraco,preflight,hippopotamus"
   },
@@ -31,32 +43,47 @@
     "alias": "blacklist",
     "label": "Blacklisted words",
     "description": "These words should never be used",
+    "tab": "lists",
     "view": "multipletextbox",
     "value": "peen,donger"
   },
   {
-    "alias": "googleApiKey",
-    "label": "Google SafeBrowsing API key",
-    "description": "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites",
-    "view": "textbox",
-    "value": "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw"
+    "alias": "autoreplace",
+    "label": "Auto-replace",
+    "description": "Pipe-separated list of terms to auto-replace in preflight checks - eg 'replace me|new text'",
+    "tab": "autoreplace",
+    "view": "multipletextbox",
+    "value": "replacethis|new term"
   },
   {
     "alias": "bindSaveHandler",
     "label": "Run Preflight on save",
     "description": "Set to true and Preflight will run on all saves, and alert users to any errors. Dialog will not display when content passes all checks.",
+    "tab": "tests",
     "view": "boolean",
-    "value": 0
+    "value": 1
   },
   {
     "alias": "checkLinks",
     "label": "Check broken links",
+    "description": "Set to true and Preflight will check links for errors (40x, 50x, invalid internal links).",
+    "tab": "tests",
     "view": "boolean",
     "value": 1
   },
   {
     "alias": "checkReadability",
     "label": "Check readability",
+    "description": "Set to true and Preflight will analyse text to ensure it falls within the defined readability range (whitelisted terms are ignored).",
+    "tab": "tests",
+    "view": "boolean",
+    "value": 1
+  },
+  {
+    "alias": "doAutoreplace",
+    "label": "Auto-replace",
+    "description": "Set to true and Preflight will apply the replacements mapped in the Auto-replace config.",
+    "tab": "tests",
     "view": "boolean",
     "value": 1
   },
@@ -64,6 +91,7 @@
     "alias": "checkSafeBrowsing",
     "label": "Ensure safe links",
     "description": "Set to true and Preflight will check links for potential malware and bad actors.",
+    "tab": "tests",
     "view": "boolean",
     "value": 1
   }

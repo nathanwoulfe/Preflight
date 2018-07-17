@@ -2,6 +2,9 @@
 $orange: #f9b945;
 $green: #35c786;
 $purple: #413659;
+$grey: #f3f3f5;
+
+$umbGreen: #00aea2;
 
 .preflight {
 
@@ -12,26 +15,58 @@ $purple: #413659;
         width: calc(100% - 200px);
     }
 
+    .alert {
+        *:last-child {
+            margin-bottom: 0;
+        }
+    }
+
     .prop-results {
         &.collapsed {
             display: none;
         }
     }
 
+    .failed {
+        color: $red;
+    }
+
     .prop-label {
         cursor: pointer;
         text-decoration: none;
+        display: flex;
+        align-items: center;
+        height: 32px;
+        padding-left: 5px;
+
+        &:hover {
+            background: $grey;
+        }
+
+        &.active {
+            background: $umbGreen;
+            color: #fff;
+
+            ins {
+                color: #fff;
+            }
+        }
+
+        ins {
+            font-size: 12px;
+            margin-top: -2px;
+        }
     }
 
     .readability-result {
         height: 10px;
-        margin: 10px 0 25px;
+        margin: 7px 0 10px 0;
     }
 
     .readability-bar {
         position: absolute;
         width: 3px;
-        background: $purple;
+        //background: $purple;
         height: 10px;
         transform: translateX(-1px);
 
@@ -39,26 +74,35 @@ $purple: #413659;
             display: block;
             position: absolute;
             transform: translateX(-50%);
-            background: $purple;
-            left: 2px;
+            //background: $purple;
+            left: 50%;
         }
 
         &::before {
             content: '';
-            top: -3px;
-            width: 20px;
-            height: 3px;
-            border-radius: 2px 2px 0 0;
+            top: -4px;
+            /*width: 20px;
+            height: 3px;*/
+            //border-radius: 2px 2px 0 0;
+            border-style: solid;
+            border-width: 8px 5px 0;
+            border-color: $purple transparent transparent transparent;
         }
 
         &::after {
-            content: attr(data-val);
-            top: 10px;
-            line-height: 1;
-            padding: 3px 4px 1px;
-            color: #fff;
-            border-radius: 0 0 2px 2px;
-            font-size: 10px;
+            /*content: attr(data-val);*/
+            content: '';
+            top: 6px;
+            /*height: 3px;
+            width: 20px;*/
+            /*line-height: 1;*/
+            /*padding: 3px 4px 1px;
+            color: #fff;*/
+            //border-radius: 0 0 2px 2px;
+            /*font-size: 10px;*/
+            border-style: solid;
+            border-width: 0 5px 8px;
+            border-color: transparent transparent $purple transparent;
         }
     }
 

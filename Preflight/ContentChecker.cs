@@ -2,6 +2,7 @@
 using Preflight.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Preflight.Services;
 using Preflight.Services.Interfaces;
 using Umbraco.Core.Models;
@@ -49,10 +50,7 @@ namespace Preflight
         /// <returns></returns>
         public PreflightResponseModel Check(IContent content)
         {
-            IEnumerable<Property> props = content.Properties
-                .Where(p => p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Grid ||
-                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Archetype ||
-                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Rte);
+            IEnumerable<Property> props = GetProperties(content);
 
             var response = new PreflightResponseModel
             {
@@ -80,6 +78,34 @@ namespace Preflight
             response.Failed = response.Properties.Any(p => p.Failed);
 
             return response;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public IContent Autoreplace(IContent content)
+        {
+            // perform autoreplace before readability check
+            // only do this in save handler as there's no point in updating if it's not being saved (potentially)
+            Dictionary<string, string> autoreplace = ((string)_settings.First(s => s.Alias == KnownSettingAlias.Autoreplace).Value)
+                .Split(',').ToDictionary(s => s.Split('|')[0], s => s.Split('|')[1]);
+
+            if (!autoreplace.Any()) return content;
+
+            IEnumerable<Property> props = GetProperties(content);
+
+            foreach (Property prop in props)
+            {
+                foreach (KeyValuePair<string, string> term in autoreplace)
+                {
+                    string pattern = $@"\b{term.Key}\b";
+                    prop.Value = Regex.Replace(prop.Value.ToString(), pattern, term.Value, RegexOptions.IgnoreCase);
+                }
+            }
+
+            return content;
         }
 
         /// <summary>
@@ -148,6 +174,19 @@ namespace Preflight
                 Links = links,
                 Failed = _checkReadability && readability.Failed || links.Any()
             };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private static IEnumerable<Property> GetProperties(IContent content)
+        {
+            return content.Properties
+                .Where(p => p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Grid ||
+                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Archetype ||
+                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Rte);
         }
 
         /// <summary>

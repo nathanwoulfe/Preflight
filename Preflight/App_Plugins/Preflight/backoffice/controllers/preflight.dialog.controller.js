@@ -26,33 +26,37 @@
 
         /**
          * 
+         * @param {any} data
+         */
+        const bindResults = data => {
+
+            this.properties = data.properties;
+            if (this.properties.length) {
+                checkProperties();
+            }
+
+            this.checkLinks = data.checkLinks;
+            this.checkReadability = data.checkReadability;
+            this.checkSafeBrowsing = data.checkSafeBrowsing;
+
+            this.failed = data.failed;
+
+            this.loaded = true;
+        };
+
+        /**
+         * 
          */
         const preflight = () => {
             if (currentNodeId !== -1) {
                 preflightService.check(currentNodeId)
                     .then(resp => {
                         if (resp.status === 200) {
-                            this.properties = resp.data.properties;
-
-                            this.checkLinks = resp.data.checkLinks;
-                            this.checkReadability = resp.data.checkReadability;
-                            this.checkSafeBrowsing = resp.data.checkSafeBrowsing;
-
-                            if (this.properties.length) {
-                                checkProperties();
-                            }
-
-                            this.loaded = true;
+                            bindResults(resp.data);
                         }
                     });
             } else {
-                this.properties = $scope.dialogOptions.results.properties;
-
-                if (this.properties.length) {
-                    checkProperties();
-                }
-
-                this.loaded = true;
+                bindResults($scope.dialogOptions.results);
             }
         };
         
@@ -79,11 +83,11 @@
          */
         this.resultGradient = () => 
             `linear-gradient(90deg, 
-                #fe6561 ${this.readabilityTargetMin - 15}%, 
-                #f9b945 ${this.readabilityTargetMin}%, 
-                #35c786,
-                #f9b945 ${this.readabilityTargetMax}%, 
-                #fe6561 ${this.readabilityTargetMax + 15}%)`;
+            #fe6561 ${this.readabilityTargetMin - 15}%, 
+            #f9b945 ${this.readabilityTargetMin}%, 
+            #35c786,
+            #f9b945 ${this.readabilityTargetMax}%, 
+            #fe6561 ${this.readabilityTargetMax + 15}%)`;
         
 
         // this is from navigation service, needs to happen here as the modal may not be added via the service, so must be closed manually

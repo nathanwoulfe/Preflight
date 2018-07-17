@@ -15,6 +15,16 @@
                 label: 'Black/white lists',
                 alias: 'tab102',
                 active: false
+            }, {
+                id: 103,
+                label: 'Autoreplace',
+                alias: 'tab103',
+                active: false
+            }, {
+                id: 104,
+                label: 'Test types',
+                alias: 'tab104',
+                active: false
             }
         ];
 

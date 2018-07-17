@@ -12,6 +12,7 @@ namespace Preflight
         public const string CheckLinksAlias = "checkLinks";
         public const string CheckReadabilityAlias = "checkReadability";
         public const string CheckSafeBrowsingAlias = "checkSafeBrowsing";
+        public const string DoAutoreplace = "doAutoreplace";
 
         public const string RteJsonPath = "$..controls[?(@.editor.alias == 'rte')]";
         public const string RteValueJsonPath = "$..value";
@@ -33,6 +34,5 @@ namespace Preflight
         public static readonly string[] Endings = { "es", "ed" };
 
         public static readonly string SettingsFilePath = HttpContext.Current.Server.MapPath("~/App_Plugins/Preflight/backoffice/settings.json");
-
     }
 }

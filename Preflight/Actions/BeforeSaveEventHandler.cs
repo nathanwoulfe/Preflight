@@ -25,13 +25,21 @@ namespace Preflight.Actions
             var settingsService = new SettingsService();
 
             List<SettingsModel> settings = settingsService.Get();
-            int onSave = Convert.ToInt32(settings.First(s => s.Alias == "bindSaveHandler").Value);
+            int onSave = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.BindSaveHandler).Value);
 
             if (onSave == 0) return;
 
             IContent content = e.SavedEntities.First();
 
             var checker = new ContentChecker();
+
+            // perform autoreplace before readability check
+            // only do this in save handler as there's no point in updating if it's not being saved (potentially)
+            if (settings.Any(s => s.Alias == Constants.DoAutoreplace && s.Value.ToString() == "1"))
+            {
+                content = checker.Autoreplace(content);
+            }
+
             PreflightResponseModel result = checker.Check(content);
 
             // at least one property on the current document fails the preflight check
