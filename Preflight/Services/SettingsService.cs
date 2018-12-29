@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
 
@@ -15,7 +16,7 @@ namespace Preflight.Services
         {
             List<SettingsModel> settings;
 
-            using (var file = new StreamReader(Constants.SettingsFilePath))
+            using (var file = new StreamReader(KnownStrings.SettingsFilePath))
             {
                 string json = file.ReadToEnd();
                 settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json);
@@ -31,7 +32,7 @@ namespace Preflight.Services
         {
             try
             {
-                using (var file = new StreamWriter(Constants.SettingsFilePath, false))
+                using (var file = new StreamWriter(KnownStrings.SettingsFilePath, false))
                 {
                     var serializer = new JsonSerializer();
                     serializer.Serialize(file, settings);

@@ -6,6 +6,7 @@ using System.Runtime.Caching;
 using System.Web;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
 using Umbraco.Core;
@@ -33,7 +34,7 @@ namespace Preflight.Services
                 var doc = new HtmlDocument();
                 doc.LoadHtml(text);
 
-                HtmlNodeCollection links = doc.DocumentNode.SelectNodes(Constants.HrefXPath);
+                HtmlNodeCollection links = doc.DocumentNode.SelectNodes(KnownStrings.HrefXPath);
                 SafeBrowsingResponseModel safeBrowsingResult = null;
 
                 if (links != null && links.Any())
@@ -49,7 +50,7 @@ namespace Preflight.Services
 
                         foreach (string href in hrefs)
                         {
-                            var cacheItem = (BrokenLinkModel) cache.Get(Constants.CacheKey + href);
+                            var cacheItem = (BrokenLinkModel) cache.Get(KnownStrings.CacheKey + href);
                             if (null == cacheItem) continue;
 
                             fromCache.Add(cacheItem);
@@ -73,7 +74,7 @@ namespace Preflight.Services
 
                                 foreach (BrokenLinkModel item in response)
                                 {
-                                    cache.Add(Constants.CacheKey + item.Href, item,
+                                    cache.Add(KnownStrings.CacheKey + item.Href, item,
                                         new CacheItemPolicy {AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(3600)});
                                 }
                             }
@@ -148,7 +149,7 @@ namespace Preflight.Services
             }
             catch (Exception ex)
             {
-                LogHelper.Error(GetType(), ex.Message, ex);
+                //LogHelper.Error(GetType(), ex.Message, ex);
             }
 
             return response;
@@ -165,7 +166,7 @@ namespace Preflight.Services
             try
             {
                 string result;
-                string url = Constants.SafeBrowsingUrl + apiKey;
+                string url = KnownStrings.SafeBrowsingUrl + apiKey;
 
                 ThreatEntry[] threatEntries = urls.Select(u => new ThreatEntry { Url = u }).ToArray();
 

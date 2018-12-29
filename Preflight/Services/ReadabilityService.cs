@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
 
@@ -42,12 +43,12 @@ namespace Preflight.Services
             List<string> longWords = new List<string>();
             List<string> blacklisted = new List<string>();
 
-            text = Regex.Replace(text, Constants.ClosingHtmlTags, ".");
-            text = text.Replace(Constants.NewLine, " ");
-            text = Regex.Replace(text, Constants.CharsToRemove, "").Replace("&amp;", "&");
-            text = Regex.Replace(text, Constants.DuplicateSpaces, " ");
+            text = Regex.Replace(text, KnownStrings.ClosingHtmlTags, ".");
+            text = text.Replace(KnownStrings.NewLine, " ");
+            text = Regex.Replace(text, KnownStrings.CharsToRemove, "").Replace("&amp;", "&");
+            text = Regex.Replace(text, KnownStrings.DuplicateSpaces, " ");
 
-            List<string> sentences = text.Split(Constants.WordDelimiters).Where(s => !string.IsNullOrEmpty(s) && s.Length > 3).ToList();
+            List<string> sentences = text.Split(KnownStrings.WordDelimiters).Where(s => !string.IsNullOrEmpty(s) && s.Length > 3).ToList();
 
             // calc words/sentence
             double totalWords = 0;
@@ -111,7 +112,7 @@ namespace Preflight.Services
             {
                 var foundVowel = false;
 
-                foreach (char vowel in Constants.Vowels)
+                foreach (char vowel in KnownStrings.Vowels)
                 {
                     //don't count diphthongs
                     if (vowel == character && lastWasVowel)
@@ -143,7 +144,7 @@ namespace Preflight.Services
             string lastTwoChars = currentWord.Substring(currentWord.Length - 2).ToLower();
             string lastThreeChars = currentWord.Substring(currentWord.Length - 3).ToLower();
 
-            if (Constants.Endings.Contains(lastTwoChars) && lastThreeChars != "ied" || lastTwoChars.First() != 'l' && lastTwoChars.Last() == 'e')
+            if (KnownStrings.Endings.Contains(lastTwoChars) && lastThreeChars != "ied" || lastTwoChars.First() != 'l' && lastTwoChars.Last() == 'e')
             {
                 numVowels--;
             }

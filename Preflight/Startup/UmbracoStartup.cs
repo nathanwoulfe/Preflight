@@ -2,22 +2,32 @@
 using System.Configuration;
 using System.Web;
 using System.Web.Configuration;
-using System.Web.Mvc;
 using System.Web.Routing;
 using Preflight.Api;
-using umbraco.cms.businesslogic.packager;
-using Umbraco.Core;
+using Preflight.Constants;
+using Preflight.Services;
+using Preflight.Services.Interfaces;
+using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Events;
 using Umbraco.Web;
 using Umbraco.Web.UI.JavaScript;
 
 namespace Preflight.Startup
 {
-    public class UmbracoStartup : ApplicationEventHandler
+    public class UmbracoStartup : UmbracoComponentBase, IUmbracoUserComponent
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext context)
+        public override void Compose(Composition composition)
+        {
+            composition.Container.RegisterSingleton<ILinksService, LinksService>();
+            composition.Container.RegisterSingleton<IReadabilityService, ReadabilityService>();
+            composition.Container.RegisterSingleton<ISettingsService, SettingsService>();
+        }
+
+        public void Initialize()
         {
             //Check to see if appSetting AnalyticsStartupInstalled is true or even present
-            string installAppSetting = WebConfigurationManager.AppSettings[Constants.AppSettingKey];
+            string installAppSetting = WebConfigurationManager.AppSettings[KnownStrings.AppSettingKey];
 
             if (string.IsNullOrEmpty(installAppSetting) || installAppSetting != true.ToString())
             {
@@ -27,13 +37,9 @@ namespace Preflight.Startup
                 //All done installing our custom stuff
                 //As we only want this to run once - not every startup of Umbraco
                 Configuration webConfig = WebConfigurationManager.OpenWebConfiguration("/");
-                webConfig.AppSettings.Settings.Add(Constants.AppSettingKey, true.ToString());
+                webConfig.AppSettings.Settings.Add(KnownStrings.AppSettingKey, true.ToString());
                 webConfig.Save();
             }
-
-            //Add OLD Style Package Event
-            InstalledPackage.BeforeDelete += InstalledPackage_BeforeDelete;
-
             ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
         }
 
@@ -44,32 +50,13 @@ namespace Preflight.Startup
         /// <param name="dictionary"></param>
         private static void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> dictionary)
         {
-            var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+            var urlHelper = new System.Web.Mvc.UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
             dictionary.Add("preflight", new Dictionary<string, object>
             {
-                { "contentFailedChecks", Constants.ContentFailedChecks },
-                { "baseApiPath", urlHelper.GetUmbracoApiServiceBaseUrl<ApiController>(controller => controller.GetSettings()) }
+                { "contentFailedChecks", KnownStrings.ContentFailedChecks },
+                { "apiPath", urlHelper.GetUmbracoApiServiceBaseUrl<ApiController>(controller => controller.GetSettings()) }
             });
-        }
-
-        /// <summary>
-        /// Uninstall Package - Before Delete (Old style events, no V6/V7 equivelant)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void InstalledPackage_BeforeDelete(InstalledPackage sender, System.EventArgs e)
-        {
-            //Check which package is being uninstalled
-            if (sender.Data.Name != Constants.Name) return;
-
-            //Start Uninstall - clean up process...
-            Uninstaller.RemoveSettingsSectionDashboard();
-
-            //Remove AppSetting key when all done
-            Configuration webConfig = WebConfigurationManager.OpenWebConfiguration("/");
-            webConfig.AppSettings.Settings.Remove(Constants.AppSettingKey);
-            webConfig.Save();
         }
     }
 }

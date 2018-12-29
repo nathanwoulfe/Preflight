@@ -1,32 +1,19 @@
 ﻿using Newtonsoft.Json;
+using Preflight.Constants;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
-using System.Web.Routing;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Core.Components;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.UI;
-using Umbraco.Web.Editors;
-using System.Web.Mvc;
-using Umbraco.Web;
 
 namespace Preflight.Actions
 {
-    public class CustomNotificationsHandler : IApplicationEventHandler
+    public class CustomNotificationsHandler : UmbracoComponentBase, IUmbracoUserComponent
     {
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-        }
-
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-        }
-
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void Initialize()
         {
             GlobalConfiguration.Configuration.MessageHandlers.Add(new WebApiHandler());
         }
@@ -53,7 +40,7 @@ namespace Preflight.Actions
                         try
                         {
                             HttpContent data = response.Content;
-                            ContentItemDisplay content = ((ObjectContent)data).Value as ContentItemDisplay;
+                            var content = ((ObjectContent)data).Value as ContentItemDisplay;
 
                             if (content != null && content.AdditionalData.ContainsKey("SaveCancelled") && content.AdditionalData.ContainsKey("PreflightResponse"))
                             {
@@ -61,7 +48,7 @@ namespace Preflight.Actions
                                 content.Notifications.Clear();
                                 content.Notifications.Add(new Notification
                                 {
-                                    Header = Constants.ContentFailedChecks,
+                                    Header = KnownStrings.ContentFailedChecks,
                                     Message = JsonConvert.SerializeObject(content.AdditionalData["PreflightResponse"]),
                                     NotificationType = SpeechBubbleIcon.Error
                                 });
@@ -70,7 +57,8 @@ namespace Preflight.Actions
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<WebApiHandler>("Error changing custom publishing cancelled message.", ex);
+                            //todo => v8 logging
+                            //LogHelper.Error<WebApiHandler>("Error changing custom publishing cancelled message.", ex);
                         }
                         return response;
 

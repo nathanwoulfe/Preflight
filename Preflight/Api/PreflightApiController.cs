@@ -5,9 +5,7 @@ using System.Net;
 using System.Web.Http;
 using Preflight.Services;
 using Preflight.Services.Interfaces;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -16,19 +14,18 @@ namespace Preflight.Api
     [PluginController("preflight")]
     public class ApiController : UmbracoAuthorizedApiController 
     { 
-        private readonly IContentService _contentService;
         private readonly ISettingsService _settingsService;
         private readonly ContentChecker _contentChecker;
 
-        public ApiController() : this(new SettingsService(), ApplicationContext.Current.Services.ContentService, new ContentChecker())
+        public ApiController() : this(new SettingsService(), new ContentChecker())
         {
+            //_settingsService = new SettingsService();
+            //_contentChecker = new ContentChecker();
         }
 
-        private ApiController(ISettingsService settingsService, IContentService contentService,
-            ContentChecker contentChecker)
+        private ApiController(ISettingsService settingsService, ContentChecker contentChecker)
         {
             _settingsService = settingsService;
-            _contentService = contentService;
             _contentChecker = contentChecker;
         }
 
@@ -42,6 +39,8 @@ namespace Preflight.Api
         {
             try
             {
+                // todo => inject this via lightinject
+                //_settingsService = new SettingsService();
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
@@ -68,6 +67,7 @@ namespace Preflight.Api
         {
             try
             {
+                // = new SettingsService();
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
@@ -95,7 +95,9 @@ namespace Preflight.Api
         {            
             try
             {
-                IContent content = _contentService.GetById(id);
+                //_contentChecker = new ContentChecker();
+
+                IContent content = Services.ContentService.GetById(id);
                 PreflightResponseModel response = _contentChecker.Check(content);
 
                 return Ok(new

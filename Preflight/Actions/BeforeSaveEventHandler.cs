@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Services;
-using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
 namespace Preflight.Actions
 {
-    public class BeforeSaveEventHandler : ApplicationEventHandler
+    public class BeforeSaveEventHandler : UmbracoComponentBase, IUmbracoUserComponent
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        protected void Initialize()
         {
             ContentService.Saving += Document_Saving;
         }
@@ -35,7 +37,7 @@ namespace Preflight.Actions
 
             // perform autoreplace before readability check
             // only do this in save handler as there's no point in updating if it's not being saved (potentially)
-            if (settings.Any(s => s.Alias == Constants.DoAutoreplace && s.Value.ToString() == "1"))
+            if (settings.Any(s => s.Alias == KnownStrings.DoAutoreplace && s.Value.ToString() == "1"))
             {
                 content = checker.Autoreplace(content);
             }
@@ -45,13 +47,14 @@ namespace Preflight.Actions
             // at least one property on the current document fails the preflight check
             if (result.Failed == false) return;
 
-            content.AdditionalData.Remove("SaveCancelled");
-            content.AdditionalData.Remove("CancellationReason");
-            content.AdditionalData.Remove("PreflightResponse");
+            // todo => v8 fix
+            //content.AdditionalData.Remove("SaveCancelled");
+            //content.AdditionalData.Remove("CancellationReason");
+            //content.AdditionalData.Remove("PreflightResponse");
 
-            content.AdditionalData.Add("CancellationReason", Constants.ContentFailedChecks);
-            content.AdditionalData.Add("PreflightResponse", result);
-            content.AdditionalData.Add("SaveCancelled", DateTime.Now);
+            //content.AdditionalData.Add("CancellationReason", KnownStrings.ContentFailedChecks);
+            //content.AdditionalData.Add("PreflightResponse", result);
+            //content.AdditionalData.Add("SaveCancelled", DateTime.Now);
 
             e.Cancel = true;
         }

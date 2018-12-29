@@ -101,9 +101,9 @@
         watch: {
 
             // dev watches everything, copies everything
-            dev: {
+            dev8: {
                 files: ['<%= backoffice %>/**/*'],
-                tasks: ['sass:dist', 'copy:dev', 'copy:configDev'],
+                tasks: ['sass:dist', 'copy:dev8', 'copy:configDev8'],
                 options: {
                     livereload: true
                 }
@@ -136,11 +136,11 @@
         },
 
         copy: {
-            dev: {
+            dev8: {
                 expand: true,
                 cwd: '<%= backoffice %>/',
                 src: '**/*',
-                dest: '../Preflight.site/<%= backoffice %>/',
+                dest: '../Preflight.site.v8/<%= backoffice %>/',
             },
 
             config: {
@@ -148,9 +148,9 @@
                 dest: '<%= dest %>/<%= basePath %>/package.manifest',
             },
 
-            configDev: {
+            configDev8: {
                 src: '<%= basePath %>/package.manifest',
-                dest: '../Preflight.site/<%= basePath %>/package.manifest',
+                dest: '../Preflight.site.v8/<%= basePath %>/package.manifest',
             },
 
             css: {
@@ -308,5 +308,6 @@
     grunt.registerTask('nuget', ['clean', 'default', 'copy:nuget', 'template:nuspec', 'mkdir:pkg', 'nugetpack']);
     grunt.registerTask('package', ['clean', 'default', 'copy:umbraco', 'copy:umbracoBin', 'mkdir:pkg', 'umbracoPackage']);
 
-    grunt.registerTask('dev', ['watch:dev']);
+    // separate tasks for v7 or v8 dev
+    grunt.registerTask('dev-v8', ['watch:dev8']);
 };

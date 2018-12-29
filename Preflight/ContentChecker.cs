@@ -3,6 +3,7 @@ using Preflight.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Preflight.Constants;
 using Preflight.Services;
 using Preflight.Services.Interfaces;
 using Umbraco.Core.Models;
@@ -24,22 +25,38 @@ namespace Preflight
 
         private readonly string _apiKey;
 
-        public ContentChecker() : this(new ReadabilityService(), new LinksService(), new SettingsService(), new List<string>())
-        {
-        }
+        // todo => v8 refactoring to inject it all
+        //public ContentChecker() : this(new ReadabilityService(), new LinksService(), new SettingsService(), new List<string>())
+        //{
+        //}
 
-        private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, ISettingsService settingsService, List<string> added)
-        {
-            _readabilityService = readabilityService;
-            _linksService = linksService;
+        //private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, ISettingsService settingsService, List<string> added)
+        //{
+        //    _readabilityService = readabilityService;
+        //    _linksService = linksService;
 
-            _added = added;
+        //    _added = added;
 
+        //    _settings = settingsService.Get();
+
+        //    _checkLinks = _settings.Any(s => s.Alias == KnownStrings.CheckLinksAlias && s.Value.ToString() == "1");
+        //    _checkReadability = _settings.Any(s => s.Alias == KnownStrings.CheckReadabilityAlias && s.Value.ToString() == "1");
+        //    _checkSafeBrowsing = _settings.Any(s => s.Alias == KnownStrings.CheckSafeBrowsingAlias && s.Value.ToString() == "1");
+        //    _apiKey = _settings.First(s => s.Alias == KnownSettingAlias.GoogleApiKey).Value.ToString();
+        //}
+
+        public ContentChecker() { 
+            _readabilityService = new ReadabilityService();
+            _linksService = new LinksService();
+
+            var settingsService = new SettingsService();
+
+            _added = new List<string>();
             _settings = settingsService.Get();
 
-            _checkLinks = _settings.Any(s => s.Alias == Constants.CheckLinksAlias && s.Value.ToString() == "1");
-            _checkReadability = _settings.Any(s => s.Alias == Constants.CheckReadabilityAlias && s.Value.ToString() == "1");
-            _checkSafeBrowsing = _settings.Any(s => s.Alias == Constants.CheckSafeBrowsingAlias && s.Value.ToString() == "1");
+            _checkLinks = _settings.Any(s => s.Alias == KnownStrings.CheckLinksAlias && s.Value.ToString() == "1");
+            _checkReadability = _settings.Any(s => s.Alias == KnownStrings.CheckReadabilityAlias && s.Value.ToString() == "1");
+            _checkSafeBrowsing = _settings.Any(s => s.Alias == KnownStrings.CheckSafeBrowsingAlias && s.Value.ToString() == "1");
             _apiKey = _settings.First(s => s.Alias == KnownSettingAlias.GoogleApiKey).Value.ToString();
         }
 
@@ -64,10 +81,10 @@ namespace Preflight
                 switch (prop.PropertyType.PropertyEditorAlias)
                 {
                     case KnownPropertyAlias.Grid:
-                        response.Properties.AddRange(CheckNestedEditor(prop, Constants.RteJsonPath));
+                        response.Properties.AddRange(CheckNestedEditor(prop, KnownStrings.RteJsonPath));
                         break;
                     case KnownPropertyAlias.Archetype:
-                        response.Properties.AddRange(CheckNestedEditor(prop, Constants.ArchetypeRteJsonPath));
+                        response.Properties.AddRange(CheckNestedEditor(prop, KnownStrings.ArchetypeRteJsonPath));
                         break;
                     case KnownPropertyAlias.Rte:
                         response.Properties.Add(CheckSingleEditor(prop));
@@ -101,7 +118,7 @@ namespace Preflight
                 foreach (KeyValuePair<string, string> term in autoreplace)
                 {
                     string pattern = $@"\b{term.Key}\b";
-                    prop.Value = Regex.Replace(prop.Value.ToString(), pattern, term.Value, RegexOptions.IgnoreCase);
+                    prop.SetValue(Regex.Replace(prop.GetValue().ToString(), pattern, term.Value, RegexOptions.IgnoreCase));
                 }
             }
 
@@ -116,12 +133,14 @@ namespace Preflight
         /// <returns></returns>
         private IEnumerable<PreflightPropertyResponseModel> CheckNestedEditor(Property prop, string editorPath)
         {
-            if (prop.Value == null)
+            var propValue = prop.GetValue();
+
+            if (propValue == null)
             {
                 return null;
             }
 
-            JObject asJson = JObject.Parse(prop.Value.ToString());
+            JObject asJson = JObject.Parse(propValue.ToString());
             IEnumerable<JToken> rtes = asJson.SelectTokens(editorPath);
 
             string name = prop.PropertyType.Name;
@@ -130,7 +149,7 @@ namespace Preflight
 
             foreach (JToken rte in rtes)
             {
-                JToken value = rte.SelectToken(Constants.RteValueJsonPath);
+                JToken value = rte.SelectToken(KnownStrings.RteValueJsonPath);
                 if (value == null) continue;
 
                 string val = value.ToString();
@@ -157,12 +176,14 @@ namespace Preflight
         /// <returns></returns>
         private PreflightPropertyResponseModel CheckSingleEditor(Property prop)
         {
-            if (prop.Value == null)
+            object propValue = prop.GetValue();
+
+            if (propValue == null)
             {
                 return null;
             }
 
-            string val = prop.Value.ToString();
+            string val = propValue.ToString();
 
             ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
             List<BrokenLinkModel> links = _linksService.Check(val, _checkLinks, _checkSafeBrowsing, _apiKey);

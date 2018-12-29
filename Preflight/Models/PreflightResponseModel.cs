@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using Preflight.Constants;
 
 namespace Preflight.Models
 {
@@ -11,13 +12,13 @@ namespace Preflight.Models
         [JsonProperty("failed")]
         public bool Failed { get; set; }
 
-        [JsonProperty(Constants.CheckLinksAlias)]
+        [JsonProperty(KnownStrings.CheckLinksAlias)]
         public bool CheckLinks { get; set; }
 
-        [JsonProperty(Constants.CheckReadabilityAlias)]
+        [JsonProperty(KnownStrings.CheckReadabilityAlias)]
         public bool CheckReadability { get; set; }
 
-        [JsonProperty(Constants.CheckSafeBrowsingAlias)]
+        [JsonProperty(KnownStrings.CheckSafeBrowsingAlias)]
         public bool CheckSafeBrowsing { get; set; }
 
         public PreflightResponseModel()
