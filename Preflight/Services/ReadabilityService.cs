@@ -88,7 +88,7 @@ namespace Preflight.Services
                 SentenceLength = Math.Round(asl, 1),
                 LongWords = longWords.OrderBy(l => l).ToList(),
                 Blacklist = blacklisted.OrderBy(l => l).ToList(),
-                Failed = score < readabilityMin || score > readabilityMax || blacklisted.Any()
+                Failed = score < readabilityMin || score > readabilityMax || blacklisted.Any() || longWords.Any()
             };
         }
 

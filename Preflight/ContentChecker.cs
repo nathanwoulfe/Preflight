@@ -25,33 +25,17 @@ namespace Preflight
 
         private readonly string _apiKey;
 
-        // todo => v8 refactoring to inject it all
-        //public ContentChecker() : this(new ReadabilityService(), new LinksService(), new SettingsService(), new List<string>())
-        //{
-        //}
+        public ContentChecker() : this(new ReadabilityService(), new LinksService(), new SettingsService(), new List<string>())
+        {
+        }
 
-        //private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, ISettingsService settingsService, List<string> added)
-        //{
-        //    _readabilityService = readabilityService;
-        //    _linksService = linksService;
+        private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, ISettingsService settingsService, List<string> added)
+        {
+            _readabilityService = readabilityService;
+            _linksService = linksService;
 
-        //    _added = added;
+            _added = added;
 
-        //    _settings = settingsService.Get();
-
-        //    _checkLinks = _settings.Any(s => s.Alias == KnownStrings.CheckLinksAlias && s.Value.ToString() == "1");
-        //    _checkReadability = _settings.Any(s => s.Alias == KnownStrings.CheckReadabilityAlias && s.Value.ToString() == "1");
-        //    _checkSafeBrowsing = _settings.Any(s => s.Alias == KnownStrings.CheckSafeBrowsingAlias && s.Value.ToString() == "1");
-        //    _apiKey = _settings.First(s => s.Alias == KnownSettingAlias.GoogleApiKey).Value.ToString();
-        //}
-
-        public ContentChecker() { 
-            _readabilityService = new ReadabilityService();
-            _linksService = new LinksService();
-
-            var settingsService = new SettingsService();
-
-            _added = new List<string>();
             _settings = settingsService.Get();
 
             _checkLinks = _settings.Any(s => s.Alias == KnownStrings.CheckLinksAlias && s.Value.ToString() == "1");
@@ -133,7 +117,7 @@ namespace Preflight
         /// <returns></returns>
         private IEnumerable<PreflightPropertyResponseModel> CheckNestedEditor(Property prop, string editorPath)
         {
-            var propValue = prop.GetValue();
+            object propValue = prop.GetValue();
 
             if (propValue == null)
             {
@@ -155,14 +139,16 @@ namespace Preflight
                 string val = value.ToString();
 
                 ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
-                List<BrokenLinkModel> links = _linksService.Check(val, _checkLinks, _checkSafeBrowsing, _apiKey);
+                List<BrokenLinkModel> safeBrowsing = _checkSafeBrowsing ? _linksService.CheckSafeBrowsing(val, _apiKey) : new List<BrokenLinkModel>();
+                List<BrokenLinkModel> links = _checkLinks ? _linksService.Check(val, safeBrowsing) : new List<BrokenLinkModel>();
 
                 response.Add(new PreflightPropertyResponseModel
                 {
                     Name = SetName(name),
                     Readability = readability,
                     Links = links,
-                    Failed = _checkReadability && readability.Failed || links.Any()
+                    SafeBrowsing = safeBrowsing,
+                    Failed = _checkReadability && readability.Failed || links.Any() || safeBrowsing.Any()
                 });
             }
 
@@ -186,13 +172,15 @@ namespace Preflight
             string val = propValue.ToString();
 
             ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
-            List<BrokenLinkModel> links = _linksService.Check(val, _checkLinks, _checkSafeBrowsing, _apiKey);
+            List<BrokenLinkModel> safeBrowsing = _checkSafeBrowsing ? _linksService.CheckSafeBrowsing(val, _apiKey) : new List<BrokenLinkModel>();
+            List<BrokenLinkModel> links = _checkLinks ? _linksService.Check(val, safeBrowsing) : new List<BrokenLinkModel>();
 
             return new PreflightPropertyResponseModel
             {
                 Name = prop.PropertyType.Name,
                 Readability = readability,
                 Links = links,
+                SafeBrowsing = safeBrowsing,
                 Failed = _checkReadability && readability.Failed || links.Any()
             };
         }
@@ -202,7 +190,7 @@ namespace Preflight
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private static IEnumerable<Property> GetProperties(IContent content)
+        private static IEnumerable<Property> GetProperties(IContentBase content)
         {
             return content.Properties
                 .Where(p => p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Grid ||
@@ -217,7 +205,7 @@ namespace Preflight
         /// <returns></returns>
         private string SetName(string name)
         {
-            string response = _added.IndexOf(name) != -1 ? name + " (Editor " + (_added.IndexOf(name) + 2) + ")" : name;
+            string response = _added.IndexOf(name) != -1 ? $"{name} (Editor {_added.IndexOf(name) + 2})" : name;
             _added.Add(name);
 
             return response;

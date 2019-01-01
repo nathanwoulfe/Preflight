@@ -5,24 +5,22 @@
         this.loaded = false;
         this.settings = {};
 
-        const currentNodeId = editorState.current.id;
-
         /**
          * 
          */
         const checkProperties = () => {
+            this.properties.forEach(p => {
+                this.blacklistFailed = this.blacklistFailed || p.readability.blacklist.length > 0;
+                this.longWordsFailed = this.longWordsFailed || p.readability.longWords.length > 0;
 
-            if (this.checkReadability) {
-                this.blacklist = this.properties.filter(p => p.readability.blacklist.length);
+                this.brokenLinksFailed = this.brokenLinksFailed || p.links.length > 0;
+                this.safeBrowsingFailed = this.safeBrowsingFailed || p.safeBrowsing.length > 0;
 
-                this.failedReadability = this.properties.filter(p =>
-                    p.readability.score < this.readabilityTargetMin || p.readability.score > this.readabilityTargetMax
-                );
-            }
+                this.readabilityFailed = this.readabilityFailed ||
+                    (p.readability.score < this.settings.readabilityTargetMin ||
+                        p.readability.score > this.settings.readabilityTargetMax);
 
-            if (this.checkLinks) {
-                this.brokenLinks = this.properties.filter(p => p.links.length);
-            }
+            });
         };
 
         /**
@@ -51,16 +49,21 @@
          */
         this.failedTestsString = () => {
             const failedTests = [];
-            if (this.failedReadability) {
+
+            if (this.readabilityFailed) {
                 failedTests.push('fails the readability test');
             }
 
-            if (this.brokenLinks && this.brokenLinks.length) {
-                failedTests.push('contains broken or invalid/unsafe links');
+            if (this.brokenLinksFailed || this.safeBrowsingFailed) {
+                failedTests.push('contains broken or unsafe links');
             }
 
-            if (this.blacklist) {
+            if (this.blacklistFailed) {
                 failedTests.push('contains blacklisted words');
+            }
+
+            if (this.longWordsFailed) {
+                failedTests.push('contains long words');
             }
 
             if (failedTests.length === 1) {
@@ -80,7 +83,7 @@
          */
         this.preflight = () => {
             this.loaded = false;
-            preflightService.check(currentNodeId)
+            preflightService.check(editorState.current.id)
                 .then(resp => {
                     if (resp.status === 200) {
                         bindResults(resp.data);
@@ -105,18 +108,7 @@
                 }
             };
         };
-
-        /**
-         * 
-         */
-        this.resultGradient = () => 
-            `linear-gradient(90deg, 
-            #fe6561 ${this.settings.readabilityTargetMin - 15}%, 
-            #f9b945 ${this.settings.readabilityTargetMin}%, 
-            #35c786,
-            #f9b945 ${this.settings.readabilityTargetMax}%, 
-            #fe6561 ${this.settings.readabilityTargetMax + 15}%)`;
-        
+      
         /**
          * 
          */
@@ -125,6 +117,8 @@
                 resp.data.forEach(v => {
                     this.settings[v.alias] = v.value;
                 });
+
+                this.preflight();
             });
     }
 

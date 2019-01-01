@@ -5,7 +5,7 @@
     "description": "Readability result must be great than this value",
     "tab": "tab101",
     "view": "views/propertyeditors/slider/slider.html",
-    "value": "60",
+    "value": "60"
   },
   {
     "alias": "readabilityTargetMax",
@@ -13,7 +13,7 @@
     "description": "Readability result should be lower than this value",
     "tab": "tab101",
     "view": "views/propertyeditors/slider/slider.html",
-    "value": "110"
+    "value": "100"
   },
   {
     "alias": "longWordSyllables",
@@ -22,14 +22,6 @@
     "tab": "tab101",
     "view": "views/propertyeditors/slider/slider.html",
     "value": "5"
-  },
-  {
-    "alias": "googleApiKey",
-    "label": "Google SafeBrowsing API key",
-    "description": "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites",
-    "tab": "tab101",
-    "view": "views/propertyeditors/textbox/textbox.html",
-    "value": "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw"
   },
   {
     "alias": "whitelist",
@@ -50,7 +42,7 @@
   {
     "alias": "autoreplace",
     "label": "Auto-replace",
-    "description": "Pipe-separated list of terms to auto-replace in preflight checks - eg 'replace me|new text'",
+    "description": "Pipe-separated list of terms to auto-replace in preflight checks - eg 'replace me|new text'. Autoreplace only runs in the save event handler.",
     "tab": "tab103",
     "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
     "value": "replacethis|new term"
@@ -58,7 +50,7 @@
   {
     "alias": "bindSaveHandler",
     "label": "Run Preflight on save",
-    "description": "Set to true and Preflight will run on all saves, and alert users to any errors. Dialog will not display when content passes all checks.",
+    "description": "Set to true and Preflight will run on all saves, and alert users to any errors.",
     "tab": "tab104",
     "view": "views/propertyeditors/boolean/boolean.html",
     "value": 0
@@ -85,7 +77,7 @@
     "description": "Set to true and Preflight will apply the replacements mapped in the Auto-replace config.",
     "tab": "tab104",
     "view": "views/propertyeditors/boolean/boolean.html",
-    "value": 1
+    "value": 0
   },
   {
     "alias": "checkSafeBrowsing",
@@ -93,6 +85,14 @@
     "description": "Set to true and Preflight will check links for potential malware and bad actors.",
     "tab": "tab104",
     "view": "views/propertyeditors/boolean/boolean.html",
-    "value": 1
+    "value": 0
+  },
+  {
+    "alias": "googleApiKey",
+    "label": "Google SafeBrowsing API key",
+    "description": "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites",
+    "tab": "tab104",
+    "view": "views/propertyeditors/textbox/textbox.html",
+    "value": "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw"
   }
 ]

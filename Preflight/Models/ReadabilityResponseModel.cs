@@ -20,6 +20,9 @@ namespace Preflight.Models
         [JsonProperty("blacklist")]
         public List<string> Blacklist { get; set; }
 
+        /// <summary>
+        /// Property will fail if readability is outside the range, or blacklisted/long words exist
+        /// </summary>
         [JsonProperty("failed")]
         public bool Failed { get; set; }
 

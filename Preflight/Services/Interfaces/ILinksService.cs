@@ -5,6 +5,7 @@ namespace Preflight.Services.Interfaces
 {
     public interface ILinksService
     {
-        List<BrokenLinkModel> Check(string text, bool checkLinks, bool checkSafeBrowsing, string apiKey);
+        List<BrokenLinkModel> Check(string text, List<BrokenLinkModel> safeBrowsingResult);
+        List<BrokenLinkModel> CheckSafeBrowsing(string text, string apiKey);
     }
 }

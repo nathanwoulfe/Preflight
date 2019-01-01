@@ -10,8 +10,13 @@ $umbGreen: #00aea2;
 
     &-settings {
         .umb-control-group {
-            position:relative;
+            position: relative;
         }
+    }
+
+    .flex {
+        display: flex;
+        margin-top: 30px;
     }
 
     .alert {
@@ -20,8 +25,59 @@ $umbGreen: #00aea2;
         }
     }
 
-    .failed {
-        color: $red;
+    .disabled {
+        background: $grey;
+
+        &-color, .icon {
+            color: #68676b;
+        }
+
+        &-bg {
+            color: #68676b;
+            background: $grey;
+        }
+    }
+
+    .fail {
+        background: rgba($red, 0.075);
+
+        &-color, .icon {
+            color: $red;
+        }
+
+        &-bg {
+            color: #fff;
+            background: $red;
+        }
+    }
+
+    .pass {
+        background: rgba($green, 0.075);
+
+        &-color, .icon {
+            color: $green;
+        }
+
+        &-bg {
+            color: #fff;
+            background: $green;
+        }
+    }
+
+    .state-icon {
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 15px;
+        width: 42px;
+        height: 42px;
+        min-width:42px;
+        border-radius: 50%;
+
+        .icon {
+            font-size: 22px;
+        }
     }
 
     .readability-result {
@@ -35,6 +91,10 @@ $umbGreen: #00aea2;
         &.unsafe {
             color: $red;
         }
+    }
+
+    h5 {
+        margin-top: 0;
     }
 
     .title {
@@ -60,12 +120,12 @@ $umbGreen: #00aea2;
     }
 
     .badge-list {
-        margin:0 -5px -5px;
-        display:flex;
-        flex-wrap:wrap;
-        
+        margin: 0 -5px -5px;
+        display: flex;
+        flex-wrap: wrap;
+
         .umb-badge {
-            margin:0 5px 5px;
+            margin: 0 5px 5px;
         }
     }
 
@@ -74,7 +134,7 @@ $umbGreen: #00aea2;
         border-bottom: 1px solid #e9e9eb;
 
         &:last-child {
-            border-bottom:0;
+            border-bottom: 0;
         }
 
         &--label {
@@ -83,28 +143,25 @@ $umbGreen: #00aea2;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-weight:bold;
+            font-weight: bold;
             padding: 10px;
             display: flex;
 
             &:hover {
                 background: $grey;
             }
-
-            &.active {
-            }
         }
 
         &--cards {
-            display:flex;
-            justify-content:center;
-            text-align:center;
-            padding:10px;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
         }
 
         &--results {
-            padding:10px;
-            margin-bottom:15px;
+            padding: 10px;
+            margin-bottom: 15px;
 
             &.collapsed {
                 display: none;
@@ -116,27 +173,20 @@ $umbGreen: #00aea2;
             font-size: 18px;
             line-height: 1.4;
             padding-top: 4px;
-
-            &.fail {
-                background: $red;
-                color:#fff;
-            }
-
-            &.pass {
-                background: $green;
-                color:#fff;
-            }
+            padding-bottom: 2px;
         }
     }
 
     .card {
-        display:flex;
-        flex-direction:column;
-        padding:20px;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        border-radius: 6px;
 
         &-score {
-            font-size:36px;
-            margin-bottom:10px;
+            font-size: 36px;
+            line-height: 1;
+            margin-bottom: 10px;
         }
     }
 }

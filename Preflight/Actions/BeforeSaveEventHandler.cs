@@ -39,7 +39,7 @@ namespace Preflight.Actions
             // only do this in save handler as there's no point in updating if it's not being saved (potentially)
             if (settings.Any(s => s.Alias == KnownStrings.DoAutoreplace && s.Value.ToString() == "1"))
             {
-                content = checker.Autoreplace(content);
+                _ = checker.Autoreplace(content);
             }
 
             PreflightResponseModel result = checker.Check(content);
@@ -48,13 +48,13 @@ namespace Preflight.Actions
             if (result.Failed == false) return;
 
             // todo => v8 fix
-            //content.AdditionalData.Remove("SaveCancelled");
-            //content.AdditionalData.Remove("CancellationReason");
-            //content.AdditionalData.Remove("PreflightResponse");
+            //e.AdditionalData.Remove("SaveCancelled");
+            //e.AdditionalData.Remove("CancellationReason");
+            //e.AdditionalData.Remove("PreflightResponse");
 
-            //content.AdditionalData.Add("CancellationReason", KnownStrings.ContentFailedChecks);
-            //content.AdditionalData.Add("PreflightResponse", result);
-            //content.AdditionalData.Add("SaveCancelled", DateTime.Now);
+            //e.AdditionalData.Add("CancellationReason", KnownStrings.ContentFailedChecks);
+            //e.AdditionalData.Add("PreflightResponse", result);
+            //e.AdditionalData["SaveCancelled"] = DateTime.Now;
 
             e.Cancel = true;
         }

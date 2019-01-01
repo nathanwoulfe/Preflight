@@ -13,7 +13,9 @@
     "~/App_Plugins/preflight/backoffice/controllers/preflight.dialog.controller.js",
     "~/App_Plugins/preflight/backoffice/controllers/preflight.dashboard.controller.js",
     "~/App_Plugins/preflight/backoffice/controllers/preflight.help.overlay.controller.js",
-    "~/App_Plugins/preflight/backoffice/interceptors/preflight.save.interceptor.js"
+    "~/App_Plugins/preflight/backoffice/interceptors/preflight.save.interceptor.js",
+    "~/App_Plugins/preflight/backoffice/directives/preflight.card.directive.js",
+    "~/App_Plugins/preflight/backoffice/directives/preflight.stateicon.directive.js"
   ],
   "css": [
     "~/App_Plugins/preflight/backoffice/css/styles.css"

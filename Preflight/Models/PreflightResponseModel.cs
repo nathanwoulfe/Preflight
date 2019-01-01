@@ -36,6 +36,9 @@ namespace Preflight.Models
         [JsonProperty("links")]
         public List<BrokenLinkModel> Links { get; set; }
 
+        [JsonProperty("safeBrowsing")]
+        public List<BrokenLinkModel> SafeBrowsing { get; set; }
+
         [JsonProperty("readability")]
         public ReadabilityResponseModel Readability { get; set; }
 

@@ -1,160 +1,160 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using Newtonsoft.Json;
+using Preflight.Constants;
+using Preflight.Extensions;
+using Preflight.Models;
+using Preflight.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Runtime.Caching;
 using System.Web;
-using HtmlAgilityPack;
-using Newtonsoft.Json;
-using Preflight.Constants;
-using Preflight.Models;
-using Preflight.Services.Interfaces;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 
 namespace Preflight.Services
 {
     public class LinksService : ILinksService
     {
         /// <summary>
-        /// Return a list of broken links (href and link text)
-        /// Checks internal links by node, fails relative internal links, checks external links
+        /// 
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="checkLinks"></param>
-        /// <param name="checkSafeBrowsing"></param>
-        public List<BrokenLinkModel> Check(string text, bool checkLinks = true, bool checkSafeBrowsing = true, string apiKey = null)
+        /// <param name="apiKey"></param>
+        /// <returns></returns>
+        public List<BrokenLinkModel> CheckSafeBrowsing(string text, string apiKey)
         {
             List<BrokenLinkModel> response = new List<BrokenLinkModel>();
 
-            if (checkLinks == false && checkSafeBrowsing == false) return response;
+            if (!apiKey.HasValue()) return response;
 
-            try
+            var doc = new HtmlDocument();
+            doc.LoadHtml(text);
+
+            HtmlNodeCollection links = doc.DocumentNode.SelectNodes(KnownStrings.HrefXPath);
+
+            if (links == null || !links.Any()) return response;
+
+            string[] hrefs = links.Select(l => l.GetAttributeValue("href", string.Empty))
+                .Where(l => l.StartsWith("http")).ToArray();
+
+            // check for cached responses - avoids request when page is being resaved
+            MemoryCache cache = MemoryCache.Default;
+            List<BrokenLinkModel> fromCache = new List<BrokenLinkModel>();
+
+            foreach (string href in hrefs)
             {
-                var doc = new HtmlDocument();
-                doc.LoadHtml(text);
+                var cacheItem = (BrokenLinkModel)cache.Get(KnownStrings.CacheKey + href);
+                if (null == cacheItem) continue;
 
-                HtmlNodeCollection links = doc.DocumentNode.SelectNodes(KnownStrings.HrefXPath);
-                SafeBrowsingResponseModel safeBrowsingResult = null;
+                fromCache.Add(cacheItem);
+                hrefs = hrefs.Except(href.AsEnumerableOfOne()).ToArray();
+            }
 
-                if (links != null && links.Any())
+
+            SafeBrowsingResponseModel safeBrowsingResult = SafeBrowsingLookup(hrefs, apiKey);
+
+            if (safeBrowsingResult.Matches.Any())
+            {
+                response.AddRange(safeBrowsingResult.Matches.Select(m => new BrokenLinkModel
                 {
-                    if (checkSafeBrowsing)
-                    {
-                        string[] hrefs = links.Select(l => l.GetAttributeValue("href", string.Empty))
-                            .Where(l => l.StartsWith("http")).ToArray();
+                    Href = m.Threat.Url,
+                    Status = m.ThreatType,
+                    Unsafe = true,
+                    Text = links.First(l => l.GetAttributeValue("href", string.Empty) == m.Threat.Url)
+                        .InnerText
+                }));
 
-                        // check for cached responses - avoids request when page is being resaved
-                        MemoryCache cache = MemoryCache.Default;
-                        List<BrokenLinkModel> fromCache = new List<BrokenLinkModel>();
-
-                        foreach (string href in hrefs)
-                        {
-                            var cacheItem = (BrokenLinkModel) cache.Get(KnownStrings.CacheKey + href);
-                            if (null == cacheItem) continue;
-
-                            fromCache.Add(cacheItem);
-                            hrefs = hrefs.Except(href.AsEnumerableOfOne()).ToArray();
-                        }
-
-                        if (!string.IsNullOrEmpty(apiKey))
-                        {
-                            safeBrowsingResult = SafeBrowsingLookup(hrefs, apiKey);
-
-                            if (safeBrowsingResult.Matches.Any())
-                            {
-                                response.AddRange(safeBrowsingResult.Matches.Select(m => new BrokenLinkModel
-                                {
-                                    Href = m.Threat.Url,
-                                    Status = m.ThreatType,
-                                    Unsafe = true,
-                                    Text = links.First(l => l.GetAttributeValue("href", string.Empty) == m.Threat.Url)
-                                        .InnerText
-                                }));
-
-                                foreach (BrokenLinkModel item in response)
-                                {
-                                    cache.Add(KnownStrings.CacheKey + item.Href, item,
-                                        new CacheItemPolicy {AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(3600)});
-                                }
-                            }
-                        }
-
-                        // add cached results
-                        response.AddRange(fromCache);
-                    }
-
-                    if (checkLinks)
-                    {
-                        // only check links marked as safe - check all if no result from lookup
-                        IEnumerable<HtmlNode> linksToCheck = links.ToList();
-                        if (safeBrowsingResult != null)
-                        {
-                            linksToCheck = !safeBrowsingResult.Matches.Any()
-                                ? links.ToList()
-                                : links.Where(l =>
-                                    safeBrowsingResult.Matches.All(m =>
-                                        m.Threat.Url != l.GetAttributeValue("href", string.Empty)));
-                        }
-
-                        if (linksToCheck.Any())
-                        {
-                            foreach (HtmlNode link in linksToCheck)
-                            {
-                                string href = link.GetAttributeValue("href", string.Empty);
-                                string linkText = link.InnerText;
-
-                                if (!string.IsNullOrEmpty(href) && Uri.IsWellFormedUriString(href, UriKind.Absolute))
-                                {
-                                    var uri = new Uri(href);
-
-                                    if (uri.Host == HttpContext.Current.Request.Url.Host)
-                                    {
-                                        response.Add(new BrokenLinkModel()
-                                        {
-                                            Href = href,
-                                            Text = linkText,
-                                            Status = "Invalid internal link"
-                                        });
-                                    }
-                                    else
-                                    {
-                                        HttpStatusCode status = GetHeaders(href);
-
-                                        if (status != HttpStatusCode.OK)
-                                        {
-                                            response.Add(new BrokenLinkModel()
-                                            {
-                                                Href = href,
-                                                Text = linkText,
-                                                Status = "Broken/unavailable (" + (int) status + ")"
-                                            });
-                                        }
-                                    }
-                                }
-                                else if (string.IsNullOrEmpty(href) || Uri.IsWellFormedUriString(href, UriKind.Relative))
-                                {
-                                    // is a relative link - fail it.
-                                    response.Add(new BrokenLinkModel()
-                                    {
-                                        Status = string.IsNullOrEmpty(href) ? "Href not set" : "Invalid internal link",
-                                        Href = href,
-                                        Text = linkText
-                                    });
-                                }
-                            }
-                        }
-                    }
+                foreach (BrokenLinkModel item in response)
+                {
+                    cache.Add(KnownStrings.CacheKey + item.Href, item,
+                        new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(3600) });
                 }
             }
-            catch (Exception ex)
-            {
-                //LogHelper.Error(GetType(), ex.Message, ex);
-            }
+
+            // add cached results
+            response.AddRange(fromCache);
 
             return response;
         }
 
+        /// <summary>
+        /// Return a list of broken links (href and link text)
+        /// Checks internal links by node, fails relative internal links, checks external links
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="safeBrowsingResult"></param>
+        public List<BrokenLinkModel> Check(string text, List<BrokenLinkModel> safeBrowsingResult)
+        {
+            List<BrokenLinkModel> response = new List<BrokenLinkModel>();
+
+            var doc = new HtmlDocument();
+            doc.LoadHtml(text);
+
+            HtmlNodeCollection links = doc.DocumentNode.SelectNodes(KnownStrings.HrefXPath);
+
+            if (links == null || !links.Any()) return response;
+
+            // filter out safebrowsing results if any exist
+            IEnumerable<HtmlNode> linksToCheck = links.ToList();
+            if (safeBrowsingResult != null && safeBrowsingResult.Any())
+            {
+                linksToCheck = links.Where(l =>
+                    safeBrowsingResult.All(m =>
+                        m.Href != l.GetAttributeValue("href", string.Empty)));
+            }
+
+            if (!linksToCheck.Any()) return response;
+
+            foreach (HtmlNode link in linksToCheck)
+            {
+                string href = link.GetAttributeValue("href", string.Empty);
+
+                var responseItem = new BrokenLinkModel
+                {
+                    Href = href,
+                    Text = link.InnerText
+                };
+
+                if (href.HasValue())
+                {
+                    if (Uri.IsWellFormedUriString(href, UriKind.Absolute))
+                    {
+                        var uri = new Uri(href);
+
+                        if (uri.Host == HttpContext.Current.Request.Url.Host)
+                        {
+                            responseItem.Status = "Invalid internal link";
+                        }
+                        else
+                        {
+                            HttpStatusCode status = GetHeaders(href);
+
+                            if (status != HttpStatusCode.OK)
+                            {
+                                responseItem.Status = $"Broken/unavailable ({(int)status})";
+                            }
+                        }
+                    }
+                    else if (Uri.IsWellFormedUriString(href, UriKind.Relative))
+                    {
+                        responseItem.Status = "Invalid internal link";
+                    }
+                }
+                else
+                {
+                    responseItem.Status = "Href not set";
+                }
+
+                // if status is null, the link is ok
+                if (responseItem.Status.HasValue())
+                {
+                    response.Add(responseItem);
+                }
+            }
+
+            return response;
+        }
 
         /// <summary>
         /// 
@@ -209,7 +209,7 @@ namespace Preflight.Services
         {
             HttpStatusCode result = default(HttpStatusCode);
             WebRequest request = WebRequest.Create(url);
-            
+
             request.Method = WebRequestMethods.Http.Head;
 
             try

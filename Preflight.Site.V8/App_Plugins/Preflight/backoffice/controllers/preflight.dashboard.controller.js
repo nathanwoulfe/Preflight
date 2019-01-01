@@ -7,7 +7,7 @@
         this.tabs = [
             {
                 id: 101,
-                label: 'Settings',
+                label: 'Readability',
                 alias: 'tab101',
                 open: true
             }, {
@@ -89,8 +89,6 @@
                     }
                 });
                  
-                debugger;
-
                 preflightService.saveSettings(settingsToSave)
                     .then(resp => {
                         resp.data
