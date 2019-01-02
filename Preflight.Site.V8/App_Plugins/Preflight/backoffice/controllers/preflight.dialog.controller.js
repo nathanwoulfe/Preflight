@@ -1,6 +1,6 @@
 ﻿(() => {
 
-    function ctrl(editorState, preflightService) {
+    function ctrl($scope, $rootScope, editorState, preflightService) {
 
         this.loaded = false;
         this.settings = {};
@@ -90,7 +90,20 @@
                     }
                 });
         };
-        
+
+        /**
+         * Watch the visibility of the app, then check rootscope for any data to display
+         */
+        $scope.$watch(
+            () => angular.element(document.getElementById('preflight-app')).is(':visible'),
+            (newVal, oldVal) => {
+                if (newVal && newVal !== oldVal) {
+                    if ($rootScope.preflightResult) {
+                        bindResults($rootScope.preflightResult);
+                    }
+                }
+            }
+        );
 
         /**
          * 
@@ -108,7 +121,7 @@
                 }
             };
         };
-      
+
         /**
          * 
          */
@@ -122,6 +135,6 @@
             });
     }
 
-    angular.module('umbraco').controller('preflight.dialog.controller', ['editorState', 'preflightService', ctrl]);
+    angular.module('umbraco').controller('preflight.dialog.controller', ['$scope', '$rootScope', 'editorState', 'preflightService', ctrl]);
 
 })();

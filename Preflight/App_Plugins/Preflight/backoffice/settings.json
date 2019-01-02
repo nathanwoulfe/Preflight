@@ -53,7 +53,7 @@
     "description": "Set to true and Preflight will run on all saves, and alert users to any errors.",
     "tab": "tab104",
     "view": "views/propertyeditors/boolean/boolean.html",
-    "value": 0
+    "value": 1
   },
   {
     "alias": "checkLinks",
@@ -61,7 +61,7 @@
     "description": "Set to true and Preflight will check links for errors (40x, 50x, invalid internal links).",
     "tab": "tab104",
     "view": "views/propertyeditors/boolean/boolean.html",
-    "value": 1
+    "value": 0
   },
   {
     "alias": "checkReadability",

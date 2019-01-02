@@ -4,6 +4,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using Umbraco.Core.Components;
 using Umbraco.Web.Models.ContentEditing;
@@ -26,11 +27,6 @@ namespace Preflight.Actions
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            //var urlHelper =
-            //    new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
-
-            //string url = urlHelper.GetUmbracoApiServiceBaseUrl<ContentController>(controller => controller.PostSave(null));
-
             if (request.RequestUri.AbsolutePath.ToLower() == "/umbraco/backoffice/umbracoapi/content/postsave")
             {
                 return base.SendAsync(request, cancellationToken)
@@ -39,17 +35,23 @@ namespace Preflight.Actions
                         HttpResponseMessage response = task.Result;
                         try
                         {
+                            request.Properties.TryGetValue("MS_HttpContext", out object contextObject);
+                            var context = contextObject as HttpContextWrapper;
+
+                            if (context == null || !context.Items.Contains("PreflightResponse"))
+                                return response;
+
                             HttpContent data = response.Content;
                             var content = ((ObjectContent)data).Value as ContentItemDisplay;
 
-                            if (content != null && content.AdditionalData.ContainsKey("SaveCancelled") && content.AdditionalData.ContainsKey("PreflightResponse"))
+                            if (content != null && context.Items["PreflightNodeId"] as int? == content.Id)
                             {
                                 // if preflight response exists, ditch all other notifications
                                 content.Notifications.Clear();
                                 content.Notifications.Add(new Notification
                                 {
                                     Header = KnownStrings.ContentFailedChecks,
-                                    Message = JsonConvert.SerializeObject(content.AdditionalData["PreflightResponse"]),
+                                    Message = JsonConvert.SerializeObject(context.Items["PreflightResponse"]),
                                     NotificationType = SpeechBubbleIcon.Error
                                 });
                                 

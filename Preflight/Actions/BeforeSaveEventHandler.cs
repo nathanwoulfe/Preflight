@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Services;
@@ -39,7 +40,7 @@ namespace Preflight.Actions
             // only do this in save handler as there's no point in updating if it's not being saved (potentially)
             if (settings.Any(s => s.Alias == KnownStrings.DoAutoreplace && s.Value.ToString() == "1"))
             {
-                _ = checker.Autoreplace(content);
+                content = checker.Autoreplace(content);
             }
 
             PreflightResponseModel result = checker.Check(content);
@@ -48,7 +49,10 @@ namespace Preflight.Actions
             if (result.Failed == false) return;
 
             // todo => v8 fix
-            //e.AdditionalData.Remove("SaveCancelled");
+            HttpContext.Current.Items["PreflightResponse"] = result;
+            HttpContext.Current.Items["PreflightNodeId"] = content.Id;
+
+            //content.AdditionalData.Remove("SaveCancelled");
             //e.AdditionalData.Remove("CancellationReason");
             //e.AdditionalData.Remove("PreflightResponse");
 
