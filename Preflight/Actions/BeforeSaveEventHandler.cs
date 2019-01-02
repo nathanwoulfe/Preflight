@@ -48,17 +48,9 @@ namespace Preflight.Actions
             // at least one property on the current document fails the preflight check
             if (result.Failed == false) return;
 
-            // todo => v8 fix
+            // these values are retrieved in the notifications handler, and passed down to the client
             HttpContext.Current.Items["PreflightResponse"] = result;
             HttpContext.Current.Items["PreflightNodeId"] = content.Id;
-
-            //content.AdditionalData.Remove("SaveCancelled");
-            //e.AdditionalData.Remove("CancellationReason");
-            //e.AdditionalData.Remove("PreflightResponse");
-
-            //e.AdditionalData.Add("CancellationReason", KnownStrings.ContentFailedChecks);
-            //e.AdditionalData.Add("PreflightResponse", result);
-            //e.AdditionalData["SaveCancelled"] = DateTime.Now;
 
             e.Cancel = true;
         }
