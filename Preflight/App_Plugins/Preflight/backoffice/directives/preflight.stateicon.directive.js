@@ -6,7 +6,7 @@
         </div>`;
 
     function preflightStateIcon() {
-        const card = {
+        const dir = {
             restrict: 'E',
             scope: {
                 failed: '=',
@@ -26,7 +26,7 @@
             }
         };
 
-        return card;
+        return dir;
     }
 
     angular.module('umbraco').directive('preflightStateIcon', preflightStateIcon);

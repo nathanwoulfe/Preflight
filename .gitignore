@@ -12,7 +12,7 @@
 **/App_Data/cache/*
 **/App_Data/preview/*
 *umbraco.config
-Preflight.Site/App_Plugins/Preflight/**
+Preflight.Site.v8/App_Plugins/Preflight/**
 Preflight/pkg
 Preflight/dist
 Preflight/tmp
@@ -203,6 +203,6 @@ $RECYCLE.BIN/
 
 BuildPackage/artifacts/*
 
-Preflight.Site/umbraco
-Preflight.Site/umbraco_client
-Preflight.Site/Media/
+Preflight.Site.v8/umbraco
+Preflight.Site.v8/umbraco_client
+Preflight.Site.v8/Media/

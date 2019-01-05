@@ -44,7 +44,7 @@
                                                 score="prop.readability.averageSyllables">
                                 </preflight-card>
 
-                                <preflight-card title="Average senetence"
+                                <preflight-card title="Average sentence"
                                                 subtitle="length"
                                                 score="prop.readability.sentenceLength">
                                 </preflight-card>
@@ -55,8 +55,11 @@
                                                       disabled="!vm.checkReadability">
                                 </preflight-state-icon>
                                 <div>
-                                    <h5>Long words ({{ vm.settings.longWordSyllables }} or more syllables)</h5>
-                                    <span ng-if="!prop.readability.longWords.length">No long words found for this property.</span>
+                                    <preflight-result-intro active="vm.checkReadability"
+                                                            heading="Long words ({{ vm.settings.longWordSyllables }} or more syllables)"
+                                                            pass-text="No long words found for this property"
+                                                            pass="prop.readability.longWords.length === 0">
+                                    </preflight-result-intro>
                                     <ul class="badge-list" ng-if="prop.readability.longWords.length">
                                         <li class="umb-badge umb-badge--gray"
                                             ng-repeat="word in prop.readability.longWords | limitTo: (vm.showAllLong ? prop.readability.longWords.length : 5) track by $index"
@@ -76,8 +79,11 @@
                                                       disabled="!vm.checkLinks">
                                 </preflight-state-icon>
                                 <div>
-                                    <h5>Broken links</h5>
-                                    <span ng-if="!prop.links.length">No broken links found for this property.</span>
+                                    <preflight-result-intro active="vm.checkLinks"
+                                                          heading="Broken links"
+                                                          pass-text="No broken links found for this property"
+                                                          pass="prop.links.length === 0">
+                                    </preflight-result-intro>
                                     <ul ng-if="prop.links.length">
                                         <li ng-repeat="link in prop.links track by $index">Link text: {{ link.text }}<br/>Target: {{ link.href }}<br/>Status: {{ link.status }}</li>
                                     </ul>
@@ -89,9 +95,11 @@
                                                       disabled="!vm.checkSafeBrowsing">
                                 </preflight-state-icon>
                                 <div>
-                                    <h5>Safe browsing</h5>
-                                    <span ng-if="!vm.checkSafeBrowsing">This test is currently disabled.</span>
-                                    <span ng-if="vm.checkSafeBrowsing && !prop.safeBrowsing.length">No unsafe links found for this property.</span>
+                                    <preflight-result-intro active="vm.checkSafeBrowsing"
+                                                            heading="Safe browsing"
+                                                            pass-text="No unsafe links found for this property."
+                                                            pass="prop.safeBrowsing.length === 0">
+                                    </preflight-result-intro>
                                     <ul ng-if="prop.safeBrowsing.length">
                                         <li ng-repeat="link in prop.safeBrowsing track by $index">Link text: {{ link.text }}<br/>Target: {{ link.href }}<br/>Status: {{ link.status }}</li>
                                     </ul>
@@ -103,8 +111,11 @@
                                                       disabled="!vm.checkReadability">
                                 </preflight-state-icon>
                                 <div>
-                                    <h5>Blacklisted terms</h5>
-                                    <span ng-if="!prop.readability.blacklist.length">No blacklisted words/phrases for this property.</span>
+                                    <preflight-result-intro active="vm.checkReadability"
+                                                            heading="Blacklisted terms"
+                                                            pass-text="No blacklisted words/phrases found for this property."
+                                                            pass="prop.readability.blacklist.length === 0">
+                                    </preflight-result-intro>
                                     <ul class="badge-list" ng-if="prop.readability.blacklist.length">
                                         <li class="umb-badge umb-badge--gray"
                                             ng-repeat="word in prop.readability.blacklist track by $index | limitTo: (vm.showAllBlacklist ? prop.readability.blacklist.length : 5)"

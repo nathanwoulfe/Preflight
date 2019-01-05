@@ -268,6 +268,7 @@
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.help.overlay.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.card.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.stateicon.directive.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.resultintro.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\interceptors\preflight.save.interceptor.js" />
     <Content Include="App_Plugins\Preflight\backoffice\resources\preflight.service.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.dialog.controller.js" />

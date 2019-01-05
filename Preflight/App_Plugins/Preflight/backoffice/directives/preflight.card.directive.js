@@ -10,7 +10,7 @@
         </div>`;
 
     function preflightCard() {
-        const card = {
+        const dir = {
             restrict: 'E',
             scope: {
                 title: '@?',
@@ -30,7 +30,7 @@
             }
         };
 
-        return card;
+        return dir;
     }
 
     angular.module('umbraco').directive('preflightCard', preflightCard);
