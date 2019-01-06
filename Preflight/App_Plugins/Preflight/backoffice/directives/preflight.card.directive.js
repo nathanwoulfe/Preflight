@@ -20,13 +20,17 @@
             },
             template: template,
             link: scope => {
-                if (scope.failed === true) {
-                    scope.cardClass = 'fail';
-                    scope.cardScoreClass = 'fail-color';
-                } else if (scope.failed === false) {
-                    scope.cardClass = 'pass';
-                    scope.cardScoreClass = 'pass-color';
-                }
+
+                scope.$watch('failed',
+                    () => {
+                        if (scope.failed === true) {
+                            scope.cardClass = 'fail';
+                            scope.cardScoreClass = 'fail-color';
+                        } else if (scope.failed === false) {
+                            scope.cardClass = 'pass';
+                            scope.cardScoreClass = 'pass-color';
+                        }
+                    });
             }
         };
 

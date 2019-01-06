@@ -19,10 +19,13 @@
                 scope.icon = 'power';
                 scope.className = 'disabled';
 
-                if (!scope.disabled) {
-                    scope.icon = scope.failed ? 'delete' : 'check';
-                    scope.className = scope.failed ? 'fail' : 'pass';
-                } 
+                scope.$watch('failed',
+                    () => {
+                        if (!scope.disabled) {
+                            scope.icon = scope.failed ? 'delete' : 'check';
+                            scope.className = scope.failed ? 'fail' : 'pass';
+                        }
+                    });
             }
         };
 

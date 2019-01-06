@@ -1,0 +1,6 @@
+﻿<div ng-controller="preflight.notification.controller as vm">
+    <h4>Content on this page has failed the preflight checks</h4>
+    <p><span ng-if="vm.saveCancelled">The save request has been cancelled. </span>Please review the test results, update the content and re-save.</p>
+    <button class="btn btn-default" ng-click="vm.discard(notification)">Close</button>
+    <button class="btn btn-success" ng-click="vm.switch(notification)">Review</button>
+</div>

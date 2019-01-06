@@ -3,6 +3,7 @@
     public static class KnownSettingAlias
     {
         public const string BindSaveHandler = "bindSaveHandler";
+        public const string CancelSaveOnFail = "cancelSaveOnFail";
         public const string ReadabilityMin = "readabilityTargetMin";
         public const string ReadabilityMax = "readabilityTargetMax";
         public const string LongWordSyllables = "longWordSyllables";

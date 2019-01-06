@@ -1,6 +1,6 @@
 ﻿(() => {
 
-    function interceptor($rootScope) {
+    function interceptor($rootScope, notificationsService) {
         return {
             response: response => {
                 try {
@@ -11,10 +11,14 @@
 
                             if (notification) {
                                 const preflightResponse = JSON.parse(notification.message);
-
-                                notification.message = 'Check the Preflight content app for more details';
-
                                 $rootScope.preflightResult = preflightResponse;
+
+                                response.data.notifications = [];
+
+                                notificationsService.add({
+                                    view: `${Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath}/preflight/backoffice/views/failed.notification.html`,
+                                    args: { saveCancelled: preflightResponse.settings.cancelSaveOnFail }
+                                });
                             }
                         }
                     }
@@ -28,7 +32,7 @@
         };
     }
 
-    angular.module('umbraco').factory('preflight.save.interceptor', ['$rootScope', interceptor]);
+    angular.module('umbraco').factory('preflight.save.interceptor', ['$rootScope', 'notificationsService', interceptor]);
 
     angular.module('umbraco')
         .config(function ($httpProvider) {

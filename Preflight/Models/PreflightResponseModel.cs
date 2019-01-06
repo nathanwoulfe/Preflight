@@ -9,6 +9,9 @@ namespace Preflight.Models
         [JsonProperty("properties")]
         public List<PreflightPropertyResponseModel> Properties { get; set; }
 
+        [JsonProperty("settings")]
+        public IDictionary<string, object> Settings { get; set; }
+
         [JsonProperty("failed")]
         public bool Failed { get; set; }
 
@@ -24,6 +27,7 @@ namespace Preflight.Models
         public PreflightResponseModel()
         {
             Properties = new List<PreflightPropertyResponseModel>();
+            Settings = new Dictionary<string, object>();
             Failed = false;
         }
     }

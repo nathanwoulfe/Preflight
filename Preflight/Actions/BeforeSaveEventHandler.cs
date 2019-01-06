@@ -29,6 +29,7 @@ namespace Preflight.Actions
 
             List<SettingsModel> settings = settingsService.Get();
             int onSave = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.BindSaveHandler).Value);
+            int cancelOnFail = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.CancelSaveOnFail).Value);
 
             if (onSave == 0) return;
 
@@ -52,7 +53,10 @@ namespace Preflight.Actions
             HttpContext.Current.Items["PreflightResponse"] = result;
             HttpContext.Current.Items["PreflightNodeId"] = content.Id;
 
-            e.Cancel = true;
+            if (cancelOnFail == 1)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }

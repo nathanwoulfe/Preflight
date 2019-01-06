@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
+using Preflight.Constants;
 using Preflight.Models;
+using Preflight.Services;
+using Preflight.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Preflight.Constants;
-using Preflight.Services;
-using Preflight.Services.Interfaces;
 using Umbraco.Core.Models;
 
 namespace Preflight
@@ -57,7 +57,8 @@ namespace Preflight
             {
                 CheckLinks = _checkLinks,
                 CheckReadability = _checkReadability,
-                CheckSafeBrowsing = _checkSafeBrowsing
+                CheckSafeBrowsing = _checkSafeBrowsing,
+                Settings = _settings.ToDictionary(s => s.Alias, s => s.Value)
             };
 
             foreach (Property prop in props)

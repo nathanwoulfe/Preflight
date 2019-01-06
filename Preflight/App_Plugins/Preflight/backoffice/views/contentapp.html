@@ -2,7 +2,6 @@
 
     <!--<umb-load-indicator ng-if="!vm.loaded"></umb-load-indicator>-->
 
-    <div ng-click="vm.preflight()" class="btn btn-success" prevent-default>PREFLIGHT</div>
     <div ng-if="vm.loaded">
 
         <div class="alert alert-warning" ng-if="dialogOptions.results.introText">
@@ -36,7 +35,7 @@
                                 <preflight-card title="Reading ease score"
                                                 subtitle="Target {{ vm.settings.readabilityTargetMin }}-{{ vm.settings.readabilityTargetMax }}"
                                                 score="prop.readability.score"
-                                                failed="prop.readability.failed">
+                                                failed="prop.readability.score < vm.settings.readabilityTargetMin || prop.readability.score > vm.settings.readabilityTargetMax">
                                 </preflight-card>
 
                                 <preflight-card title="Average syllables"
@@ -113,7 +112,7 @@
                                 <div>
                                     <preflight-result-intro active="vm.checkReadability"
                                                             heading="Blacklisted terms"
-                                                            pass-text="No blacklisted words/phrases found for this property."
+                                                            pass-text="No blacklisted words/phrases for this property."
                                                             pass="prop.readability.blacklist.length === 0">
                                     </preflight-result-intro>
                                     <ul class="badge-list" ng-if="prop.readability.blacklist.length">

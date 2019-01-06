@@ -56,6 +56,14 @@
     "value": 1
   },
   {
+    "alias": "cancelSaveOnFail",
+    "label": "Cancel save when Preflight tests fail",
+    "description": "Set to true and Preflight will cancel the save event, if tests fail and Preflight is set to run on save.",
+    "tab": "tab104",
+    "view": "views/propertyeditors/boolean/boolean.html",
+    "value": 1
+  },
+  {
     "alias": "checkLinks",
     "label": "Check broken links",
     "description": "Set to true and Preflight will check links for errors (40x, 50x, invalid internal links).",
