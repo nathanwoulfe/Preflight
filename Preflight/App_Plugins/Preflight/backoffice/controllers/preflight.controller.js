@@ -135,6 +135,6 @@
             });
     }
 
-    angular.module('umbraco').controller('preflight.dialog.controller', ['$scope', '$rootScope', 'editorState', 'preflightService', ctrl]);
+    angular.module('umbraco').controller('preflight.controller', ['$scope', '$rootScope', 'editorState', 'preflightService', ctrl]);
 
 })();

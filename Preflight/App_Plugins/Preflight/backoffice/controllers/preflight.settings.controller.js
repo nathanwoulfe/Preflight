@@ -105,6 +105,6 @@
         getSettings();
     }
 
-    angular.module('umbraco').controller('preflight.dashboard.controller', ['notificationsService', 'preflightService', ctrl]);
+    angular.module('umbraco').controller('preflight.settings.controller', ['notificationsService', 'preflightService', ctrl]);
 
 })();

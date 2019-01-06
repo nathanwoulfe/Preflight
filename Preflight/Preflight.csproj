@@ -264,7 +264,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.dashboard.controller.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.settings.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.help.overlay.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.notification.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.card.directive.js" />
@@ -272,7 +272,7 @@
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.resultintro.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\interceptors\preflight.save.interceptor.js" />
     <Content Include="App_Plugins\Preflight\backoffice\resources\preflight.service.js" />
-    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.dialog.controller.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\views\contentapp.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\failed.notification.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\help.overlay.html" />
