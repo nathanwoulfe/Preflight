@@ -4,30 +4,6 @@
 
         this.content = preflightService.getHelpText();
 
-        this.tabs = [
-            {
-                id: 101,
-                label: 'Readability',
-                alias: 'tab101',
-                open: true
-            }, {
-                id: 102,
-                label: 'Black/white lists',
-                alias: 'tab102',
-                open: false
-            }, {
-                id: 103,
-                label: 'Autoreplace',
-                alias: 'tab103',
-                open: false
-            }, {
-                id: 104,
-                label: 'Test types',
-                alias: 'tab104',
-                open: false
-            }
-        ];
-
         const getSettingByAlias = alias => this.settings.filter(v => v.alias === alias)[0];
 
         /**
@@ -36,7 +12,8 @@
         const getSettings = () => {
             preflightService.getSettings()
                 .then(resp => {
-                    this.settings = resp.data;
+                    this.settings = resp.data.settings;
+                    this.tabs = resp.data.tabs;
 
                     this.settings.forEach(v => {
                         if (v.view.indexOf('slider') !== -1) {
@@ -70,8 +47,10 @@
          */
         this.saveSettings = () => {
 
-            const min = parseInt(getSettingByAlias('readabilityTargetMin').value);
-            const max = parseInt(getSettingByAlias('readabilityTargetMax').value);
+            //const min = parseInt(getSettingByAlias('readabilityTargetMin').value);
+            //const max = parseInt(getSettingByAlias('readabilityTargetMax').value);
+            const min = 1;
+            const max = 100;
 
             if (min < max) {
 
@@ -88,13 +67,12 @@
                         v.value = v.value.map(o => o.value).join(',');
                     }
                 });
-                 
+                
                 preflightService.saveSettings(settingsToSave)
                     .then(resp => {
                         resp.data
                             ? notificationsService.success('SUCCESS', 'Settings updated')
                             : notificationsService.error('ERROR', 'Unable to save settings');
-                        getSettings();
                     });
             } else {
                 notificationsService.error('ERROR',

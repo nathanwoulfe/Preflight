@@ -10,12 +10,12 @@
     <div class="form-horizontal">
         <div class="umb-expansion-panel" ng-repeat="tab in vm.tabs">
             <div class="umb-expansion-panel__header" ng-click="tab.open = !tab.open">
-                <div ng-bind="tab.label"></div>
+                <div ng-bind="tab.name"></div>
                 <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !tab.open, 'icon-navigation-down': tab.open }">&nbsp;</ins>
             </div>
 
             <div class="umb-expansion-panel__content" ng-show="tab.open">
-                <umb-property data-element="property-{{ tab.alias }}" ng-repeat="property in vm.settings | filter: { tab: tab.alias }" property="property">
+                <umb-property data-element="property-{{ tab.alias }}" ng-repeat="property in vm.settings | filter: { tab: tab.name } | orderBy: 'order'" property="property">
                     <umb-property-editor model="property"></umb-property-editor>
                 </umb-property>
             </div>

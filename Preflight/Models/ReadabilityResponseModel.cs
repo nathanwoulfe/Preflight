@@ -20,11 +20,23 @@ namespace Preflight.Models
         [JsonProperty("blacklist")]
         public List<string> Blacklist { get; set; }
 
+        [JsonProperty("targetMin")]
+        public int TargetMin { get; set; }
+
+        [JsonProperty("targetMax")]
+        public int TargetMax { get; set; }
+
+        [JsonProperty("longWordSyllables")]
+        public int LongWordSyllables { get; set; }
+
         /// <summary>
         /// Property will fail if readability is outside the range, or blacklisted/long words exist
         /// </summary>
         [JsonProperty("failed")]
         public bool Failed { get; set; }
+
+        [JsonProperty("failedReadability")]
+        public bool FailedReadability { get; set; }
 
         public ReadabilityResponseModel()
         {

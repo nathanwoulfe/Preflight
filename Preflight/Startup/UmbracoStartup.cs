@@ -5,11 +5,11 @@ using System.Web.Configuration;
 using System.Web.Routing;
 using Preflight.Api;
 using Preflight.Constants;
+using Preflight.Plugins;
 using Preflight.Services;
 using Preflight.Services.Interfaces;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
 using Umbraco.Web;
 using Umbraco.Web.UI.JavaScript;
 
@@ -21,7 +21,10 @@ namespace Preflight.Startup
         {
             composition.Container.RegisterSingleton<ILinksService, LinksService>();
             composition.Container.RegisterSingleton<IReadabilityService, ReadabilityService>();
+            composition.Container.RegisterSingleton<ISafeBrowsingService, SafeBrowsingService>();
             composition.Container.RegisterSingleton<ISettingsService, SettingsService>();
+
+            composition.Container.Register<IPreflightPlugin, PreflightPlugin>();
         }
 
         public void Initialize()

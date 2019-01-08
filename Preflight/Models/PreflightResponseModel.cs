@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using Preflight.Constants;
+using Preflight.Plugins;
 
 namespace Preflight.Models
 {
@@ -9,25 +9,27 @@ namespace Preflight.Models
         [JsonProperty("properties")]
         public List<PreflightPropertyResponseModel> Properties { get; set; }
 
-        [JsonProperty("settings")]
-        public IDictionary<string, object> Settings { get; set; }
-
         [JsonProperty("failed")]
         public bool Failed { get; set; }
 
-        [JsonProperty(KnownStrings.CheckLinksAlias)]
+        [JsonProperty("cancelSaveOnFail")]
+        public bool CancelSaveOnFail { get; set; }
+
+        [JsonProperty("hideDisabled")]
+        public bool HideDisabled { get; set; }
+
+        [JsonProperty("checkLinks")]
         public bool CheckLinks { get; set; }
 
-        [JsonProperty(KnownStrings.CheckReadabilityAlias)]
+        [JsonProperty("checkReadability")]
         public bool CheckReadability { get; set; }
 
-        [JsonProperty(KnownStrings.CheckSafeBrowsingAlias)]
+        [JsonProperty("checkSafeBrowsing")]
         public bool CheckSafeBrowsing { get; set; }
 
         public PreflightResponseModel()
         {
             Properties = new List<PreflightPropertyResponseModel>();
-            Settings = new Dictionary<string, object>();
             Failed = false;
         }
     }
@@ -46,6 +48,9 @@ namespace Preflight.Models
         [JsonProperty("readability")]
         public ReadabilityResponseModel Readability { get; set; }
 
+        [JsonProperty("plugins")]
+        public List<PreflightPlugin> Plugins { get; set; }
+
         [JsonProperty("collapsed")]
         public bool Collapsed { get; set; }
 
@@ -56,6 +61,8 @@ namespace Preflight.Models
         {
             Collapsed = true;
             Failed = false;
+
+            Plugins = new List<PreflightPlugin>();
         }
     }
 }

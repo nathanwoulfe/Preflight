@@ -17,7 +17,7 @@
 
                                 notificationsService.add({
                                     view: `${Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath}/preflight/backoffice/views/failed.notification.html`,
-                                    args: { saveCancelled: preflightResponse.settings.cancelSaveOnFail }
+                                    args: { saveCancelled: preflightResponse.cancelSaveOnFail }
                                 });
                             }
                         }

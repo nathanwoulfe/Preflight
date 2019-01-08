@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ClientDependency.Core;
 using Preflight.Constants;
+using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
 
@@ -32,14 +34,13 @@ namespace Preflight.Services
         /// <returns></returns>
         public ReadabilityResponseModel Check(string text, List<SettingsModel> settings)
         {
-            int longWordLength = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.LongWordSyllables).Value);
-            int readabilityMin = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.ReadabilityMin).Value);
-            int readabilityMax = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.ReadabilityMax).Value);
+            int longWordLength = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.LongWordSyllables.Camel()).Value);
+            int readabilityMin = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.ReadabilityMin.Camel()).Value);
+            int readabilityMax = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.ReadabilityMax.Camel()).Value);
 
-            string[] whitelist = ((string)settings.First(s => s.Alias == KnownSettingAlias.Whitelist).Value).Split(',');
-            string[] blacklist = ((string)settings.First(s => s.Alias == KnownSettingAlias.Blacklist).Value).Split(',');
+            string[] whitelist = ((string)settings.First(s => s.Alias == KnownSettings.Whitelist.Camel()).Value).Split(',');
+            string[] blacklist = ((string)settings.First(s => s.Alias == KnownSettings.Blacklist.Camel()).Value).Split(',');
 
-            // Words longer than three syllables
             List<string> longWords = new List<string>();
             List<string> blacklisted = new List<string>();
 
@@ -48,7 +49,7 @@ namespace Preflight.Services
             text = Regex.Replace(text, KnownStrings.CharsToRemove, "").Replace("&amp;", "&");
             text = Regex.Replace(text, KnownStrings.DuplicateSpaces, " ");
 
-            List<string> sentences = text.Split(KnownStrings.WordDelimiters).Where(s => !string.IsNullOrEmpty(s) && s.Length > 3).ToList();
+            List<string> sentences = text.Split(KnownStrings.WordDelimiters).Where(s => s.HasValue() && s.Length > 3).ToList();
 
             // calc words/sentence
             double totalWords = 0;
@@ -56,7 +57,7 @@ namespace Preflight.Services
 
             foreach (string sentence in sentences)
             {
-                List<string> words = sentence.Trim().Split(' ').Where(s => !string.IsNullOrEmpty(s) && !whitelist.Contains(s, StringComparer.OrdinalIgnoreCase)).ToList();
+                List<string> words = sentence.Trim().Split(' ').Where(s => s.HasValue() && !whitelist.Contains(s, StringComparer.OrdinalIgnoreCase)).ToList();
                 totalWords += words.Count;
 
                 foreach (string word in words)
@@ -88,7 +89,11 @@ namespace Preflight.Services
                 SentenceLength = Math.Round(asl, 1),
                 LongWords = longWords.OrderBy(l => l).ToList(),
                 Blacklist = blacklisted.OrderBy(l => l).ToList(),
-                Failed = score < readabilityMin || score > readabilityMax || blacklisted.Any() || longWords.Any()
+                Failed = score < readabilityMin || score > readabilityMax || blacklisted.Any() || longWords.Any(),
+                FailedReadability = score < readabilityMin || score > readabilityMax,
+                TargetMin = readabilityMin,
+                TargetMax = readabilityMax,
+                LongWordSyllables = longWordLength
             };
         }
 

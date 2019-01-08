@@ -15,12 +15,12 @@
 
         <div ng-if="vm.checkLinks || vm.checkReadability || vm.checkSafeBrowsing">
             <div ng-show="!vm.failed" class="alert alert-success">
-                <h3 class="title">Content on this page passes preflight checks. Good job!</h3>
+                <h3 class="title">Content on this page passes all preflight checks. Good job!</h3>
             </div>
 
             <div ng-show="vm.failed">
                 <h3 class="title">That's not great...</h3>
-                <h4 class="intro-text">Content on this page {{ vm.failedTestsString() }}.</h4>
+                <h4 class="intro-text">Content on this page fails one or more preflight checks.</h4>
             </div>
 
             <umb-box>
@@ -33,9 +33,9 @@
                         <div class="preflight-property--results" ng-class="{'collapsed' : prop.collapsed}">
                             <div class="preflight-property--cards">
                                 <preflight-card title="Reading ease score"
-                                                subtitle="Target {{ vm.settings.readabilityTargetMin }}-{{ vm.settings.readabilityTargetMax }}"
+                                                subtitle="Target {{ prop.readability.targetMin }}-{{ prop.readability.targetMax }}"
                                                 score="prop.readability.score"
-                                                failed="prop.readability.score < vm.settings.readabilityTargetMin || prop.readability.score > vm.settings.readabilityTargetMax">
+                                                failed="prop.readability.failedReadability">
                                 </preflight-card>
 
                                 <preflight-card title="Average syllables"
@@ -49,13 +49,11 @@
                                 </preflight-card>
                             </div>
 
-                            <div class="flex">
-                                <preflight-state-icon failed="prop.readability.longWords.length > 0"
-                                                      disabled="!vm.checkReadability">
-                                </preflight-state-icon>
+                            <div class="flex mt-30">
+                                <preflight-state-icon failed="prop.readability.longWords.length > 0" disabled="!vm.checkReadability"></preflight-state-icon>
                                 <div>
                                     <preflight-result-intro active="vm.checkReadability"
-                                                            heading="Long words ({{ vm.settings.longWordSyllables }} or more syllables)"
+                                                            heading="Long words ({{ prop.readability.longWordSyllables }} or more syllables)"
                                                             pass-text="No long words found for this property"
                                                             pass="prop.readability.longWords.length === 0">
                                     </preflight-result-intro>
@@ -73,26 +71,22 @@
                                 </div>
                             </div>
 
-                            <div class="flex">
-                                <preflight-state-icon failed="prop.links.length > 0"
-                                                      disabled="!vm.checkLinks">
-                                </preflight-state-icon>
+                            <div class="flex mt-30" ng-if="!vm.hideDisabled && vm.checkLinks">
+                                <preflight-state-icon failed="prop.links.length > 0" disabled="!vm.checkLinks"></preflight-state-icon>
                                 <div>
                                     <preflight-result-intro active="vm.checkLinks"
-                                                          heading="Broken links"
-                                                          pass-text="No broken links found for this property"
-                                                          pass="prop.links.length === 0">
+                                                            heading="Broken links"
+                                                            pass-text="No broken links found for this property"
+                                                            pass="prop.links.length === 0">
                                     </preflight-result-intro>
                                     <ul ng-if="prop.links.length">
-                                        <li ng-repeat="link in prop.links track by $index">Link text: {{ link.text }}<br/>Target: {{ link.href }}<br/>Status: {{ link.status }}</li>
+                                        <li ng-repeat="link in prop.links track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
                                     </ul>
                                 </div>
                             </div>
 
-                            <div class="flex">
-                                <preflight-state-icon failed="prop.safeBrowsing.length > 0"
-                                                      disabled="!vm.checkSafeBrowsing">
-                                </preflight-state-icon>
+                            <div class="flex mt-30" ng-if="!vm.hideDisabled && vm.checkSafeBrowsing">
+                                <preflight-state-icon failed="prop.safeBrowsing.length > 0" disabled="!vm.checkSafeBrowsing"></preflight-state-icon>
                                 <div>
                                     <preflight-result-intro active="vm.checkSafeBrowsing"
                                                             heading="Safe browsing"
@@ -100,15 +94,13 @@
                                                             pass="prop.safeBrowsing.length === 0">
                                     </preflight-result-intro>
                                     <ul ng-if="prop.safeBrowsing.length">
-                                        <li ng-repeat="link in prop.safeBrowsing track by $index">Link text: {{ link.text }}<br/>Target: {{ link.href }}<br/>Status: {{ link.status }}</li>
+                                        <li ng-repeat="link in prop.safeBrowsing track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
                                     </ul>
                                 </div>
                             </div>
 
-                            <div class="flex">
-                                <preflight-state-icon failed="prop.readability.blacklist.length > 0"
-                                                      disabled="!vm.checkReadability">
-                                </preflight-state-icon>
+                            <div class="flex mt-30">
+                                <preflight-state-icon failed="prop.readability.blacklist.length > 0" disabled="!vm.checkReadability"></preflight-state-icon>
                                 <div>
                                     <preflight-result-intro active="vm.checkReadability"
                                                             heading="Blacklisted terms"
@@ -126,6 +118,22 @@
                                             plus {{ prop.readability.blacklist.length - 5 }} more...
                                         </li>
                                     </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="flex mt-30" ng-repeat="plugin in prop.plugins">
+                                <preflight-state-icon failed="plugin.failed" disabled="false"></preflight-state-icon>
+                                <div>
+                                    <preflight-result-intro active="true"
+                                                            heading="{{ plugin.name }}"
+                                                            pass-text="{{ plugin.passText }}"
+                                                            pass="!plugin.failed">
+                                    </preflight-result-intro>
+                                    <div ng-if="plugin.failed">
+                                        <div ng-if="plugin.failText && !plugin.viewPath" ng-bind="plugin.failText"></div>
+                                        <div ng-if="plugin.viewPath" ng-include="plugin.viewPath" ng-repeat="model in [plugin.result]"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

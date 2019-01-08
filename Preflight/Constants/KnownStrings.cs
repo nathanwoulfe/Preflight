@@ -9,11 +9,6 @@ namespace Preflight.Constants
 
         public const string ContentFailedChecks = "Content failed Preflight checks";
 
-        public const string CheckLinksAlias = "checkLinks";
-        public const string CheckReadabilityAlias = "checkReadability";
-        public const string CheckSafeBrowsingAlias = "checkSafeBrowsing";
-        public const string DoAutoreplace = "doAutoreplace";
-
         public const string RteJsonPath = "$..controls[?(@.editor.alias == 'rte')]";
         public const string RteValueJsonPath = "$..value";
         public const string ArchetypeRteJsonPath = "$..[?(@.propertyEditorAlias == 'Umbraco.TinyMCEv3')]";

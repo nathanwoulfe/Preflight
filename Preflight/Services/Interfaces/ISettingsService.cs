@@ -5,7 +5,7 @@ namespace Preflight.Services.Interfaces
 {
     public interface ISettingsService
     {
-        List<SettingsModel> Get();
+        PreflightSettings Get();
 
         bool Save(List<SettingsModel> settings);
     }

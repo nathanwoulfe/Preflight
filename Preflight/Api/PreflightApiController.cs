@@ -19,8 +19,6 @@ namespace Preflight.Api
 
         public ApiController() : this(new SettingsService(), new ContentChecker())
         {
-            //_settingsService = new SettingsService();
-            //_contentChecker = new ContentChecker();
         }
 
         private ApiController(ISettingsService settingsService, ContentChecker contentChecker)
@@ -39,8 +37,6 @@ namespace Preflight.Api
         {
             try
             {
-                // todo => inject this via lightinject
-                //_settingsService = new SettingsService();
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
@@ -67,7 +63,6 @@ namespace Preflight.Api
         {
             try
             {
-                // = new SettingsService();
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
@@ -95,8 +90,6 @@ namespace Preflight.Api
         {            
             try
             {
-                //_contentChecker = new ContentChecker();
-
                 IContent content = Services.ContentService.GetById(id);
                 PreflightResponseModel response = _contentChecker.Check(content);
 

@@ -1,7 +1,8 @@
 .preflight-settings .umb-control-group {
   position: relative; }
 .preflight .flex {
-  display: flex;
+  display: flex; }
+.preflight .mt-30 {
   margin-top: 30px; }
 .preflight .alert *:last-child {
   margin-bottom: 0; }

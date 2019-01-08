@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using Newtonsoft.Json.Linq;
 using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Services;
@@ -6,6 +7,8 @@ using Preflight.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Preflight.Extensions;
+using Preflight.Plugins;
 using Umbraco.Core.Models;
 
 namespace Preflight
@@ -13,10 +16,10 @@ namespace Preflight
     public class ContentChecker
     {
         private readonly IReadabilityService _readabilityService;
+        private readonly ISafeBrowsingService _safeBrowsingService;
         private readonly ILinksService _linksService;
 
         private readonly List<string> _added;
-
         private readonly List<SettingsModel> _settings;
 
         private readonly bool _checkLinks;
@@ -25,23 +28,26 @@ namespace Preflight
 
         private readonly string _apiKey;
 
-        public ContentChecker() : this(new ReadabilityService(), new LinksService(), new SettingsService(), new List<string>())
+        public ContentChecker() : this(new ReadabilityService(), new LinksService(), new SafeBrowsingService(), 
+            new SettingsService(), new List<string>())
         {
         }
 
-        private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, ISettingsService settingsService, List<string> added)
+        private ContentChecker(IReadabilityService readabilityService, ILinksService linksService, 
+            ISafeBrowsingService safeBrowsingService, ISettingsService settingsService, List<string> added)
         {
             _readabilityService = readabilityService;
             _linksService = linksService;
+            _safeBrowsingService = safeBrowsingService;
 
             _added = added;
+            
+            _settings = settingsService.Get().Settings;
 
-            _settings = settingsService.Get();
-
-            _checkLinks = _settings.Any(s => s.Alias == KnownStrings.CheckLinksAlias && s.Value.ToString() == "1");
-            _checkReadability = _settings.Any(s => s.Alias == KnownStrings.CheckReadabilityAlias && s.Value.ToString() == "1");
-            _checkSafeBrowsing = _settings.Any(s => s.Alias == KnownStrings.CheckSafeBrowsingAlias && s.Value.ToString() == "1");
-            _apiKey = _settings.First(s => s.Alias == KnownSettingAlias.GoogleApiKey).Value.ToString();
+            _checkLinks = _settings.Any(s => s.Alias == KnownSettings.CheckLinks.Camel() && s.Value.ToString() == "1");
+            _checkReadability = _settings.Any(s => s.Alias == KnownSettings.CheckReadability.Camel() && s.Value.ToString() == "1");
+            _checkSafeBrowsing = _settings.Any(s => s.Alias == KnownSettings.EnsureSafeLinks.Camel() && s.Value.ToString() == "1");
+            _apiKey = _settings.First(s => s.Alias == KnownSettings.GoogleApiKey.Camel()).Value?.ToString();
         }
 
         /// <summary>
@@ -58,7 +64,8 @@ namespace Preflight
                 CheckLinks = _checkLinks,
                 CheckReadability = _checkReadability,
                 CheckSafeBrowsing = _checkSafeBrowsing,
-                Settings = _settings.ToDictionary(s => s.Alias, s => s.Value)
+                HideDisabled = _settings.Any(s => s.Alias == KnownSettings.HideDisabled.Camel() && s.Value.ToString() == "1"),
+                CancelSaveOnFail = _settings.Any(s => s.Alias == KnownSettings.CancelSaveOnFail.Camel() && s.Value.ToString() == "1")
             };
 
             foreach (Property prop in props)
@@ -91,7 +98,7 @@ namespace Preflight
         {
             // perform autoreplace before readability check
             // only do this in save handler as there's no point in updating if it's not being saved (potentially)
-            Dictionary<string, string> autoreplace = ((string)_settings.First(s => s.Alias == KnownSettingAlias.Autoreplace).Value)
+            Dictionary<string, string> autoreplace = ((string)_settings.First(s => s.Alias == KnownSettings.AutoreplaceTerms.Camel()).Value)
                 .Split(',').ToDictionary(s => s.Split('|')[0], s => s.Split('|')[1]);
 
             if (!autoreplace.Any()) return content;
@@ -137,20 +144,9 @@ namespace Preflight
                 JToken value = rte.SelectToken(KnownStrings.RteValueJsonPath);
                 if (value == null) continue;
 
-                string val = value.ToString();
+                PreflightPropertyResponseModel model = Check(SetName(name), value.ToString());
 
-                ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
-                List<BrokenLinkModel> safeBrowsing = _checkSafeBrowsing ? _linksService.CheckSafeBrowsing(val, _apiKey) : new List<BrokenLinkModel>();
-                List<BrokenLinkModel> links = _checkLinks ? _linksService.Check(val, safeBrowsing) : new List<BrokenLinkModel>();
-
-                response.Add(new PreflightPropertyResponseModel
-                {
-                    Name = SetName(name),
-                    Readability = readability,
-                    Links = links,
-                    SafeBrowsing = safeBrowsing,
-                    Failed = _checkReadability && readability.Failed || links.Any() || safeBrowsing.Any()
-                });
+                response.Add(model);
             }
 
             return response;
@@ -164,26 +160,62 @@ namespace Preflight
         private PreflightPropertyResponseModel CheckSingleEditor(Property prop)
         {
             object propValue = prop.GetValue();
+            return propValue == null ? null : Check(prop.PropertyType.Name, propValue.ToString());
+        }
 
-            if (propValue == null)
-            {
-                return null;
-            }
-
-            string val = propValue.ToString();
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        private PreflightPropertyResponseModel Check(string name, string val)
+        {
             ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
-            List<BrokenLinkModel> safeBrowsing = _checkSafeBrowsing ? _linksService.CheckSafeBrowsing(val, _apiKey) : new List<BrokenLinkModel>();
+            List<BrokenLinkModel> safeBrowsing = _checkSafeBrowsing ? _safeBrowsingService.Check(val, _apiKey) : new List<BrokenLinkModel>();
             List<BrokenLinkModel> links = _checkLinks ? _linksService.Check(val, safeBrowsing) : new List<BrokenLinkModel>();
 
-            return new PreflightPropertyResponseModel
+            var model = new PreflightPropertyResponseModel
             {
-                Name = prop.PropertyType.Name,
+                Name = name,
                 Readability = readability,
                 Links = links,
-                SafeBrowsing = safeBrowsing,
-                Failed = _checkReadability && readability.Failed || links.Any()
+                SafeBrowsing = safeBrowsing
             };
+
+            // this is a POC and should be refactored
+            foreach (PreflightPlugin plugin in PluginsHelper.GetPlugins())
+            {
+                // ignore disabled plugins
+                if (plugin.Settings.Any(s =>
+                    s.Alias == $"{plugin.Name} disabled".Camel() && s.Value.ToString() == "1")) continue;
+
+                try
+                {
+                    if (!plugin.Name.HasValue()) continue;
+
+                    plugin.Result = plugin.Check(val, out bool failed);
+
+                    if (plugin.Result != null)
+                    {
+                        plugin.Failed = failed;
+                        model.Plugins.Add(plugin);
+                    }
+                }
+                catch (Exception e)
+                {
+                    // todo => log
+                    string m = e.Message;
+                }
+            }
+
+            // mark as failed if any sub-tests have failed
+            model.Failed = _checkReadability && readability.Failed || 
+                           links.Any() || 
+                           safeBrowsing.Any() || 
+                           (bool) model.Plugins?.Any(x => x.Failed);
+
+            return model;
         }
 
         /// <summary>

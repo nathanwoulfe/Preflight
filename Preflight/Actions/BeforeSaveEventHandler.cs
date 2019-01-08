@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ClientDependency.Core;
 using Preflight.Constants;
+using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services;
 using Umbraco.Core.Components;
@@ -27,9 +29,9 @@ namespace Preflight.Actions
         {
             var settingsService = new SettingsService();
 
-            List<SettingsModel> settings = settingsService.Get();
-            int onSave = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.BindSaveHandler).Value);
-            int cancelOnFail = Convert.ToInt32(settings.First(s => s.Alias == KnownSettingAlias.CancelSaveOnFail).Value);
+            List<SettingsModel> settings = settingsService.Get().Settings;
+            int onSave = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.BindSaveHandler.Camel()).Value);
+            int cancelOnFail = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.CancelSaveOnFail.Camel()).Value);
 
             if (onSave == 0) return;
 
@@ -39,7 +41,7 @@ namespace Preflight.Actions
 
             // perform autoreplace before readability check
             // only do this in save handler as there's no point in updating if it's not being saved (potentially)
-            if (settings.Any(s => s.Alias == KnownStrings.DoAutoreplace && s.Value.ToString() == "1"))
+            if (settings.Any(s => s.Alias == KnownSettings.RunAutoreplace.Camel() && s.Value.ToString() == "1"))
             {
                 content = checker.Autoreplace(content);
             }
