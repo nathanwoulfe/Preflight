@@ -6,27 +6,8 @@
   margin-top: 30px; }
 .preflight .alert *:last-child {
   margin-bottom: 0; }
-.preflight .disabled {
-  background: #f3f3f5; }
-  .preflight .disabled-color, .preflight .disabled .icon {
-    color: #68676b; }
-  .preflight .disabled-bg {
-    color: #68676b;
-    background: #f3f3f5; }
-.preflight .fail {
-  background: rgba(254, 101, 97, 0.075); }
-  .preflight .fail-color, .preflight .fail .icon {
-    color: #fe6561; }
-  .preflight .fail-bg {
-    color: #fff;
-    background: #fe6561; }
-.preflight .pass {
-  background: rgba(53, 199, 134, 0.075); }
-  .preflight .pass-color, .preflight .pass .icon {
-    color: #35c786; }
-  .preflight .pass-bg {
-    color: #fff;
-    background: #35c786; }
+.preflight h5 {
+  margin-top: 0; }
 .preflight .state-icon {
   padding: 10px;
   display: flex;
@@ -39,15 +20,23 @@
   border-radius: 50%; }
   .preflight .state-icon .icon {
     font-size: 22px; }
-.preflight .readability-result {
-  height: 10px;
-  margin: 7px 0 10px 0; }
+.preflight .count-badge {
+  color: #fff;
+  background-color: #fe6561;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px;
+  line-height: 16px;
+  position: absolute;
+  text-align: center;
+  min-width: 16px;
+  transform: translate(-110%, -60%); }
 .preflight .broken-link-type {
   color: #f9b945; }
   .preflight .broken-link-type.unsafe {
     color: #fe6561; }
-.preflight h5 {
-  margin-top: 0; }
 .preflight .title {
   font-size: 30px;
   color: #363636;
@@ -72,46 +61,43 @@
   flex-wrap: wrap; }
   .preflight .badge-list .umb-badge {
     margin: 0 5px 5px; }
-.preflight .preflight-property {
-  box-sizing: border-box;
-  border-bottom: 1px solid #e9e9eb; }
-  .preflight .preflight-property:last-child {
-    border-bottom: 0; }
-  .preflight .preflight-property--label {
-    cursor: pointer;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-weight: bold;
-    padding: 10px;
-    display: flex; }
-    .preflight .preflight-property--label:hover {
-      background: #f3f3f5; }
-  .preflight .preflight-property--cards {
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    padding: 10px; }
-  .preflight .preflight-property--results {
-    padding: 10px;
-    margin-bottom: 15px; }
-    .preflight .preflight-property--results.collapsed {
-      display: none; }
-  .preflight .preflight-property .umb-badge--state {
-    border-radius: 2px;
-    font-size: 18px;
-    line-height: 1.4;
-    padding-top: 4px;
-    padding-bottom: 2px; }
+.preflight .preflight-cards {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  margin: 0 -10px; }
 .preflight .card {
   display: flex;
   flex-direction: column;
   padding: 20px;
-  border-radius: 6px; }
+  border-radius: 6px;
+  background: rgba(243, 243, 245, 0.75);
+  margin: 0 10px; }
   .preflight .card-score {
     font-size: 36px;
     line-height: 1;
     margin-bottom: 10px; }
+.preflight .disabled {
+  background: rgba(243, 243, 245, 0.75); }
+  .preflight .disabled-color, .preflight .disabled .icon {
+    color: #68676b; }
+  .preflight .disabled-bg {
+    color: #68676b;
+    background: #f3f3f5; }
+.preflight .fail {
+  background: rgba(254, 101, 97, 0.1); }
+  .preflight .fail-color, .preflight .fail .icon {
+    color: #fe6561; }
+  .preflight .fail-bg {
+    color: #fff;
+    background: #fe6561; }
+.preflight .pass {
+  background: rgba(53, 199, 134, 0.1); }
+  .preflight .pass-color, .preflight .pass .icon {
+    color: #35c786; }
+  .preflight .pass-bg {
+    color: #fff;
+    background: #35c786; }
 
 /*# sourceMappingURL=styles.css.map */

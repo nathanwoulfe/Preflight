@@ -24,10 +24,10 @@ namespace Preflight.Site.V8.App_Code
             });
         }
 
-        public override object Check(string val, out bool failed)
+        public override object Check(int id, string val, out bool failed)
         {
-            failed = true;
             var r = new Random();
+            failed = r.Next(0, 2) == 1;
 
             List<int> response = new List<int>();
             for (var i = 0; i < 5; i += 1)

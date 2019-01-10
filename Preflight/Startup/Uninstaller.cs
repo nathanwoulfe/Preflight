@@ -12,7 +12,7 @@ namespace Preflight.Startup
         {
             const string dashboardPath = "~/config/dashboard.config";
 
-            //Path to the file resolved
+            //Path to the file resolve
             string dashboardFilePath = HostingEnvironment.MapPath(dashboardPath);
             if (dashboardFilePath == null) return;
 

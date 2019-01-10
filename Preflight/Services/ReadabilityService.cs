@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using ClientDependency.Core;
 using Preflight.Constants;
 using Preflight.Extensions;
 using Preflight.Models;
@@ -34,12 +33,12 @@ namespace Preflight.Services
         /// <returns></returns>
         public ReadabilityResponseModel Check(string text, List<SettingsModel> settings)
         {
-            int longWordLength = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.LongWordSyllables.Camel()).Value);
-            int readabilityMin = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.ReadabilityMin.Camel()).Value);
-            int readabilityMax = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.ReadabilityMax.Camel()).Value);
+            var longWordLength = settings.GetValue<int>(KnownSettings.LongWordSyllables);
+            var readabilityMin = settings.GetValue<int>(KnownSettings.ReadabilityMin);
+            var readabilityMax = settings.GetValue<int>(KnownSettings.ReadabilityMax);
 
-            string[] whitelist = ((string)settings.First(s => s.Alias == KnownSettings.Whitelist.Camel()).Value).Split(',');
-            string[] blacklist = ((string)settings.First(s => s.Alias == KnownSettings.Blacklist.Camel()).Value).Split(',');
+            string[] whitelist = settings.GetValue<string>(KnownSettings.Whitelist).Split(',');
+            string[] blacklist = settings.GetValue<string>(KnownSettings.Blacklist).Split(',');
 
             List<string> longWords = new List<string>();
             List<string> blacklisted = new List<string>();

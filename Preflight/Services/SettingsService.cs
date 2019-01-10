@@ -3,7 +3,6 @@ using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Plugins;
 using Preflight.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +12,7 @@ namespace Preflight.Services
 {
     public class SettingsService : ISettingsService
     {
+
         /// <summary>
         /// Load the Preflight settings from the JSON file in app_plugins
         /// </summary>
@@ -54,7 +54,7 @@ namespace Preflight.Services
                     settings.Add(setting);
                 }
 
-                string disabledAlias = $"{plugin.Name} disabled".Camel();
+                string disabledAlias = plugin.Name.DisabledAlias();
                 if (settings.All(s => s.Alias != disabledAlias))
                 {
                     settings.Add(new SettingsModel

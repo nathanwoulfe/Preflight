@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
-using Preflight.Services;
 using Preflight.Services.Interfaces;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
@@ -15,13 +14,9 @@ namespace Preflight.Api
     public class ApiController : UmbracoAuthorizedApiController 
     { 
         private readonly ISettingsService _settingsService;
-        private readonly ContentChecker _contentChecker;
+        private readonly IContentChecker _contentChecker;
 
-        public ApiController() : this(new SettingsService(), new ContentChecker())
-        {
-        }
-
-        private ApiController(ISettingsService settingsService, ContentChecker contentChecker)
+        public ApiController(ISettingsService settingsService, IContentChecker contentChecker)
         {
             _settingsService = settingsService;
             _contentChecker = contentChecker;
@@ -80,7 +75,7 @@ namespace Preflight.Api
         }
 
         /// <summary>
-        /// Entry point for 
+        /// Entry point for all content checking
         /// </summary>
         /// <param name="id">Node id</param>
         /// <returns></returns>

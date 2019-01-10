@@ -8,141 +8,138 @@
             <span ng-bind="dialogOptions.results.introText"></span>
         </div>
 
-        <div ng-if="!vm.checkLinks && !vm.checkReadability && !vm.checkSafeBrowsing">
+        <div ng-if="!vm.results.checkLinks && !vm.results.checkReadability && !vm.results.checkSafeBrowsing">
             <h3 class="title">All Preflight checks are currently disabled</h3>
             <h4 class="intro-text">Enable checks on the Preflight dashboard in the settings section.</h4>
         </div>
 
-        <div ng-if="vm.checkLinks || vm.checkReadability || vm.checkSafeBrowsing">
-            <div ng-show="!vm.failed" class="alert alert-success">
+        <div ng-if="vm.results.checkLinks || vm.results.checkReadability || vm.results.checkSafeBrowsing">
+            <div ng-show="!vm.results.failed" class="alert alert-success">
                 <h3 class="title">Content on this page passes all preflight checks. Good job!</h3>
             </div>
 
-            <div ng-show="vm.failed">
+            <div ng-show="vm.results.failed">
                 <h3 class="title">That's not great...</h3>
-                <h4 class="intro-text">Content on this page fails one or more preflight checks.</h4>
+                <h4 class="intro-text">Content on this page fails {{ vm.results.failedCount }} preflight checks.</h4>
             </div>
 
-            <umb-box>
-                <div class="umb-box-content">
-                    <div ng-repeat="prop in vm.properties track by $index" class="preflight-property">
-                        <a ng-click="prop.collapsed = !prop.collapsed" class="preflight-property--label" ng-class="{'active' : !prop.collapsed}">
-                            <h4 ng-bind="prop.name"></h4>
-                            <div class="umb-badge umb-badge--state" ng-class="{'fail-bg' : prop.failed, 'pass-bg' : !prop.failed }" ng-bind="prop.failed ? 'FAIL' : 'PASS'"></div>
-                        </a>
-                        <div class="preflight-property--results" ng-class="{'collapsed' : prop.collapsed}">
-                            <div class="preflight-property--cards">
-                                <preflight-card title="Reading ease score"
-                                                subtitle="Target {{ prop.readability.targetMin }}-{{ prop.readability.targetMax }}"
-                                                score="prop.readability.score"
-                                                failed="prop.readability.failedReadability">
-                                </preflight-card>
+            <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties track by $index">
+                <div class="umb-expansion-panel__header" ng-click="prop.open = !prop.open">
+                    <div>
+                        <span class="count-badge" ng-bind="prop.failedCount"></span>
+                        {{ prop.name }}
+                    </div>
+                    <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !prop.open, 'icon-navigation-down': prop.open }">&nbsp;</ins>
+                </div>
 
-                                <preflight-card title="Average syllables"
-                                                subtitle="per word"
-                                                score="prop.readability.averageSyllables">
-                                </preflight-card>
+                <div class="umb-expansion-panel__content" ng-show="prop.open">
+                    <div class="preflight-cards" ng-if="vm.results.checkReadability">
+                        <preflight-card title="Reading ease score"
+                                        subtitle="Target {{ prop.readability.targetMin }}-{{ prop.readability.targetMax }}"
+                                        score="prop.readability.score"
+                                        failed="prop.readability.failedReadability">
+                        </preflight-card>
 
-                                <preflight-card title="Average sentence"
-                                                subtitle="length"
-                                                score="prop.readability.sentenceLength">
-                                </preflight-card>
-                            </div>
+                        <preflight-card title="Average syllables"
+                                        subtitle="per word"
+                                        score="prop.readability.averageSyllables">
+                        </preflight-card>
 
-                            <div class="flex mt-30">
-                                <preflight-state-icon failed="prop.readability.longWords.length > 0" disabled="!vm.checkReadability"></preflight-state-icon>
-                                <div>
-                                    <preflight-result-intro active="vm.checkReadability"
-                                                            heading="Long words ({{ prop.readability.longWordSyllables }} or more syllables)"
-                                                            pass-text="No long words found for this property"
-                                                            pass="prop.readability.longWords.length === 0">
-                                    </preflight-result-intro>
-                                    <ul class="badge-list" ng-if="prop.readability.longWords.length">
-                                        <li class="umb-badge umb-badge--gray"
-                                            ng-repeat="word in prop.readability.longWords | limitTo: (vm.showAllLong ? prop.readability.longWords.length : 5) track by $index"
-                                            ng-bind="word">
-                                        </li>
-                                        <li class="umb-badge umb-badge--primary"
-                                            ng-show="prop.readability.longWords.length > 5 && !vm.showAllLong"
-                                            ng-click="vm.showAllLong = true">
-                                            plus {{ prop.readability.longWords.length - 5 }} more...
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <preflight-card title="Average sentence"
+                                        subtitle="length"
+                                        score="prop.readability.sentenceLength">
+                        </preflight-card>
+                    </div>
 
-                            <div class="flex mt-30" ng-if="!vm.hideDisabled && vm.checkLinks">
-                                <preflight-state-icon failed="prop.links.length > 0" disabled="!vm.checkLinks"></preflight-state-icon>
-                                <div>
-                                    <preflight-result-intro active="vm.checkLinks"
-                                                            heading="Broken links"
-                                                            pass-text="No broken links found for this property"
-                                                            pass="prop.links.length === 0">
-                                    </preflight-result-intro>
-                                    <ul ng-if="prop.links.length">
-                                        <li ng-repeat="link in prop.links track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
-                                    </ul>
-                                </div>
-                            </div>
+                    <div class="flex mt-30" ng-if="vm.results.checkReadability">
+                        <preflight-state-icon failed="prop.readability.longWords.length > 0" disabled="!vm.results.checkReadability"></preflight-state-icon>
+                        <div>
+                            <preflight-result-intro active="vm.results.checkReadability"
+                                                    heading="Long words ({{ prop.readability.longWordSyllables }} or more syllables)"
+                                                    pass-text="No long words found for this property"
+                                                    pass="prop.readability.longWords.length === 0">
+                            </preflight-result-intro>
+                            <ul class="badge-list" ng-if="prop.readability.longWords.length">
+                                <li class="umb-badge umb-badge--gray"
+                                    ng-repeat="word in prop.readability.longWords | limitTo: (vm.showAllLong ? prop.readability.longWords.length : 5) track by $index"
+                                    ng-bind="word">
+                                </li>
+                                <li class="umb-badge umb-badge--primary"
+                                    ng-show="prop.readability.longWords.length > 5 && !vm.showAllLong"
+                                    ng-click="vm.showAllLong = true">
+                                    plus {{ prop.readability.longWords.length - 5 }} more...
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- todo => only return disabled tests if hide disabled is false - removes need to check in the view, can then simply display em all -->
+                    <div class="flex mt-30">
+                        <preflight-state-icon failed="prop.links.length > 0" disabled="!vm.results.checkLinks"></preflight-state-icon>
+                        <div>
+                            <preflight-result-intro active="vm.results.checkLinks"
+                                                    heading="Broken links"
+                                                    pass-text="No broken links found for this property"
+                                                    pass="prop.links.length === 0">
+                            </preflight-result-intro>
+                            <ul ng-if="prop.links.length">
+                                <li ng-repeat="link in prop.links track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
+                            </ul>
+                        </div>
+                    </div>
 
-                            <div class="flex mt-30" ng-if="!vm.hideDisabled && vm.checkSafeBrowsing">
-                                <preflight-state-icon failed="prop.safeBrowsing.length > 0" disabled="!vm.checkSafeBrowsing"></preflight-state-icon>
-                                <div>
-                                    <preflight-result-intro active="vm.checkSafeBrowsing"
-                                                            heading="Safe browsing"
-                                                            pass-text="No unsafe links found for this property."
-                                                            pass="prop.safeBrowsing.length === 0">
-                                    </preflight-result-intro>
-                                    <ul ng-if="prop.safeBrowsing.length">
-                                        <li ng-repeat="link in prop.safeBrowsing track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
-                                    </ul>
-                                </div>
-                            </div>
+                    <div class="flex mt-30" ng-if="vm.results.checkSafeBrowsing">
+                        <preflight-state-icon failed="prop.safeBrowsing.length > 0" disabled="!vm.checkSafeBrowsing"></preflight-state-icon>
+                        <div>
+                            <preflight-result-intro active="vm.checkSafeBrowsing"
+                                                    heading="Safe browsing"
+                                                    pass-text="No unsafe links found for this property."
+                                                    pass="prop.safeBrowsing.length === 0">
+                            </preflight-result-intro>
+                            <ul ng-if="prop.safeBrowsing.length">
+                                <li ng-repeat="link in prop.safeBrowsing track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
+                            </ul>
+                        </div>
+                    </div>
 
-                            <div class="flex mt-30">
-                                <preflight-state-icon failed="prop.readability.blacklist.length > 0" disabled="!vm.checkReadability"></preflight-state-icon>
-                                <div>
-                                    <preflight-result-intro active="vm.checkReadability"
-                                                            heading="Blacklisted terms"
-                                                            pass-text="No blacklisted words/phrases for this property."
-                                                            pass="prop.readability.blacklist.length === 0">
-                                    </preflight-result-intro>
-                                    <ul class="badge-list" ng-if="prop.readability.blacklist.length">
-                                        <li class="umb-badge umb-badge--gray"
-                                            ng-repeat="word in prop.readability.blacklist track by $index | limitTo: (vm.showAllBlacklist ? prop.readability.blacklist.length : 5)"
-                                            ng-bind="word">
-                                        </li>
-                                        <li class="umb-badge umb-badge--primary"
-                                            ng-show="prop.readability.blacklist.length > 5 && !vm.showAllBlacklist"
-                                            ng-click="vm.showAllBlacklist = true">
-                                            plus {{ prop.readability.blacklist.length - 5 }} more...
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                    <div class="flex mt-30" ng-if="vm.results.checkReadability">
+                        <preflight-state-icon failed="prop.readability.blacklist.length > 0" disabled="!vm.results.checkReadability"></preflight-state-icon>
+                        <div>
+                            <preflight-result-intro active="vm.results.checkReadability"
+                                                    heading="Blacklisted terms"
+                                                    pass-text="No blacklisted words/phrases for this property."
+                                                    pass="prop.readability.blacklist.length === 0">
+                            </preflight-result-intro>
+                            <ul class="badge-list" ng-if="prop.readability.blacklist.length">
+                                <li class="umb-badge umb-badge--gray"
+                                    ng-repeat="word in prop.readability.blacklist track by $index | limitTo: (vm.showAllBlacklist ? prop.readability.blacklist.length : 5)"
+                                    ng-bind="word">
+                                </li>
+                                <li class="umb-badge umb-badge--primary"
+                                    ng-show="prop.readability.blacklist.length > 5 && !vm.showAllBlacklist"
+                                    ng-click="vm.showAllBlacklist = true">
+                                    plus {{ prop.readability.blacklist.length - 5 }} more...
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
 
-
-                            <div class="flex mt-30" ng-repeat="plugin in prop.plugins">
-                                <preflight-state-icon failed="plugin.failed" disabled="false"></preflight-state-icon>
-                                <div>
-                                    <preflight-result-intro active="true"
-                                                            heading="{{ plugin.name }}"
-                                                            pass-text="{{ plugin.passText }}"
-                                                            pass="!plugin.failed">
-                                    </preflight-result-intro>
-                                    <div ng-if="plugin.failed">
-                                        <div ng-if="plugin.failText && !plugin.viewPath" ng-bind="plugin.failText"></div>
-                                        <div ng-if="plugin.viewPath" ng-include="plugin.viewPath" ng-repeat="model in [plugin.result]"></div>
-                                    </div>
-                                </div>
+                    <div class="flex mt-30" ng-repeat="plugin in prop.plugins">
+                        <preflight-state-icon failed="plugin.failed" disabled="false"></preflight-state-icon>
+                        <div>
+                            <preflight-result-intro active="true"
+                                                    heading="{{ plugin.name }}"
+                                                    pass-text="{{ plugin.passText }}"
+                                                    pass="!plugin.failed">
+                            </preflight-result-intro>
+                            <div ng-if="plugin.failed">
+                                <div ng-if="plugin.failText && !plugin.viewPath" ng-bind="plugin.failText"></div>
+                                <div ng-if="plugin.viewPath" ng-include="plugin.viewPath" ng-repeat="model in [plugin.result]"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </umb-box>
+            </div>
         </div>
-
-
     </div>
 
     <umb-overlay ng-if="vm.overlay.show"

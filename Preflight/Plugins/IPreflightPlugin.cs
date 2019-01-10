@@ -13,7 +13,7 @@ namespace Preflight.Plugins
         string ViewPath { get; set; }
 
         object Result { get; set; }
-        object Check(string val, out bool failed);
+        object Check(int id, string val, out bool failed);
 
         List<SettingsModel> Settings { get; set; }
     }

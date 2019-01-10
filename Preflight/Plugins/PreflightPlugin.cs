@@ -2,7 +2,6 @@
 using Preflight.Models;
 using System.Collections.Generic;
 using Preflight.Extensions;
-using Umbraco.Core;
 
 namespace Preflight.Plugins
 {
@@ -55,13 +54,15 @@ namespace Preflight.Plugins
         public object Result { get; set; }
 
         /// <summary>
-        /// Check performs the test - Preflight will provide the property value as a paramater, do with it what you choose
-        /// Return any serializable object, and be sure to set failed to the appropriate value
+        /// Check performs the test - Preflight will provide the current node id and property value as paramaters
+        /// Currently, checks are assumed to be property-based, not whole-node. This may change in the future
+        /// Return any serializable object, and be sure to set failed to the appropriate value - will be false unless modified
         /// </summary>
+        /// <param name="id">The current node id</param>
         /// <param name="val">The stringified property data</param>
         /// <param name="failed">Set this to indicate the test result - pass or fail</param>
         /// <returns>Whatever object you choose to return, which will be returned to the custom view as $scope.model</returns>
-        public abstract object Check(string val, out bool failed);
+        public abstract object Check(int id, string val, out bool failed);
 
         /// <summary>
         /// The settings list should be populated as part of the plugin to allow inclusion of items on the settings dashboard
@@ -72,6 +73,7 @@ namespace Preflight.Plugins
 
         protected PreflightPlugin()
         {
+            Failed = false;
             Settings = new List<SettingsModel>();
         }
     }

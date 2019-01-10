@@ -216,30 +216,32 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="Umbraco.Core, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UmbracoCms.Core.8.0.0-alpha.52.1441\lib\net472\Umbraco.Core.dll</HintPath>
+      <HintPath>..\packages\UmbracoCms.Core.8.0.0-alpha.58.1500\lib\net472\Umbraco.Core.dll</HintPath>
     </Reference>
     <Reference Include="Umbraco.Examine, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UmbracoCms.Web.8.0.0-alpha.52.1441\lib\net472\Umbraco.Examine.dll</HintPath>
+      <HintPath>..\packages\UmbracoCms.Web.8.0.0-alpha.58.1500\lib\net472\Umbraco.Examine.dll</HintPath>
     </Reference>
     <Reference Include="Umbraco.Web, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UmbracoCms.Web.8.0.0-alpha.52.1441\lib\net472\Umbraco.Web.dll</HintPath>
+      <HintPath>..\packages\UmbracoCms.Web.8.0.0-alpha.58.1500\lib\net472\Umbraco.Web.dll</HintPath>
     </Reference>
     <Reference Include="Umbraco.Web.UI, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UmbracoCms.Web.8.0.0-alpha.52.1441\lib\net472\Umbraco.Web.UI.dll</HintPath>
+      <HintPath>..\packages\UmbracoCms.Web.8.0.0-alpha.58.1500\lib\net472\Umbraco.Web.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\BeforeSaveEventHandler.cs" />
-    <Compile Include="Actions\CustomNotificationsHandler.cs" />
+    <Compile Include="NotificationsHandler.cs" />
     <Compile Include="Api\PreflightApiController.cs" />
     <Compile Include="Constants\KnownPropertyEditors.cs" />
-    <Compile Include="ContentChecker.cs" />
+    <Compile Include="Extensions\ContentBaseExtensions.cs" />
+    <Compile Include="Extensions\SettingsModelListExtensions.cs" />
+    <Compile Include="Services\ContentChecker.cs" />
     <Compile Include="Constants\KnownSettings.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Models\SettingsTabNames.cs" />
     <Compile Include="Plugins\Helper.cs" />
     <Compile Include="Plugins\PreflightPlugin.cs" />
     <Compile Include="Plugins\IPreflightPlugin.cs" />
+    <Compile Include="Services\Interfaces\IContentChecker.cs" />
     <Compile Include="Services\Interfaces\ILinksService.cs" />
     <Compile Include="Services\Interfaces\IReadabilityService.cs" />
     <Compile Include="Services\Interfaces\ISafeBrowsingService.cs" />
@@ -248,7 +250,8 @@
     <Compile Include="Services\ReadabilityService.cs" />
     <Compile Include="Services\SafeBrowsingService.cs" />
     <Compile Include="Services\SettingsService.cs" />
-    <Compile Include="Startup\UmbracoStartup.cs" />
+    <Compile Include="Startup\PreflightComponent.cs" />
+    <Compile Include="Startup\PreflightComposer.cs" />
     <Compile Include="Startup\Uninstaller.cs" />
     <Compile Include="Startup\Installer.cs" />
     <Compile Include="Models\SafeBrowsingRequestModel.cs" />
@@ -287,6 +290,7 @@
     <Content Include="Gruntfile.js" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Actions\" />
     <Folder Include="App_Plugins\Preflight\lang\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

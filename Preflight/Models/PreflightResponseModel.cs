@@ -27,6 +27,9 @@ namespace Preflight.Models
         [JsonProperty("checkSafeBrowsing")]
         public bool CheckSafeBrowsing { get; set; }
 
+        [JsonProperty("failedCount")]
+        public int FailedCount { get; set; }
+
         public PreflightResponseModel()
         {
             Properties = new List<PreflightPropertyResponseModel>();
@@ -51,15 +54,18 @@ namespace Preflight.Models
         [JsonProperty("plugins")]
         public List<PreflightPlugin> Plugins { get; set; }
 
-        [JsonProperty("collapsed")]
-        public bool Collapsed { get; set; }
+        [JsonProperty("open")]
+        public bool Open { get; set; }
 
         [JsonProperty("failed")]
         public bool Failed { get; set; }
 
+        [JsonProperty("failedCount")]
+        public int FailedCount { get; set; }
+
         public PreflightPropertyResponseModel()
         {
-            Collapsed = true;
+            Open = false;
             Failed = false;
 
             Plugins = new List<PreflightPlugin>();

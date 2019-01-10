@@ -4,40 +4,33 @@
 
         this.loaded = false;
 
-        /**
-         * 
-         */
-        const checkProperties = () => {
-            this.properties.forEach(p => {
-                this.blacklistFailed = this.blacklistFailed || p.readability.blacklist.length > 0;
-                this.longWordsFailed = this.longWordsFailed || p.readability.longWords.length > 0;
-
-                this.brokenLinksFailed = this.brokenLinksFailed || p.links.length > 0;
-                this.safeBrowsingFailed = this.safeBrowsingFailed || p.safeBrowsing.length > 0;
-
-                this.readabilityFailed = this.readabilityFailed || p.failedReadability;
-            });
+        const setBadgeCount = () => {
+            $scope.model.badge = {
+                count: this.results.failedCount,
+                type: 'alert'
+            };
         };
 
         /**
-         * 
+         *  
          * @param {any} data
          */
-        const bindResults = data => {
+        //const bindResults = () => {
 
-            this.properties = data.properties;
-            if (this.properties.length) {
-                checkProperties();
-            }
+        //    if (this.results.properties.length) {
+        //        this.results.properties.forEach(p => {
+        //            this.blacklistFailed = this.blacklistFailed || p.readability.blacklist.length > 0;
+        //            this.longWordsFailed = this.longWordsFailed || p.readability.longWords.length > 0;
 
-            this.checkLinks = data.checkLinks;
-            this.checkReadability = data.checkReadability;
-            this.checkSafeBrowsing = data.checkSafeBrowsing;
+        //            this.brokenLinksFailed = this.brokenLinksFailed || p.links.length > 0;
+        //            this.safeBrowsingFailed = this.safeBrowsingFailed || p.safeBrowsing.length > 0;
 
-            this.failed = data.failed;
+        //            this.readabilityFailed = this.readabilityFailed || p.failedReadability;
+        //        });
+        //    }
 
-            this.loaded = true;
-        };
+        //    this.loaded = true;
+        //};
 
 
         /**
@@ -48,7 +41,10 @@
             preflightService.check(editorState.current.id)
                 .then(resp => {
                     if (resp.status === 200) {
-                        bindResults(resp.data);
+                        this.results = resp.data;
+                        setBadgeCount();
+                        //bindResults();
+                        this.loaded = true;
                     }
                 });
         };
@@ -61,7 +57,10 @@
             (newVal, oldVal) => {
                 if (newVal && newVal !== oldVal) {
                     if ($rootScope.preflightResult) {
-                        bindResults($rootScope.preflightResult);
+                        this.results = $rootScope.preflightResult;
+                        setBadgeCount();
+                        //bindResults();
+                        this.loaded = true;
                     }
                 }
             }
@@ -89,14 +88,6 @@
          */
 
         this.preflight();
-        //preflightService.getSettings()
-        //    .then(resp => {
-        //        resp.data.settings.forEach(v => {
-        //            this.settings[v.alias] = v.value;
-        //        });
-
-        //        this.preflight();
-        //    });
     }
 
     angular.module('umbraco').controller('preflight.controller', ['$scope', '$rootScope', 'editorState', 'preflightService', ctrl]);

@@ -28,43 +28,8 @@ $umbGreen: #00aea2;
         }
     }
 
-    .disabled {
-        background: $grey;
-
-        &-color, .icon {
-            color: #68676b;
-        }
-
-        &-bg {
-            color: #68676b;
-            background: $grey;
-        }
-    }
-
-    .fail {
-        background: rgba($red, 0.075);
-
-        &-color, .icon {
-            color: $red;
-        }
-
-        &-bg {
-            color: #fff;
-            background: $red;
-        }
-    }
-
-    .pass {
-        background: rgba($green, 0.075);
-
-        &-color, .icon {
-            color: $green;
-        }
-
-        &-bg {
-            color: #fff;
-            background: $green;
-        }
+    h5 {
+        margin-top:0;
     }
 
     .state-icon {
@@ -75,7 +40,7 @@ $umbGreen: #00aea2;
         margin-right: 15px;
         width: 42px;
         height: 42px;
-        min-width:42px;
+        min-width: 42px;
         border-radius: 50%;
 
         .icon {
@@ -83,9 +48,19 @@ $umbGreen: #00aea2;
         }
     }
 
-    .readability-result {
-        height: 10px;
-        margin: 7px 0 10px 0;
+    .count-badge {
+        color: #fff;
+        background-color: $red;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 2px;
+        line-height: 16px;
+        position: absolute;
+        text-align: center;
+        min-width: 16px;
+        transform: translate(-110%, -60%);
     }
 
     .broken-link-type {
@@ -94,10 +69,6 @@ $umbGreen: #00aea2;
         &.unsafe {
             color: $red;
         }
-    }
-
-    h5 {
-        margin-top: 0;
     }
 
     .title {
@@ -132,52 +103,12 @@ $umbGreen: #00aea2;
         }
     }
 
-    .preflight-property {
-        box-sizing: border-box;
-        border-bottom: 1px solid #e9e9eb;
-
-        &:last-child {
-            border-bottom: 0;
-        }
-
-        &--label {
-            cursor: pointer;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: bold;
-            padding: 10px;
-            display: flex;
-
-            &:hover {
-                background: $grey;
-            }
-        }
-
-        &--cards {
-            display: flex;
-            justify-content: center;
-            text-align: center;
-            padding: 10px;
-        }
-
-        &--results {
-            padding: 10px;
-            margin-bottom: 15px;
-
-            &.collapsed {
-                display: none;
-            }
-        }
-
-        .umb-badge--state {
-            border-radius: 2px;
-            font-size: 18px;
-            line-height: 1.4;
-            padding-top: 4px;
-            padding-bottom: 2px;
-        }
+    .preflight-cards {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        padding: 10px;
+        margin:0 -10px;
     }
 
     .card {
@@ -185,11 +116,52 @@ $umbGreen: #00aea2;
         flex-direction: column;
         padding: 20px;
         border-radius: 6px;
+        background: rgba($grey, 0.75);
+        margin:0 10px;
 
         &-score {
             font-size: 36px;
             line-height: 1;
             margin-bottom: 10px;
+        }
+    }
+
+    .disabled {
+        background: rgba($grey, 0.75);
+
+        &-color, .icon {
+            color: #68676b;
+        }
+
+        &-bg {
+            color: #68676b;
+            background: $grey;
+        }
+    }
+
+    .fail {
+        background: rgba($red, 0.1);
+
+        &-color, .icon {
+            color: $red;
+        }
+
+        &-bg {
+            color: #fff;
+            background: $red;
+        }
+    }
+
+    .pass {
+        background: rgba($green, 0.1);
+
+        &-color, .icon {
+            color: $green;
+        }
+
+        &-bg {
+            color: #fff;
+            background: $green;
         }
     }
 }

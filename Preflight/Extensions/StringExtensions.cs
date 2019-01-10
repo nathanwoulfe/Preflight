@@ -6,7 +6,7 @@ namespace Preflight.Extensions
     public static class StringExtensions
     {
         /// <summary>
-        /// 
+        /// Is the string not null and not empty?
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
@@ -23,6 +23,16 @@ namespace Preflight.Extensions
         public static string Camel(this string str)
         {
             return str.ToCleanString(CleanStringType.CamelCase);
+        }
+
+        /// <summary>
+        /// Appends 'Disabled' and camelCases the given string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string DisabledAlias(this string str)
+        {
+            return $"{str} disabled".Camel();
         }
     }
 }
