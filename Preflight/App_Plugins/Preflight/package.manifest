@@ -18,7 +18,6 @@
     "~/App_Plugins/preflight/backoffice/directives/preflight.card.directive.js",
     "~/App_Plugins/preflight/backoffice/directives/preflight.stateicon.directive.js",
     "~/App_Plugins/preflight/backoffice/directives/preflight.resultintro.directive.js"
-
   ],
   "css": [
     "~/App_Plugins/preflight/backoffice/css/styles.css"

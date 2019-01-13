@@ -9,7 +9,7 @@ namespace Preflight.Extensions
     {
         public static bool HasValue(this IEnumerable<SettingsModel> settings, string name, object value)
         {
-            return settings.Any(s => s.Alias == name.Camel() && s.Value == value);
+            return settings.Any(s => s.Alias == name.Camel() && ReferenceEquals(s.Value, value));
         }
 
         public static T GetValue<T>(this IEnumerable<SettingsModel> settings, string name) where T : IConvertible
@@ -23,6 +23,12 @@ namespace Preflight.Extensions
             }
 
             return value == null ? default(T) : (T) Convert.ChangeType(value, typeof(T));
+        }
+
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            HashSet<TKey> known = new HashSet<TKey>();
+            return source.Where(element => known.Add(keySelector(element)));
         }
     }
 }

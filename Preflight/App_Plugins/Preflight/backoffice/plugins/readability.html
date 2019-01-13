@@ -1,0 +1,61 @@
+﻿<div class="preflight-cards">
+    <preflight-card title="Reading ease score"
+                    subtitle="Target {{ model.result.targetMin }}-{{ model.result.targetMax }}"
+                    score="model.result.score"
+                    failed="model.result.failedReadability">
+    </preflight-card>
+
+    <preflight-card title="Average syllables"
+                    subtitle="per word"
+                    score="model.result.averageSyllables">
+    </preflight-card>
+
+    <preflight-card title="Average sentence"
+                    subtitle="length"
+                    score="model.result.sentenceLength">
+    </preflight-card>
+</div>
+
+<div class="flex mt-30">
+    <preflight-state-icon failed="model.result.longWords.length > 0"></preflight-state-icon>
+    <div class="preflight-result">
+        <preflight-result-intro active="true"
+                                heading="Long words ({{ model.result.longWordSyllables }} or more syllables)"
+                                pass-text="No long words found for this property"
+                                pass="model.result.longWords.length === 0">
+        </preflight-result-intro>
+        <ul class="badge-list" ng-if="model.result.longWords.length">
+            <li class="umb-badge umb-badge--gray"
+                ng-repeat="word in model.result.longWords | limitTo: (showAllLong ? model.result.longWords.length : 5) track by $index"
+                ng-bind="word">
+            </li>
+            <li class="umb-badge umb-badge--primary" role="button"
+                ng-show="model.result.longWords.length > 5 && !showAllLong"
+                ng-click="showAllLong = true">
+                plus {{ model.result.longWords.length - 5 }} more...
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="flex mt-30">
+    <preflight-state-icon failed="model.result.blacklist.length > 0"></preflight-state-icon>
+    <div class="preflight-result">
+        <preflight-result-intro active="true"
+                                heading="Blacklisted terms"
+                                pass-text="No blacklisted words/phrases for this property."
+                                pass="model.result.blacklist.length === 0">
+        </preflight-result-intro>
+        <ul class="badge-list" ng-if="model.result.blacklist.length">
+            <li class="umb-badge umb-badge--gray"
+                ng-repeat="word in model.result.blacklist track by $index | limitTo: (showAllBlacklist ? model.result.blacklist.length : 5)"
+                ng-bind="word">
+            </li>
+            <li class="umb-badge umb-badge--primary" role="button"
+                ng-show="model.result.blacklist.length > 5 && !showAllBlacklist"
+                ng-click="showAllBlacklist = true">
+                plus {{ model.result.blacklist.length - 5 }} more...
+            </li>
+        </ul>
+    </div>
+</div>

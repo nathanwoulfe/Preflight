@@ -15,18 +15,6 @@ namespace Preflight.Models
         [JsonProperty("cancelSaveOnFail")]
         public bool CancelSaveOnFail { get; set; }
 
-        [JsonProperty("hideDisabled")]
-        public bool HideDisabled { get; set; }
-
-        [JsonProperty("checkLinks")]
-        public bool CheckLinks { get; set; }
-
-        [JsonProperty("checkReadability")]
-        public bool CheckReadability { get; set; }
-
-        [JsonProperty("checkSafeBrowsing")]
-        public bool CheckSafeBrowsing { get; set; }
-
         [JsonProperty("failedCount")]
         public int FailedCount { get; set; }
 
@@ -42,17 +30,8 @@ namespace Preflight.Models
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("links")]
-        public List<BrokenLinkModel> Links { get; set; }
-
-        [JsonProperty("safeBrowsing")]
-        public List<BrokenLinkModel> SafeBrowsing { get; set; }
-
-        [JsonProperty("readability")]
-        public ReadabilityResponseModel Readability { get; set; }
-
         [JsonProperty("plugins")]
-        public List<PreflightPlugin> Plugins { get; set; }
+        public List<IPreflightPlugin> Plugins { get; set; }
 
         [JsonProperty("open")]
         public bool Open { get; set; }
@@ -68,7 +47,7 @@ namespace Preflight.Models
             Open = false;
             Failed = false;
 
-            Plugins = new List<PreflightPlugin>();
+            Plugins = new List<IPreflightPlugin>();
         }
     }
 }

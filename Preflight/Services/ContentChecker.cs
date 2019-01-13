@@ -14,37 +14,15 @@ namespace Preflight.Services
 {
     internal class ContentChecker : IContentChecker
     {
-        private readonly IReadabilityService _readabilityService;
-        private readonly ISafeBrowsingService _safeBrowsingService;
-        private readonly ILinksService _linksService;
-
         private readonly List<string> _added;
         private readonly List<SettingsModel> _settings;
 
-        private readonly bool _checkLinks;
-        private readonly bool _checkReadability;
-        private readonly bool _checkSafeBrowsing;
-
         private int _id;
 
-        private readonly string _apiKey;
-
-
-        public ContentChecker(IReadabilityService readabilityService, ILinksService linksService, 
-            ISafeBrowsingService safeBrowsingService, ISettingsService settingsService)
+        public ContentChecker(ISettingsService settingsService)
         {
-            _readabilityService = readabilityService;
-            _linksService = linksService;
-            _safeBrowsingService = safeBrowsingService;
-
             _added = new List<string>();
-            
             _settings = settingsService.Get().Settings;
-
-            _checkLinks = _settings.GetValue<bool>(KnownSettings.CheckLinks);
-            _checkReadability = _settings.GetValue<bool>(KnownSettings.CheckReadability);
-            _checkSafeBrowsing = _settings.GetValue<bool>(KnownSettings.EnsureSafeLinks);
-            _apiKey = _settings.GetValue<string>(KnownSettings.GoogleApiKey);
         }
 
         /// <summary>
@@ -57,14 +35,10 @@ namespace Preflight.Services
             // make this available to pass into any plugins
             _id = content.Id;
 
-            IEnumerable<Property> props = content.GetPreflightProperties();
+            IEnumerable <Property> props = content.GetPreflightProperties();
 
             var response = new PreflightResponseModel
             {
-                CheckLinks = _checkLinks,
-                CheckReadability = _checkReadability,
-                CheckSafeBrowsing = _checkSafeBrowsing,
-                HideDisabled = _settings.GetValue<bool>(KnownSettings.HideDisabled),
                 CancelSaveOnFail = _settings.GetValue<bool>(KnownSettings.CancelSaveOnFail)
             };
 
@@ -178,34 +152,41 @@ namespace Preflight.Services
         /// <returns></returns>
         private PreflightPropertyResponseModel CheckProperty(string name, string val)
         {
-            ReadabilityResponseModel readability = _checkReadability ? _readabilityService.Check(val, _settings) : new ReadabilityResponseModel();
-            List<BrokenLinkModel> safeBrowsing = _checkSafeBrowsing ? _safeBrowsingService.Check(val, _apiKey) : new List<BrokenLinkModel>();
-            List<BrokenLinkModel> links = _checkLinks ? _linksService.Check(val, safeBrowsing) : new List<BrokenLinkModel>();
-
             var model = new PreflightPropertyResponseModel
             {
-                Name = name,
-                Readability = readability,
-                Links = links,
-                SafeBrowsing = safeBrowsing
+                Name = name
             };
 
-            // this is a POC and should be refactored
-            foreach (PreflightPlugin plugin in PluginsHelper.GetPlugins())
+            var pluginProvider = new PluginProvider();
+
+            foreach (IPreflightPlugin plugin in pluginProvider.Get())
             {
+                // settings on the plugin are the defaults - set to correct values from _settings
+                // needs foreach as Settings has no settor, but the individual setting values do
+                IEnumerable<SettingsModel> pluginSettings = _settings.Where(s => s.Tab == plugin.Name).ToList();
+               
+                foreach (SettingsModel setting in plugin.Settings)
+                {
+                    setting.Value = pluginSettings.First(s => s.Alias == setting.Alias).Value;
+                }
+
                 // ignore disabled plugins
-                if (plugin.Settings.Any(s =>
-                    s.Alias == plugin.Name.DisabledAlias() && s.Value.ToString() == "1")) continue;
+                if (plugin.IsDisabled())
+                    continue;
 
                 try
                 {
-                    if (!plugin.Name.HasValue()) continue;
+                    Type pluginType = plugin.GetType();
+                    if (pluginType.GetMethod("Check") == null) continue;
 
-                    plugin.Result = plugin.Check(_id, val, out bool failed);
+                    plugin.Check(_id, val, _settings);
 
                     if (plugin.Result != null)
                     {
-                        plugin.Failed = failed;
+                        if (plugin.FailedCount == 0)
+                        {
+                            plugin.FailedCount = plugin.Failed ? 1 : 0;
+                        }
                         model.Plugins.Add(plugin);
                     }
                 }
@@ -217,26 +198,10 @@ namespace Preflight.Services
             }
 
             // mark as failed if any sub-tests have failed
-            model.Failed = _checkReadability && readability.Failed || 
-                           links.Any() || 
-                           safeBrowsing.Any() || 
-                           (bool) model.Plugins?.Any(x => x.Failed);
+            model.FailedCount = model.Plugins.Sum(x => x.FailedCount);
+            model.Failed = model.FailedCount > 0;
 
-            // counting failed is a bit messy - check all core test for failures, then count failed plugins
-            // ultimately, core tests should use plugin structure but set core=true
-            var failedCount = 0;
-            if (_checkReadability && readability.Failed)
-            {
-                failedCount += readability.Blacklist.Any() ? 1 : 0;
-                failedCount += readability.FailedReadability ? 1 : 0;
-                failedCount += readability.LongWords.Any() ? 1 : 0;
-            }
-
-            failedCount += links.Any() ? 1 : 0;
-            failedCount += safeBrowsing.Any() ? 1 : 0;
-            failedCount += model.Plugins.Count(x => x.Failed);
-
-            model.FailedCount = failedCount;
+            model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
 
             return model;
         }

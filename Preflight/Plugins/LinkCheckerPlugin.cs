@@ -1,0 +1,86 @@
+﻿using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
+using Preflight.Constants;
+using Preflight.Extensions;
+using Preflight.Models;
+using Preflight.Services;
+using Preflight.Services.Interfaces;
+
+namespace Preflight.Plugins
+{
+    [Export(typeof(IPreflightPlugin))]
+    public class LinkCheckerPlugin : IPreflightCorePlugin
+    {
+        private readonly ILinksService _linksService;
+        private readonly ISafeBrowsingService _safeBrowsingService;
+
+        public object Result { get; set; }
+        public List<SettingsModel> Settings { get; set; }
+
+        public bool Failed { get; set; }
+        public bool Core => true;
+
+        public int SortOrder => -1;
+        public int FailedCount { get; set; }
+
+        public string Name => "Link health";
+        public string ViewPath => "/app_plugins/preflight/backoffice/plugins/linkhealth.html";
+
+        public LinkCheckerPlugin() : this(new LinksService(), new SafeBrowsingService())
+        {
+        }
+
+        private LinkCheckerPlugin(ILinksService linksService, ISafeBrowsingService safeBrowsingService)
+        {
+            _linksService = linksService;
+            _safeBrowsingService = safeBrowsingService;
+
+            Settings = new List<SettingsModel>
+            {
+                new DisabledSettingModel(Name),
+                new GenericSettingModel("Ensure safe links")
+                {
+                    Description = "Set to true and Preflight will check links for potential malware and bad actors.",
+                    View = SettingType.Boolean,
+                    Value = "0",
+                    Order = 1,
+                    Tab = Name,
+                    Core = true
+                },
+                new GenericSettingModel("Google SafeBrowsing API key")
+                {
+                    Description = "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites.",
+                    View = SettingType.String,
+                    Value = "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw",
+                    Order = 2,
+                    Tab = Name,
+                    Core = true
+                }
+            };
+        }
+
+        public void Check(int id, string val, List<SettingsModel> settings)
+        {
+            var apiKey = settings.GetValue<string>(KnownSettings.GoogleApiKey);
+            var checkSafeBrowsing = settings.GetValue<bool>(KnownSettings.EnsureSafeLinks);
+
+            // check safebrowsing first to avoid double processing of links
+            List<BrokenLinkModel> safeBrowsingResult = checkSafeBrowsing && apiKey.HasValue() ? _safeBrowsingService.Check(val, apiKey) : new List<BrokenLinkModel>();
+            List<BrokenLinkModel> brokenLinksResult = _linksService.Check(val, safeBrowsingResult);
+
+            // then set Failed
+            Failed = brokenLinksResult.Any() || safeBrowsingResult.Any();
+            // and set Result
+            Result = new Dictionary<string, List<BrokenLinkModel>>
+            {
+                { "safeBrowsing", safeBrowsingResult},
+                { "brokenLinks", brokenLinksResult }
+            };
+
+            // finally, tally failed tests
+            FailedCount = safeBrowsingResult.Any() ? 1 : 0;
+            FailedCount += brokenLinksResult.Any() ? 1 : 0;
+        }
+    }
+}

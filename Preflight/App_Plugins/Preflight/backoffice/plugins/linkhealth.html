@@ -1,0 +1,25 @@
+﻿<preflight-state-icon failed="model.result.brokenLinks.length > 0"></preflight-state-icon>
+<div class="preflight-result">
+    <preflight-result-intro active="true"
+                            heading="Broken links"
+                            pass-text="No broken links found for this property"
+                            pass="model.result.brokenLinks.length === 0">
+    </preflight-result-intro>
+    <ul ng-if="model.result.brokenLinks.length">
+        <li ng-repeat="link in model.result.brokenLinks track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
+    </ul>
+</div>
+
+<div class="flex mt-30" ng-if="model.result.safeBrowsing.length > 0">
+    <preflight-state-icon failed="model.result.safeBrowsing.length > 0"></preflight-state-icon>
+    <div class="preflight-result">
+        <preflight-result-intro active="true"
+                                heading="Safe browsing"
+                                pass-text="No unsafe links found for this property."
+                                pass="model.result.safeBrowsing.length === 0">
+        </preflight-result-intro>
+        <ul ng-if="model.result.safeBrowsing.length">
+            <li ng-repeat="link in model.result.safeBrowsing track by $index">Link text: {{ link.text }}<br />Target: {{ link.href }}<br />Status: {{ link.status }}</li>
+        </ul>
+    </div>
+</div>

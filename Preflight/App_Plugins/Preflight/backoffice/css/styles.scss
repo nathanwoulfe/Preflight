@@ -7,6 +7,21 @@ $grey: #f3f3f5;
 $umbGreen: #00aea2;
 
 .preflight {
+    position: relative;
+
+    &::before {
+        content: '\e0c7';
+        font-family: icomoon;
+        font-size: 55vw;
+        position: absolute;
+        left: 0;
+        top: 120%;
+        opacity: .025;
+    }
+
+    > div {
+        position:relative;
+    }
 
     &-settings {
         .umb-control-group {
@@ -16,6 +31,7 @@ $umbGreen: #00aea2;
 
     .flex {
         display: flex;
+        position: relative;
     }
 
     .mt-30 {
@@ -29,7 +45,7 @@ $umbGreen: #00aea2;
     }
 
     h5 {
-        margin-top:0;
+        margin-top: 0;
     }
 
     .state-icon {
@@ -42,9 +58,16 @@ $umbGreen: #00aea2;
         height: 42px;
         min-width: 42px;
         border-radius: 50%;
+        position: absolute;
+        top: 0;
+        left: 0;
 
         .icon {
             font-size: 22px;
+        }
+
+        + .preflight-result {
+            padding-left: 77px;
         }
     }
 
@@ -100,15 +123,27 @@ $umbGreen: #00aea2;
 
         .umb-badge {
             margin: 0 5px 5px;
+
+            &[role=button] {
+                cursor:pointer;
+            }
         }
     }
 
-    .preflight-cards {
+    &-plugin-wrapper {
+        width: 100%;
+    }
+
+    &-result {
+        min-height:62px;
+    }
+
+    &-cards {
         display: flex;
         justify-content: center;
         text-align: center;
         padding: 10px;
-        margin:0 -10px;
+        margin: 0 -10px;
     }
 
     .card {
@@ -117,7 +152,7 @@ $umbGreen: #00aea2;
         padding: 20px;
         border-radius: 6px;
         background: rgba($grey, 0.75);
-        margin:0 10px;
+        margin: 0 10px;
 
         &-score {
             font-size: 36px;

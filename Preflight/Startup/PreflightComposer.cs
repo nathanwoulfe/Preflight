@@ -16,7 +16,7 @@ namespace Preflight.Startup
             composition.Register<ISafeBrowsingService, SafeBrowsingService>();
             composition.Register<ISettingsService, SettingsService>();
 
-            composition.Register<IPreflightPlugin, PreflightPlugin>();
+            //composition.Register<IPreflightPlugin, ReadabilityPlugin>();
 
             composition.Components().Append<PreflightComponent>();
         }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Plugins;
@@ -32,8 +33,8 @@ namespace Preflight.Services
             List<SettingsTab> tabs = new List<SettingsTab>();
             foreach (SettingsModel s in settings)
             {
-                if (s.Core || !s.Alias.HasValue())
-                {
+                if (!s.Alias.HasValue()) { 
+                //if (s.Core && !s.Label.Equals("disabled", StringComparison.InvariantCultureIgnoreCase)) { 
                     s.Alias = s.Label.Camel();
                 }
 
@@ -42,30 +43,14 @@ namespace Preflight.Services
 
             // get any plugins and add their settings
             // once settings have been saved from the backoffice, need to check that plugins aren't added twice
-            foreach (PreflightPlugin plugin in PluginsHelper.GetPlugins())
+            var pluginProvider = new PluginProvider();
+
+            foreach (IPreflightPlugin plugin in pluginProvider.Get())
             {
                 foreach (SettingsModel setting in plugin.Settings)
                 {
-                    setting.Alias = setting.Label.Camel();
-
-                    if (settings.Any(s => s.Alias == setting.Alias)) continue;
-
                     setting.Tab = plugin.Name;
                     settings.Add(setting);
-                }
-
-                string disabledAlias = plugin.Name.DisabledAlias();
-                if (settings.All(s => s.Alias != disabledAlias))
-                {
-                    settings.Add(new SettingsModel
-                    {
-                        Label = "Disabled",
-                        Alias = disabledAlias,
-                        View = KnownPropertyEditors.Boolean,
-                        Value = 0,
-                        Order = 0,
-                        Tab = plugin.Name
-                    });
                 }
 
                 // generate a tab from the setting - this list is filtered later
@@ -75,7 +60,7 @@ namespace Preflight.Services
             // tabs are sorted alpha, with general first
             var response = new PreflightSettings
             {
-                Settings = settings,
+                Settings = settings.DistinctBy(s => new { s.Tab, s.Label }).ToList(),
                 Tabs = tabs.GroupBy(x => x.Alias)
                     .Select(y => y.First())
                     .OrderBy(i => i.Name != SettingsTabNames.General)

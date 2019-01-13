@@ -12,28 +12,6 @@
         };
 
         /**
-         *  
-         * @param {any} data
-         */
-        //const bindResults = () => {
-
-        //    if (this.results.properties.length) {
-        //        this.results.properties.forEach(p => {
-        //            this.blacklistFailed = this.blacklistFailed || p.readability.blacklist.length > 0;
-        //            this.longWordsFailed = this.longWordsFailed || p.readability.longWords.length > 0;
-
-        //            this.brokenLinksFailed = this.brokenLinksFailed || p.links.length > 0;
-        //            this.safeBrowsingFailed = this.safeBrowsingFailed || p.safeBrowsing.length > 0;
-
-        //            this.readabilityFailed = this.readabilityFailed || p.failedReadability;
-        //        });
-        //    }
-
-        //    this.loaded = true;
-        //};
-
-
-        /**
          * 
          */
         this.preflight = () => {
@@ -43,7 +21,6 @@
                     if (resp.status === 200) {
                         this.results = resp.data;
                         setBadgeCount();
-                        //bindResults();
                         this.loaded = true;
                     }
                 });
@@ -59,7 +36,6 @@
                     if ($rootScope.preflightResult) {
                         this.results = $rootScope.preflightResult;
                         setBadgeCount();
-                        //bindResults();
                         this.loaded = true;
                     }
                 }

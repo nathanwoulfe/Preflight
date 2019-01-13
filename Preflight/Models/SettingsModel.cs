@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using ClientDependency.Core;
 using Newtonsoft.Json;
 using Preflight.Extensions;
 
@@ -49,7 +48,7 @@ namespace Preflight.Models
         /// Set the default value for the setting
         /// </summary>
         [JsonProperty("value")]
-        public object Value { get; set; }
+        public string Value { get; set; }
 
         /// <summary>
         /// Describe the setting
@@ -81,5 +80,35 @@ namespace Preflight.Models
         /// </summary>
         [JsonProperty("alias")]
         internal string Alias { get; set; }
+    }
+
+
+    /// <summary>
+    /// Defines a generic Preflight setting
+    /// </summary>
+    public class GenericSettingModel : SettingsModel {
+        public GenericSettingModel(string label)
+        {
+            Label = label;
+            Alias = label.Camel();
+        }
+    }
+
+    /// <summary>
+    /// Defines the Preflight setting for the disable/enable setting 
+    /// </summary>
+    public class DisabledSettingModel : SettingsModel
+    {
+        public DisabledSettingModel(string tab)
+        {
+            Value = "0";
+            Label = "Disabled";
+            Alias = tab.DisabledAlias();
+            Description = "Disable this plugin";
+            View = "views/propertyeditors/boolean/boolean.html";
+            Order = -1;
+            Core = true;
+            Tab = tab;
+        }
     }
 }
