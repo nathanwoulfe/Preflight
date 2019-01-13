@@ -236,6 +236,7 @@
     <Compile Include="Constants\SettingType.cs" />
     <Compile Include="Extensions\ContentBaseExtensions.cs" />
     <Compile Include="Extensions\SettingsModelListExtensions.cs" />
+    <Compile Include="Plugins\AutoreplacePlugin.cs" />
     <Compile Include="Plugins\IPreflightCorePlugin.cs" />
     <Compile Include="Plugins\LinkCheckerPlugin.cs" />
     <Compile Include="Plugins\PluginProvider.cs" />

@@ -23,7 +23,7 @@
                 <h4 class="intro-text">Content on this page fails {{ vm.results.failedCount }} preflight checks.</h4>
             </div>
 
-            <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties track by $index">
+            <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties track by $index" ng-if="vm.results.failed">
                 <div class="umb-expansion-panel__header" ng-click="prop.open = !prop.open">
                     <div>
                         <span class="count-badge" ng-bind="prop.failedCount"></span>

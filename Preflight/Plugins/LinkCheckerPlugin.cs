@@ -16,7 +16,7 @@ namespace Preflight.Plugins
         private readonly ISafeBrowsingService _safeBrowsingService;
 
         public object Result { get; set; }
-        public List<SettingsModel> Settings { get; set; }
+        public IEnumerable<SettingsModel> Settings { get; set; }
 
         public bool Failed { get; set; }
         public bool Core => true;
@@ -26,7 +26,7 @@ namespace Preflight.Plugins
 
         public string Name => "Link health";
         public string ViewPath => "/app_plugins/preflight/backoffice/plugins/linkhealth.html";
-
+ 
         public LinkCheckerPlugin() : this(new LinksService(), new SafeBrowsingService())
         {
         }
@@ -36,16 +36,15 @@ namespace Preflight.Plugins
             _linksService = linksService;
             _safeBrowsingService = safeBrowsingService;
 
-            Settings = new List<SettingsModel>
-            {
-                new DisabledSettingModel(Name),
+            Settings = PluginSettingsList.Populate(Name,
+                false,
+                true,
                 new GenericSettingModel("Ensure safe links")
                 {
                     Description = "Set to true and Preflight will check links for potential malware and bad actors.",
                     View = SettingType.Boolean,
                     Value = "0",
                     Order = 1,
-                    Tab = Name,
                     Core = true
                 },
                 new GenericSettingModel("Google SafeBrowsing API key")
@@ -54,10 +53,9 @@ namespace Preflight.Plugins
                     View = SettingType.String,
                     Value = "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw",
                     Order = 2,
-                    Tab = Name,
                     Core = true
                 }
-            };
+            );
         }
 
         public void Check(int id, string val, List<SettingsModel> settings)

@@ -4,7 +4,6 @@
     {
         public const string BindSaveHandler = "Run Preflight on save";
         public const string EnsureSafeLinks = "Ensure safe links";
-        public const string RunAutoreplace = "Run autoreplace";
         public const string CancelSaveOnFail = "Cancel save when Preflight tests fail";
         public const string ReadabilityMin = "Readability target - minimum";
         public const string ReadabilityMax = "Readability target - maximum";

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Preflight.Extensions;
 
@@ -6,23 +7,18 @@ namespace Preflight.Models
 {
     public class PreflightSettings
     {
-        [JsonProperty("settings")]
-        public List<SettingsModel> Settings { get; set; }
+        [JsonProperty("settings")] public List<SettingsModel> Settings { get; set; }
 
-        [JsonProperty("tabs")]
-        public List<SettingsTab> Tabs { get; set; }
+        [JsonProperty("tabs")] internal List<SettingsTab> Tabs { get; set; }
     }
 
     public class SettingsTab
     {
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonProperty("name")] public string Name { get; set; }
 
-        [JsonProperty("alias")]
-        public string Alias => Name.Camel();
+        [JsonProperty("alias")] public string Alias => Name.Camel();
 
-        [JsonProperty("open")]
-        public bool Open => false;
+        [JsonProperty("open")] public bool Open => false;
 
         public SettingsTab(string name)
         {
@@ -35,8 +31,7 @@ namespace Preflight.Models
     /// </summary>
     public class SettingsModel
     {
-        [JsonProperty("core")]
-        internal bool Core { get; set; }
+        [JsonProperty("core")] internal bool Core { get; set; }
 
         /// <summary>
         /// A UI-friendly label for the setting
@@ -86,7 +81,8 @@ namespace Preflight.Models
     /// <summary>
     /// Defines a generic Preflight setting
     /// </summary>
-    public class GenericSettingModel : SettingsModel {
+    public class GenericSettingModel : SettingsModel
+    {
         public GenericSettingModel(string label)
         {
             Label = label;
@@ -97,18 +93,63 @@ namespace Preflight.Models
     /// <summary>
     /// Defines the Preflight setting for the disable/enable setting 
     /// </summary>
-    public class DisabledSettingModel : SettingsModel
+    internal class DisabledSettingModel : SettingsModel
     {
-        public DisabledSettingModel(string tab)
+        public DisabledSettingModel(string tab, bool val)
         {
-            Value = "0";
+            Value = val ? "1" : "0";
             Label = "Disabled";
             Alias = tab.DisabledAlias();
             Description = "Disable this plugin";
             View = "views/propertyeditors/boolean/boolean.html";
-            Order = -1;
+            Order = -10;
             Core = true;
             Tab = tab;
+        }
+    }
+
+    /// <summary>
+    /// Defines the Preflight setting for the on-save-only setting 
+    /// </summary>
+    internal class OnSaveOnlySettingModel : SettingsModel
+    {
+        public OnSaveOnlySettingModel(string tab, bool val)
+        {
+            Value = val ? "1" : "0";
+            Label = "Run on save only";
+            Alias = tab.OnSaveOnlyAlias();
+            Description = "Restrict this plugin to run only in a save event";
+            View = "views/propertyeditors/boolean/boolean.html";
+            Order = -5;
+            Core = true;
+            Tab = tab;
+        }
+    }
+
+    /// <summary>
+    /// Quickly generate settings list with defaults included
+    /// Set the default values for the plugin's disabled and run-on-save states
+    /// </summary>
+    public static class PluginSettingsList
+    {
+        public static IEnumerable<SettingsModel> Populate(string name, bool disabled, bool runOnSaveOnly, params SettingsModel[] settings)
+        {
+            if (!settings.Any())
+                return new List<SettingsModel>();
+
+            List<SettingsModel> response = new List<SettingsModel>
+            {
+                new DisabledSettingModel(name, disabled),
+                new OnSaveOnlySettingModel(name, runOnSaveOnly)
+            };
+
+            foreach (SettingsModel s in settings)
+            {
+                s.Tab = name;
+                response.Add(s);
+            }
+
+            return response;
         }
     }
 }

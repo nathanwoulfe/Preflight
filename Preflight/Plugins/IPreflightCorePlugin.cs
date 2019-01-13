@@ -2,7 +2,7 @@
 
 namespace Preflight.Plugins
 {
-    public interface IPreflightCorePlugin : IPreflightPlugin
+    internal interface IPreflightCorePlugin : IPreflightPlugin
     {
         /// <summary>
         /// Is this a core plugin, shipped with with package?

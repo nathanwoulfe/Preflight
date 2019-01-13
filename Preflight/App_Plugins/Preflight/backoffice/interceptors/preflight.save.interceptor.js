@@ -8,6 +8,7 @@
                         if (response.data.notifications) {
 
                             const notification = response.data.notifications.filter(f => f.header === Umbraco.Sys.ServerVariables.preflight.contentFailedChecks)[0];
+                            $rootScope.preflightResult = undefined;
 
                             if (notification) {
                                 const preflightResponse = JSON.parse(notification.message);

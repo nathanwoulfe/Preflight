@@ -14,7 +14,7 @@ namespace Preflight.Plugins
         private readonly IReadabilityService _readabilityService;
 
         public object Result { get; set; }
-        public List<SettingsModel> Settings { get; set; }
+        public IEnumerable<SettingsModel> Settings { get; set; }
 
         public bool Failed { get; set; }
         public bool Core => true;
@@ -33,9 +33,9 @@ namespace Preflight.Plugins
         {
             _readabilityService = readabilityService;
 
-            Settings = new List<SettingsModel>
-            {
-                new DisabledSettingModel(Name),
+            Settings = PluginSettingsList.Populate(Name, 
+                false,
+                false,
                 new GenericSettingModel("Readability target - minimum")
                 {
                     Value = "60",
@@ -43,7 +43,6 @@ namespace Preflight.Plugins
                     View = SettingType.Slider,
                     Order = 1,
                     Core = true,
-                    Tab = Name
                 },
                 new GenericSettingModel("Readability target - maximum")
                 {
@@ -52,7 +51,6 @@ namespace Preflight.Plugins
                     View = SettingType.Slider,
                     Order = 2,
                     Core = true,
-                    Tab = Name
                 },
                 new GenericSettingModel("Long word syllable count")
                 {
@@ -62,9 +60,8 @@ namespace Preflight.Plugins
                     View = SettingType.Slider,
                     Order = 3,
                     Core = true,
-                    Tab = Name
                 }
-            };
+            );
         }
 
         public void Check(int id, string val, List<SettingsModel> settings)

@@ -5,7 +5,6 @@ using Preflight.Models;
 using Preflight.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Preflight.Extensions;
 using Preflight.Plugins;
 using Umbraco.Core.Models;
@@ -15,25 +14,30 @@ namespace Preflight.Services
     internal class ContentChecker : IContentChecker
     {
         private readonly List<string> _added;
-        private readonly List<SettingsModel> _settings;
+        private readonly ISettingsService _settingsService;
 
         private int _id;
+        private bool _fromSave;
+        private List<SettingsModel> _settings;
 
         public ContentChecker(ISettingsService settingsService)
         {
             _added = new List<string>();
-            _settings = settingsService.Get().Settings;
+            _settingsService = settingsService;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="content"></param>
+        /// <param name="fromSave"></param>
         /// <returns></returns>
-        public PreflightResponseModel Check(IContent content)
+        public PreflightResponseModel Check(IContent content, bool fromSave)
         {
             // make this available to pass into any plugins
             _id = content.Id;
+            _fromSave = fromSave;
+            _settings = _settingsService.Get().Settings;
 
             IEnumerable <Property> props = content.GetPreflightProperties();
 
@@ -65,37 +69,6 @@ namespace Preflight.Services
             response.FailedCount = response.Properties.Sum(p => p.FailedCount);
 
             return response;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        public IContent Autoreplace(IContent content)
-        {
-            // perform autoreplace before readability check
-            // only do this in save handler as there's no point in updating if it's not being saved (potentially)
-            Dictionary<string, string> autoreplace = _settings.GetValue<string>(KnownSettings.AutoreplaceTerms)?.Split(',')
-                .ToDictionary(
-                    s => s.Split('|')[0], 
-                    s => s.Split('|')[1]
-                );
-
-            if (autoreplace == null || !autoreplace.Any()) return content;
-
-            IEnumerable<Property> props = content.GetPreflightProperties();
-
-            foreach (Property prop in props)
-            {
-                foreach (KeyValuePair<string, string> term in autoreplace)
-                {
-                    string pattern = $@"\b{term.Key}\b";
-                    prop.SetValue(Regex.Replace(prop.GetValue().ToString(), pattern, term.Value, RegexOptions.IgnoreCase));
-                }
-            }
-
-            return content;
         }
 
         /// <summary>
@@ -171,8 +144,8 @@ namespace Preflight.Services
                 }
 
                 // ignore disabled plugins
-                if (plugin.IsDisabled())
-                    continue;
+                if (plugin.IsDisabled()) continue;
+                if(!_fromSave && plugin.IsOnSaveOnly()) continue;
 
                 try
                 {

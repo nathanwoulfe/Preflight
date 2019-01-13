@@ -46,7 +46,7 @@ namespace Preflight.Plugins
         /// The settings for this plugin
         /// </summary>
         [JsonProperty("settings")]
-        List<SettingsModel> Settings { get; set; }
+        IEnumerable<SettingsModel> Settings { get; set; }
 
         /// <summary>
         /// Must set both the Failed and Result values. How this is done is up to the implementation

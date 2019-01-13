@@ -18,15 +18,6 @@
     "core": true
   },
   {
-    "label": "Auto-replace terms",
-    "description": "Pipe-separated list of terms to auto-replace in preflight checks - eg 'replace me|new text'. Autoreplace only runs in the save event handler.",
-    "tab": "Autoreplace",
-    "order": 1,
-    "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
-    "value": "replacethis|new term",
-    "core": true
-  },
-  {
     "label": "Run Preflight on save",
     "description": "Set to true and Preflight will run on all saves, and alert users to any errors.",
     "tab": "General",
@@ -42,15 +33,6 @@
     "order": 1,
     "view": "views/propertyeditors/boolean/boolean.html",
     "value": 1,
-    "core": true
-  },
-  {
-    "label": "Run autoreplace",
-    "description": "Set to true and Preflight will apply the replacements mapped in the Auto-replace config.",
-    "tab": "Autoreplace",
-    "order": 0,
-    "view": "views/propertyeditors/boolean/boolean.html",
-    "value": 0,
     "core": true
   }
 ]

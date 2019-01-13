@@ -83,20 +83,11 @@ namespace Preflight.Startup
         private void ContentService_Saving(IContentService sender, SaveEventArgs<IContent> e)
         {
             List<SettingsModel> settings = _settingsService.Get().Settings;
-
-            int onSave = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.BindSaveHandler.Camel()).Value);
-            if (onSave == 0) return;
+            if (!settings.GetValue<bool>(KnownSettings.BindSaveHandler)) return;
 
             IContent content = e.SavedEntities.First();
 
-            // perform autoreplace before readability check
-            // only do this in save handler as there's no point in updating if it's not being saved (potentially)
-            if (settings.Any(s => s.Alias == KnownSettings.RunAutoreplace.Camel() && s.Value.ToString() == "1"))
-            {
-                content = _contentChecker.Autoreplace(content);
-            }
-
-            PreflightResponseModel result = _contentChecker.Check(content);
+            PreflightResponseModel result = _contentChecker.Check(content, true);
 
             // at least one property on the current document fails the preflight check
             if (result.Failed == false) return;
@@ -104,12 +95,8 @@ namespace Preflight.Startup
             // these values are retrieved in the notifications handler, and passed down to the client
             HttpContext.Current.Items["PreflightResponse"] = result;
             HttpContext.Current.Items["PreflightNodeId"] = content.Id;
-
-            int cancelOnFail = Convert.ToInt32(settings.First(s => s.Alias == KnownSettings.CancelSaveOnFail.Camel()).Value);
-            if (cancelOnFail == 1)
-            {
-                e.Cancel = true;
-            }
+   
+            e.Cancel = settings.GetValue<bool>(KnownSettings.CancelSaveOnFail);
         }
     }
 }

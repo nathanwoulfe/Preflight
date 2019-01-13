@@ -5,10 +5,12 @@
         this.loaded = false;
 
         const setBadgeCount = () => {
-            $scope.model.badge = {
-                count: this.results.failedCount,
-                type: 'alert'
-            };
+            if (this.results.failedCount) {
+                $scope.model.badge = {
+                    count: this.results.failedCount,
+                    type: 'alert'
+                };
+            }
         };
 
         /**

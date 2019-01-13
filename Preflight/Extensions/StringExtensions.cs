@@ -30,6 +30,16 @@ namespace Preflight.Extensions
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
+        public static string OnSaveOnlyAlias(this string str)
+        {
+            return $"{str} on save only".Camel();
+        }
+
+        /// <summary>
+        /// Appends 'Disabled' and camelCases the given string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static string DisabledAlias(this string str)
         {
             return $"{str} disabled".Camel();
