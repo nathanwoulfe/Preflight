@@ -5,16 +5,21 @@ using Preflight.Models;
 using Preflight.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNet.SignalR;
 using Preflight.Extensions;
 using Preflight.Plugins;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 
 namespace Preflight.Services
 {
+    /// <summary>
+    /// Where the magic happens. ContentChecker extracts property values and passes them into the set of plugins for testing
+    /// </summary>
     internal class ContentChecker : IContentChecker
     {
-        private readonly List<string> _added;
         private readonly ISettingsService _settingsService;
+        private readonly IHubContext _hubContext;
 
         private int _id;
         private bool _fromSave;
@@ -22,12 +27,50 @@ namespace Preflight.Services
 
         public ContentChecker(ISettingsService settingsService)
         {
-            _added = new List<string>();
             _settingsService = settingsService;
+            _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub>();
         }
 
         /// <summary>
         /// 
+        /// </summary>
+        /// <param name="properties"></param>
+        public int CheckDirty(IEnumerable<SimpleProperty> properties)
+        {
+            _settings = _settingsService.Get().Settings;
+
+            var totalTests = 0;
+
+            foreach (SimpleProperty prop in properties)
+            {
+                List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
+
+                switch (prop.Editor)
+                {
+                    case KnownPropertyAlias.Grid:
+                        testResult = CheckNestedProperty(prop, KnownStrings.RteJsonPath);
+                        break;
+                    case KnownPropertyAlias.Archetype:
+                        testResult = CheckNestedProperty(prop, KnownStrings.ArchetypeRteJsonPath);
+                        break;
+                    case KnownPropertyAlias.Rte:
+                        testResult = CheckProperty(prop.Name, prop.Value).AsEnumerableOfOne().ToList();
+                        break;
+                }
+
+                foreach (PreflightPropertyResponseModel result in testResult)
+                {
+                    _hubContext.Clients.All.PreflightTest(result);
+                }
+
+                totalTests += testResult.Count;
+            }
+
+            return totalTests;
+        }
+
+        /// <summary>
+        /// Checks all testable properties on the given IContent item
         /// </summary>
         /// <param name="content"></param>
         /// <param name="fromSave"></param>
@@ -39,13 +82,12 @@ namespace Preflight.Services
             _fromSave = fromSave;
             _settings = _settingsService.Get().Settings;
 
-            IEnumerable <Property> props = content.GetPreflightProperties();
-
             var response = new PreflightResponseModel
             {
                 CancelSaveOnFail = _settings.GetValue<bool>(KnownSettings.CancelSaveOnFail)
             };
 
+            IEnumerable<Property> props = content.GetPreflightProperties();
             foreach (Property prop in props)
             {
                 switch (prop.PropertyType.PropertyEditorAlias)
@@ -71,8 +113,39 @@ namespace Preflight.Services
             return response;
         }
 
+
         /// <summary>
-        /// 
+        /// Extracts the testable values from a <see cref="SimpleProperty"/> and passes each to CheckProperty 
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <param name="editorPath"></param>
+        /// <returns></returns>
+        private List<PreflightPropertyResponseModel> CheckNestedProperty(SimpleProperty prop, string editorPath)
+        {
+            JObject asJson = JObject.Parse(prop.Value);
+            IEnumerable<JToken> rtes = asJson.SelectTokens(editorPath);
+
+            List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
+            var index = 1;
+
+            foreach (JToken rte in rtes)
+            {
+                JToken value = rte.SelectToken(KnownStrings.RteValueJsonPath);
+                if (value == null) continue;
+
+                PreflightPropertyResponseModel model = CheckProperty(prop.Name, value.ToString());
+
+                model.Label = $"{model.Name} (Editor {index})";
+                index += 1;
+
+                response.Add(model);
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Extracts the testable values from a single Property, and passes each to CheckProperty
         /// </summary>
         /// <param name="prop"></param>
         /// <param name="editorPath"></param>
@@ -83,7 +156,7 @@ namespace Preflight.Services
 
             if (propValue == null)
             {
-                return null;
+                return new List<PreflightPropertyResponseModel>();
             }
 
             JObject asJson = JObject.Parse(propValue.ToString());
@@ -92,13 +165,17 @@ namespace Preflight.Services
             string name = prop.PropertyType.Name;
 
             List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
+            var index = 1;
 
             foreach (JToken rte in rtes)
             {
                 JToken value = rte.SelectToken(KnownStrings.RteValueJsonPath);
                 if (value == null) continue;
 
-                PreflightPropertyResponseModel model = CheckProperty(SetName(name), value.ToString());
+                PreflightPropertyResponseModel model = CheckProperty(name, value.ToString());
+                
+                model.Label = $"{model.Name} (Editor {index})";
+                index += 1;
 
                 response.Add(model);
             }
@@ -118,7 +195,7 @@ namespace Preflight.Services
         }
 
         /// <summary>
-        /// 
+        /// Runs the set of plugins against the given string
         /// </summary>
         /// <param name="name"></param>
         /// <param name="val"></param>
@@ -127,6 +204,7 @@ namespace Preflight.Services
         {
             var model = new PreflightPropertyResponseModel
             {
+                Label = name,
                 Name = name
             };
 
@@ -135,13 +213,13 @@ namespace Preflight.Services
             foreach (IPreflightPlugin plugin in pluginProvider.Get())
             {
                 // settings on the plugin are the defaults - set to correct values from _settings
-                // needs foreach as Settings has no settor, but the individual setting values do
                 IEnumerable<SettingsModel> pluginSettings = _settings.Where(s => s.Tab == plugin.Name).ToList();
-               
-                foreach (SettingsModel setting in plugin.Settings)
-                {
-                    setting.Value = pluginSettings.First(s => s.Alias == setting.Alias).Value;
-                }
+                plugin.Settings = pluginSettings;
+
+                //foreach (SettingsModel setting in plugin.Settings)
+                //{
+                //    setting.Value = pluginSettings.First(s => s.Alias == setting.Alias).Value;
+                //}
 
                 // ignore disabled plugins
                 if (plugin.IsDisabled()) continue;
@@ -177,19 +255,6 @@ namespace Preflight.Services
             model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
 
             return model;
-        }
-
-        /// <summary>
-        /// Helper for formatting the property name in the response
-        /// </summary>
-        /// <param name="name">Name of the current property</param>
-        /// <returns></returns>
-        private string SetName(string name)
-        {
-            string response = _added.IndexOf(name) != -1 ? $"{name} (Editor {_added.IndexOf(name) + 2})" : name;
-            _added.Add(name);
-
-            return response;
         }
     }
 }

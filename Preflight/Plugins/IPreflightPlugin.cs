@@ -19,7 +19,11 @@ namespace Preflight.Plugins
         /// </summary>
         [JsonProperty("failedCount")]
         int FailedCount { get; set; }
-
+        
+        /// <summary>
+        /// Sets the sort for the plugin - determins order of display in the app
+        /// </summary>
+        [JsonIgnore]
         int SortOrder { get; }
 
         /// <summary>

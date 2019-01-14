@@ -102,6 +102,35 @@ namespace Preflight.Api
                     data = ex.Message
                 });
             }
-        }        
+        }
+
+        /// <summary>
+        /// Entry point for checking sub-set of properties
+        /// </summary>
+        /// <param name="data">Node id</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("checkdirty")]
+        public IHttpActionResult CheckDirty(IEnumerable<SimpleProperty> data)
+        {
+            try
+            {
+                int testCount = _contentChecker.CheckDirty(data);
+
+                return Ok(new
+                {
+                    status = HttpStatusCode.OK,
+                    testCount
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    status = HttpStatusCode.InternalServerError,
+                    data = ex.Message
+                });
+            }
+        }
     }
 }

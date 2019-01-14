@@ -25,6 +25,8 @@
         const service = {
             check: id => request('GET', `${urlBase}check/${id}`),
 
+            checkDirty: data => request('POST', `${urlBase}checkdirty/`, data),
+
             getSettings: () => request('GET', `${urlBase}getSettings`),
 
             saveSettings: settings => request('POST', `${urlBase}saveSettings`, settings),

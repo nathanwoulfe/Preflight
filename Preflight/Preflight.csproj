@@ -231,6 +231,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\PreflightPluginExtensions.cs" />
+    <Compile Include="Models\SimpleProperty.cs" />
     <Compile Include="NotificationsHandler.cs" />
     <Compile Include="Api\PreflightApiController.cs" />
     <Compile Include="Constants\SettingType.cs" />
@@ -241,6 +242,7 @@
     <Compile Include="Plugins\LinkCheckerPlugin.cs" />
     <Compile Include="Plugins\PluginProvider.cs" />
     <Compile Include="Plugins\ReadabilityPlugin.cs" />
+    <Compile Include="PreflightHub.cs" />
     <Compile Include="Services\ContentChecker.cs" />
     <Compile Include="Constants\KnownSettings.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -286,8 +288,10 @@
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.stateicon.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.resultintro.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\interceptors\preflight.save.interceptor.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\lib\signalr\jquery.signalr-2.2.1.min.js" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\linkhealth.html" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.html" />
+    <Content Include="App_Plugins\Preflight\backoffice\resources\preflight.hub.js" />
     <Content Include="App_Plugins\Preflight\backoffice\resources\preflight.service.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\views\contentapp.html" />
@@ -297,7 +301,6 @@
     <Content Include="Gruntfile.js" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Actions\" />
     <Folder Include="App_Plugins\Preflight\lang\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

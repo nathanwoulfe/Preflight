@@ -36,6 +36,10 @@ $umbGreen: #00aea2;
 
     .mt-30 {
         margin-top: 30px;
+
+        &:first-child {
+            margin-top:0; 
+        }
     }
 
     .alert {
@@ -84,6 +88,10 @@ $umbGreen: #00aea2;
         text-align: center;
         min-width: 16px;
         transform: translate(-110%, -60%);
+
+        &.pass {
+            background-color:$green;
+        }
     }
 
     .broken-link-type {
@@ -198,5 +206,9 @@ $umbGreen: #00aea2;
             color: #fff;
             background: $green;
         }
+    }
+
+    .umb-expansion-panel__header {
+        position:relative;
     }
 }

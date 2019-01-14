@@ -30,6 +30,9 @@ namespace Preflight.Models
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("label")]
+        internal string Label { get; set; }
+
         [JsonProperty("plugins")]
         public List<IPreflightPlugin> Plugins { get; set; }
 

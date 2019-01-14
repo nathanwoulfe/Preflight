@@ -9,6 +9,7 @@
     }
   ],
   "javascript": [
+    "~/App_Plugins/preflight/backoffice/resources/preflight.hub.js",
     "~/App_Plugins/preflight/backoffice/resources/preflight.service.js",
     "~/App_Plugins/preflight/backoffice/controllers/preflight.controller.js",
     "~/App_Plugins/preflight/backoffice/controllers/preflight.settings.controller.js",

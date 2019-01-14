@@ -1,16 +1,9 @@
 ﻿<div ng-controller="preflight.controller as vm" class="preflight" id="preflight-app" ng-cloak>
 
-    <!--<umb-load-indicator ng-if="!vm.loaded"></umb-load-indicator>-->
-
     <div ng-if="vm.loaded">
 
         <!--<div class="alert alert-warning" ng-if="dialogOptions.results.introText">
             <span ng-bind="dialogOptions.results.introText"></span>
-        </div>-->
-
-        <!--<div ng-if="!vm.results.checkLinks && !vm.results.checkReadability && !vm.results.checkSafeBrowsing">
-            <h3 class="title">All Preflight checks are currently disabled</h3>
-            <h4 class="intro-text">Enable checks on the Preflight dashboard in the settings section.</h4>
         </div>-->
 
         <div>
@@ -23,12 +16,17 @@
                 <h4 class="intro-text">Content on this page fails {{ vm.results.failedCount }} preflight checks.</h4>
             </div>
 
-            <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties track by $index" ng-if="vm.results.failed">
+            <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties track by $index" ng-if="vm.results.failed" ng-class="{'loading': prop.loading}">
                 <div class="umb-expansion-panel__header" ng-click="prop.open = !prop.open">
                     <div>
-                        <span class="count-badge" ng-bind="prop.failedCount"></span>
-                        {{ prop.name }}
+                        <span class="count-badge" ng-bind="prop.failedCount" ng-if="prop.failedCount"></span>
+                        <span class="count-badge pass" ng-if="!prop.failedCount">
+                            <ins class="icon-check"></ins>
+                        </span>
+
+                        {{ prop.label }}
                     </div>
+                    <umb-load-indicator ng-if="prop.loading"></umb-load-indicator>
                     <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !prop.open, 'icon-navigation-down': prop.open }">&nbsp;</ins>
                 </div>
 
@@ -41,10 +39,10 @@
         </div>
     </div>
 
-    <umb-overlay ng-if="vm.overlay.show"
+    <!--<umb-overlay ng-if="vm.overlay.show"
                  model="vm.overlay"
                  view="vm.overlay.view"
                  position="right">
-    </umb-overlay>
+    </umb-overlay>-->
 
 </div>

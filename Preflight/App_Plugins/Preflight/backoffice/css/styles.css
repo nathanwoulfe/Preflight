@@ -17,6 +17,8 @@
     position: relative; }
   .preflight .mt-30 {
     margin-top: 30px; }
+    .preflight .mt-30:first-child {
+      margin-top: 0; }
   .preflight .alert *:last-child {
     margin-bottom: 0; }
   .preflight h5 {
@@ -51,6 +53,8 @@
     text-align: center;
     min-width: 16px;
     transform: translate(-110%, -60%); }
+    .preflight .count-badge.pass {
+      background-color: #35c786; }
   .preflight .broken-link-type {
     color: #f9b945; }
     .preflight .broken-link-type.unsafe {
@@ -123,5 +127,7 @@
     .preflight .pass-bg {
       color: #fff;
       background: #35c786; }
+  .preflight .umb-expansion-panel__header {
+    position: relative; }
 
 /*# sourceMappingURL=styles.css.map */

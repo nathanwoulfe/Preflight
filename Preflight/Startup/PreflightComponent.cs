@@ -90,7 +90,7 @@ namespace Preflight.Startup
             PreflightResponseModel result = _contentChecker.Check(content, true);
 
             // at least one property on the current document fails the preflight check
-            if (result.Failed == false) return;
+            if (!result.Failed) return;
 
             // these values are retrieved in the notifications handler, and passed down to the client
             HttpContext.Current.Items["PreflightResponse"] = result;
