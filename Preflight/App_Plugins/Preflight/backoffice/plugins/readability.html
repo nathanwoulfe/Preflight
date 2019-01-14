@@ -1,4 +1,4 @@
-﻿<div class="preflight-cards">
+﻿<div class="preflight-cards" ng-controller="readability.plugin.controller as vm">
     <preflight-card title="Reading ease score"
                     subtitle="Target {{ model.result.targetMin }}-{{ model.result.targetMax }}"
                     score="model.result.score"
@@ -14,6 +14,14 @@
                     subtitle="length"
                     score="model.result.sentenceLength">
     </preflight-card>
+    
+    <button class="btn btn-help" ng-click="vm.help($event)"><ins class="icon-help-alt"></ins></button>
+
+    <umb-overlay ng-if="vm.overlay.show"
+                     model="vm.overlay"
+                     view="vm.overlay.view"
+                     position="right">
+    </umb-overlay>
 </div>
 
 <div class="flex mt-30">

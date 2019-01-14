@@ -2,15 +2,24 @@
 
     function ctrl($scope, $rootScope, $timeout, editorState, preflightService, preflightHub) {
 
-        this.loaded = false;
         const dirtyHashes = [];
         const validPropTypes = ['Umbraco.TinyMCEv3', 'Umbraco.Grid', 'Imulus.Archetype'];
 
+
+        /**
+         * Convert a string to a hash for storage and comparison.
+         * @param {string} s - the string to hashify
+         * @returns {int} the generated hash
+         */
         const getHash = s => s.split('').reduce((a, b) => {
                 a = ((a << 5) - a) + b.charCodeAt(0);
                 return a & a;
             }, 0);
 
+
+        /**
+         * Updates the badge in the header with the number of failed tests
+         */
         const setBadgeCount = () => {
             if (this.results && this.results.failedCount) {
                 $scope.model.badge = {
@@ -20,6 +29,11 @@
             }
         };
 
+
+        /**
+         * Updates the property set with the new value, and removes any temporary property from that set
+         * @param {object} data - a response model item returned via the signalr hub
+         */
         const rebindResult = data => {
             let newProp = true;
             this.results.properties.forEach(prop => {
@@ -30,6 +44,8 @@
                 } 
             });
 
+            // a new property will have a temporary placeholder - remove it
+            // _temp ensures grid with multiple editors only removes the correct temp entry
             if (newProp) {
                 const tempIndex = this.results.properties.map(p => p.name === `${data.name}_temp`).indexOf(true);
                 if (tempIndex !== -1) {
@@ -42,6 +58,11 @@
             this.results.failed = this.results.failedCount > 0;
         };
 
+
+        /**
+         * Finds dirty content properties, checks the type and builds a collection of simple models for posting to the preflight checkdirty endpoint
+         * Also generates and stores a hash of the property value for comparison on subsequent calls, to prevent re-fetching unchanged data
+         */
         const checkDirty = () => {
             const propForms = document.querySelectorAll('[data-element="editor-container"] [name="propertyForm"]');
             const dirtyProps = [];
@@ -58,18 +79,17 @@
                         dirtyProps.push({
                             name: elmScope.property.label,
                             value: valAsString,
-                            editor: elmScope.property.editor,
+                            editor: elmScope.property.editor
                         });
 
                         dirtyHashes.push(hash);
                         hasDirty = true;
                     }
-
-                    console.log(dirtyHashes);
                 }
             });
 
-            // response will be true/false, signalr handles updating ui
+            // if dirty properties exist, create a simple model for each and send the lot off for checking
+            // response comes via the signalr hub so is not handled here
             if (hasDirty) {
                 $timeout(() => {
                     dirtyProps.forEach(prop => {
@@ -78,7 +98,7 @@
                             existing.loading = true;
                             existing.open = false;
                         } else {
-                            // generate new placeholder for pending results
+                            // generate new placeholder for pending results - this is removed when the response is returned
                             this.results.properties.push({
                                 label: prop.name,
                                 loading: true,
@@ -92,27 +112,16 @@
 
                     preflightService.checkDirty(dirtyProps)
                         .then(resp => {
-                            console.log(resp);
+                            // swallowed
                         });
                 });
             }
         };
 
-        /**
-         * 
-         */
-        this.preflight = () => {
-            this.loaded = false;
-            preflightService.check(editorState.current.id)
-                .then(resp => {
-                    if (resp.status === 200) {
-                        this.results = resp.data;
-                        setBadgeCount();
-                        this.loaded = true;
-                    }
-                });
-        };
 
+        /**
+         * Determine what data to display - content from $rootScope if it exists, otherwise updates the existing properties
+         */
         const init = () => {
             if ($rootScope.preflightResult) {
                 this.results = $rootScope.preflightResult;
@@ -122,8 +131,8 @@
             }
 
             setBadgeCount();
-            this.loaded = true;
         };
+
 
         /**
          * Watch the visibility of the app, then check rootscope for any data to display
@@ -137,23 +146,10 @@
             }
         );
 
-        /**
-         * 
-         */
-        this.readabilityHelp = () => {
-            this.overlay = {
-                view: '../app_plugins/preflight/backoffice/views/help.overlay.html',
-                show: true,
-                title: 'Readability',
-                subtitle: 'Why should I care?',
-                text: 'Text, yo',
-                close: () => {
-                    this.overlay.show = false;
-                    this.overlay = null;
-                }
-            };
-        };
 
+        /**
+         * Initiates the signalr hub for returning test results
+         */
         preflightHub.initHub(hub => {
             hub.on('preflightTest',
                 e => {
@@ -165,15 +161,19 @@
             hub.start();
         });
 
-        preflightService.getSettings()
-            .then(resp => {
-                console.log(resp);
-            });
 
-        // check all properties on load
-        this.preflight();
+        /**
+         * Check all properties when the controller loads. Won't re-run when changing between apps
+         */
+        preflightService.check(editorState.current.id)
+            .then(resp => {
+                if (resp.status === 200) {
+                    this.results = resp.data;
+                    setBadgeCount();
+                }
+            });
     }
 
-    angular.module('umbraco').controller('preflight.controller', ['$scope', '$rootScope', '$timeout', 'editorState', 'preflightService', 'preflightHub', ctrl]);
+    angular.module('preflight').controller('preflight.controller', ['$scope', '$rootScope', '$timeout', 'editorState', 'preflightService', 'preflightHub', ctrl]);
 
 })();

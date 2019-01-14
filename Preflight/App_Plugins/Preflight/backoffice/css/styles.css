@@ -12,6 +12,8 @@
     position: relative; }
   .preflight-settings .umb-control-group {
     position: relative; }
+  .preflight-overlay, .preflight .umb-overlay-header {
+    text-align: left; }
   .preflight .flex {
     display: flex;
     position: relative; }
@@ -129,5 +131,10 @@
       background: #35c786; }
   .preflight .umb-expansion-panel__header {
     position: relative; }
+  .preflight .btn-help {
+    background: 0;
+    font-size: 20px;
+    position: absolute;
+    right: 0; }
 
 /*# sourceMappingURL=styles.css.map */

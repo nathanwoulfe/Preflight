@@ -32,6 +32,6 @@
         return dir;
     }
 
-    angular.module('umbraco').directive('preflightStateIcon', preflightStateIcon);
+    angular.module('preflight.directives').directive('preflightStateIcon', preflightStateIcon);
 
 })();

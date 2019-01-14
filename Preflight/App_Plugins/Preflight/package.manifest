@@ -9,16 +9,22 @@
     }
   ],
   "javascript": [
+    "~/App_Plugins/preflight/backoffice/app.js",
+
     "~/App_Plugins/preflight/backoffice/resources/preflight.hub.js",
     "~/App_Plugins/preflight/backoffice/resources/preflight.service.js",
+
     "~/App_Plugins/preflight/backoffice/controllers/preflight.controller.js",
-    "~/App_Plugins/preflight/backoffice/controllers/preflight.settings.controller.js",
-    "~/App_Plugins/preflight/backoffice/controllers/preflight.help.overlay.controller.js",
     "~/App_Plugins/preflight/backoffice/controllers/preflight.notification.controller.js",
+    "~/App_Plugins/preflight/backoffice/controllers/preflight.settings.controller.js",
+
+    "~/App_Plugins/preflight/backoffice/plugins/readability.plugin.controller.js",
+
     "~/App_Plugins/preflight/backoffice/interceptors/preflight.save.interceptor.js",
+
     "~/App_Plugins/preflight/backoffice/directives/preflight.card.directive.js",
-    "~/App_Plugins/preflight/backoffice/directives/preflight.stateicon.directive.js",
-    "~/App_Plugins/preflight/backoffice/directives/preflight.resultintro.directive.js"
+    "~/App_Plugins/preflight/backoffice/directives/preflight.resultintro.directive.js",
+    "~/App_Plugins/preflight/backoffice/directives/preflight.stateicon.directive.js"
   ],
   "css": [
     "~/App_Plugins/preflight/backoffice/css/styles.css"

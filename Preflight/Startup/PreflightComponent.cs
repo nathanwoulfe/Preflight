@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Routing;
+using ClientDependency.Core;
 using Preflight.Constants;
 using Preflight.Extensions;
 using Preflight.Models;
@@ -67,11 +68,13 @@ namespace Preflight.Startup
         private static void ServerVariablesParser_Parsing(object sender, Dictionary<string, object> dictionary)
         {
             var urlHelper = new System.Web.Mvc.UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+            IDictionary<string, object> settings = dictionary["umbracoSettings"].ToDictionary();
 
-            dictionary.Add("preflight", new Dictionary<string, object>
+            dictionary.Add("Preflight", new Dictionary<string, object>
             {
-                { "contentFailedChecks", KnownStrings.ContentFailedChecks },
-                { "apiPath", urlHelper.GetUmbracoApiServiceBaseUrl<Api.ApiController>(controller => controller.GetSettings()) }
+                { "ContentFailedChecks", KnownStrings.ContentFailedChecks },
+                { "PluginPath",$"{settings["appPluginsPath"]}/preflight/backoffice" },
+                { "ApiPath", urlHelper.GetUmbracoApiServiceBaseUrl<Api.ApiController>(controller => controller.GetSettings()) }
             });
         }
 

@@ -22,5 +22,5 @@
     }
 
     // register controller 
-    angular.module('umbraco').controller('preflight.notification.controller', ['notificationsService', notificationController]);
+    angular.module('preflight').controller('preflight.notification.controller', ['notificationsService', notificationController]);
 })();

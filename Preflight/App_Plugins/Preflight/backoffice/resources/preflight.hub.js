@@ -62,6 +62,6 @@
         };
     }
 
-    angular.module('umbraco.services').factory('preflightHub', ['$rootScope', '$q', 'assetsService', preflightHub]);
+    angular.module('preflight.services').factory('preflightHub', ['$rootScope', '$q', 'assetsService', preflightHub]);
 
 })();

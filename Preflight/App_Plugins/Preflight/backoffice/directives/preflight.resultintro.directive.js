@@ -20,6 +20,6 @@
         return dir;
     }
 
-    angular.module('umbraco').directive('preflightResultIntro', preflightResultIntro);
+    angular.module('preflight.directives').directive('preflightResultIntro', preflightResultIntro);
 
 })();

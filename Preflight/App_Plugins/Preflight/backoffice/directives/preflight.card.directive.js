@@ -37,6 +37,6 @@
         return dir;
     }
 
-    angular.module('umbraco').directive('preflightCard', preflightCard);
+    angular.module('preflight.directives').directive('preflightCard', preflightCard);
 
 })();

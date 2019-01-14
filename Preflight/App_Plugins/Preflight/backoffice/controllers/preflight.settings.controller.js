@@ -4,8 +4,6 @@
 
         this.content = preflightService.getHelpText();
 
-        const getSettingByAlias = alias => this.settings.filter(v => v.alias === alias)[0];
-
         /**
          * 
          */
@@ -83,6 +81,6 @@
         getSettings();
     }
 
-    angular.module('umbraco').controller('preflight.settings.controller', ['notificationsService', 'preflightService', ctrl]);
+    angular.module('preflight').controller('preflight.settings.controller', ['notificationsService', 'preflightService', ctrl]);
 
 })();

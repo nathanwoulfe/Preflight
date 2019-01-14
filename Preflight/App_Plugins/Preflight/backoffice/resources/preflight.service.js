@@ -2,19 +2,17 @@
 
     function preflightService($http, umbRequestHelper) {
 
-        const urlBase = Umbraco.Sys.ServerVariables.preflight.apiPath;
+        const urlBase = Umbraco.Sys.ServerVariables.Preflight.ApiPath;
 
         const helpText = `
             <p>If your content is too difficult for your visitors to read, you're all going to have a bad time.</p>
-            <p>The Preflight readability test runs your content through the Flesch reading ease algorithm to determine text complexity.</p>
+            <p>The readability test runs your content through the Flesch reading ease algorithm to determine text complexity.</p>
             <h5>The algorithm</h5>
             <p><code>RE = 206.835 - (1.015 x ASL) - (84.6 x ASW)</code></p>
-            <p>Where RE is Readability Ease, ASL is Average Sentence Length, and ASW is Average Syllables per Word</p>
+            <p>Where <code>RE</code> is Readability Ease, <code>ASL</code> is Average Sentence Length, and <code>ASW</code> is Average Syllables per Word</p>
             <p>The result is a number between 0 and 100, where a higher score means better readability, with a score between 60 and 69 largely considered acceptable.</p>
-            <h5>Preflight test results</h5>
-            <p>As well as the Flesch score, Preflight returns sentence length; average syllables per word; long or complex words; and broken links (an external link returning a non-200 code response, or a relative internal link).</p>
-            <p>Links are also submitted to Google's SafeBrowsing API, if an API key has been provided.</p>
-            <p>The package currently supports RTE editors nested in Grid or Archetype editors, or added as standalone properties.</p>`;
+            <h5>Readability test results</h5>
+            <p>As well as the Flesch score, the readability test returns sentence length; average syllables per word; and long or complex words;</p>`;
 
         const request = (method, url, data) =>
             umbRequestHelper.resourcePromise(
@@ -37,6 +35,6 @@
         return service;
     }
 
-    angular.module('umbraco').service('preflightService', ['$http', 'umbRequestHelper', preflightService]);
+    angular.module('preflight.services').service('preflightService', ['$http', 'umbRequestHelper', preflightService]);
 
 })();

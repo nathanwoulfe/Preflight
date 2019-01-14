@@ -281,8 +281,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Plugins\Preflight\backoffice\app.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.settings.controller.js" />
-    <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.help.overlay.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.notification.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.card.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.stateicon.directive.js" />
@@ -291,12 +291,13 @@
     <Content Include="App_Plugins\Preflight\backoffice\lib\signalr\jquery.signalr-2.2.1.min.js" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\linkhealth.html" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.html" />
+    <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.plugin.controller.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.overlay.html" />
     <Content Include="App_Plugins\Preflight\backoffice\resources\preflight.hub.js" />
     <Content Include="App_Plugins\Preflight\backoffice\resources\preflight.service.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\views\contentapp.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\failed.notification.html" />
-    <Content Include="App_Plugins\Preflight\backoffice\views\help.overlay.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\settings.dashboard.html" />
     <Content Include="Gruntfile.js" />
   </ItemGroup>
