@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Web;
 using Newtonsoft.Json;
 using Preflight.Models;
 
@@ -51,6 +52,18 @@ namespace Preflight.Plugins
         /// </summary>
         [JsonProperty("settings")]
         IEnumerable<SettingsModel> Settings { get; set; }
+
+        /// <summary>
+        /// What does the plugin do, in brief, no markup
+        /// </summary>
+        [JsonProperty("summary")]
+        string Summary { get; }
+
+        /// <summary>
+        /// What does the plugin do? Mark up welcome and will be trusted in the browser
+        /// </summary>
+        [JsonProperty("description")]
+        string Description { get; set; }
 
         /// <summary>
         /// Must set both the Failed and Result values. How this is done is up to the implementation

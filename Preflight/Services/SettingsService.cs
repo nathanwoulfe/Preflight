@@ -7,6 +7,7 @@ using Preflight.Services.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using Preflight.Extensions;
 
 namespace Preflight.Services
@@ -19,6 +20,12 @@ namespace Preflight.Services
         /// </summary>
         public PreflightSettings Get()
         {
+            MemoryCache cache = MemoryCache.Default;
+            object fromCache = cache.Get(KnownStrings.SettingsCacheKey);
+            if (fromCache != null)
+                return fromCache as PreflightSettings;
+
+            // only get here when nothing is cached 
             List<SettingsModel> settings;
 
             // json initially stores the core checks only
@@ -34,7 +41,6 @@ namespace Preflight.Services
             foreach (SettingsModel s in settings)
             {
                 if (!s.Alias.HasValue()) { 
-                //if (s.Core && !s.Label.Equals("disabled", StringComparison.InvariantCultureIgnoreCase)) { 
                     s.Alias = s.Label.Camel();
                 }
 
@@ -54,7 +60,14 @@ namespace Preflight.Services
                 }
 
                 // generate a tab from the setting - this list is filtered later
-                tabs.Add(new SettingsTab(plugin.Name));
+                // send back the summary and description for the plugin as part of the tab object for display in the settings view
+                var pluginTab = new SettingsTab(plugin.Name)
+                {
+                    Summary = plugin.Summary,
+                    Description = plugin.Description
+                };
+
+                tabs.Add(pluginTab);
             }
 
             // tabs are sorted alpha, with general first
@@ -67,16 +80,22 @@ namespace Preflight.Services
                     .ThenBy(i => i.Name).ToList()
             };
 
+            // if we are here, cache should be set
+            cache.Set(KnownStrings.SettingsCacheKey, response, DateTimeOffset.UtcNow.AddMinutes(120));
+
             return response;
         }
 
         /// <summary>
-        /// Save the Preflight settings to the JSON file in app_plugins
+        /// Save the Preflight settings to the JSON file in app_plugins and update cache
         /// </summary>
-        public bool Save(List<SettingsModel> settings)
+        public bool Save(PreflightSettings settings)
         {
             try
             {
+                MemoryCache cache = MemoryCache.Default;
+                cache.Set(KnownStrings.SettingsCacheKey, settings, DateTimeOffset.UtcNow.AddMinutes(120));
+
                 using (var file = new StreamWriter(KnownStrings.SettingsFilePath, false))
                 {
                     var serializer = new JsonSerializer();

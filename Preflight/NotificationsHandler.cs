@@ -28,7 +28,7 @@ namespace Preflight
                             request.Properties.TryGetValue("MS_HttpContext", out object contextObject);
                             var context = contextObject as HttpContextWrapper;
 
-                            if (context == null || !context.Items.Contains("PreflightResponse"))
+                            if (context == null || !context.Items.Contains("PreflightFailed"))
                                 return response;
 
                             HttpContent data = response.Content;
@@ -41,7 +41,7 @@ namespace Preflight
                                 content.Notifications.Add(new Notification
                                 {
                                     Header = KnownStrings.ContentFailedChecks,
-                                    Message = JsonConvert.SerializeObject(context.Items["PreflightResponse"]),
+                                    Message = $"PreflightCancelSaveOnFail_{context.Items["PreflightCancelSaveOnFail"]}",
                                     NotificationType = SpeechBubbleIcon.Error
                                 });
                                 

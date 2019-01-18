@@ -1,10 +1,30 @@
 ﻿(() => {
 
-    function ctrl($scope, $rootScope, $timeout, editorState, preflightService, preflightHub) {
+    function ctrl($scope, $timeout, editorState, preflightService, preflightHub) {
 
-        const dirtyHashes = [];
+        const dirtyHashes = {};
+        const propsBeingChecked = [];
         const validPropTypes = ['Umbraco.TinyMCEv3', 'Umbraco.Grid', 'Imulus.Archetype'];
 
+        // cache these for the trivial perf benefit
+        const formSelector = '.umb-property ng-form[name="propertyForm"]';
+        const appSelector = 'preflight-app';
+
+        const joinList = arr => {
+            let outStr = '';
+            if (arr.length === 1) {
+                outStr = arr[0];
+            } else if (arr.length === 2) {
+                outStr = arr.join(' and ');
+            } else if (arr.length > 2) {
+                outStr = arr.slice(0, -1).join(', ') + ', and ' + arr.slice(-1);
+            }
+            return outStr;
+        };
+
+        this.results = {
+            properties: []
+        };
 
         /**
          * Convert a string to a hash for storage and comparison.
@@ -21,11 +41,13 @@
          * Updates the badge in the header with the number of failed tests
          */
         const setBadgeCount = () => {
-            if (this.results && this.results.failedCount) {
+            if (this.results && this.results.failedCount > 0) {
                 $scope.model.badge = {
                     count: this.results.failedCount,
                     type: 'alert'
                 };
+            } else {
+                $scope.model.badge = {};
             }
         };
 
@@ -56,6 +78,9 @@
             
             this.results.failedCount = this.results.properties.reduce((prev, cur) => prev + cur.failedCount, 0);
             this.results.failed = this.results.failedCount > 0;
+
+            propsBeingChecked.splice(propsBeingChecked.indexOf(data.name), 1);
+            this.propsBeingCheckedStr = joinList(propsBeingChecked);
         };
 
 
@@ -64,8 +89,11 @@
          * Also generates and stores a hash of the property value for comparison on subsequent calls, to prevent re-fetching unchanged data
          */
         const checkDirty = () => {
-            const propForms = document.querySelectorAll('[data-element="editor-container"] [name="propertyForm"]');
+            const propForms = document.querySelectorAll(formSelector);
             const dirtyProps = [];
+
+            this.propsBeingCheckedStr = '';
+
             let hasDirty = false;
 
             propForms.forEach(f => {
@@ -73,16 +101,17 @@
                 if (elmScope.propertyForm.$dirty && validPropTypes.indexOf(elmScope.property.editor) !== -1) {
                     const valAsString = JSON.stringify(elmScope.property.value); // treat json editors as strings
                     const hash = getHash(valAsString);
+                    const propSlug = elmScope.property.label;
 
-                    if (dirtyHashes.indexOf(hash) === -1) {
+                    if (dirtyHashes[propSlug] !== hash) {
 
                         dirtyProps.push({
                             name: elmScope.property.label,
-                            value: valAsString,
+                            value: elmScope.property.editor === 'Umbraco.TinyMCEv3' ? elmScope.property.value : valAsString,
                             editor: elmScope.property.editor
                         });
 
-                        dirtyHashes.push(hash);
+                        dirtyHashes[propSlug] = hash;
                         hasDirty = true;
                     }
                 }
@@ -92,25 +121,34 @@
             // response comes via the signalr hub so is not handled here
             if (hasDirty) {
                 $timeout(() => {
+
                     dirtyProps.forEach(prop => {
                         const existing = this.results.properties.filter(p => p.name === prop.name)[0];
                         if (existing) {
-                            existing.loading = true;
                             existing.open = false;
+                            existing.failedCount = -1;
                         } else {
                             // generate new placeholder for pending results - this is removed when the response is returned
                             this.results.properties.push({
                                 label: prop.name,
-                                loading: true,
                                 open: false,
                                 failed: false,
-                                failedCount: 0,
+                                failedCount: -1,
                                 name: `${prop.name}_temp`
                             });
                         }
+
+                        propsBeingChecked.push(prop.name);
                     });
 
-                    preflightService.checkDirty(dirtyProps)
+                    this.propsBeingCheckedStr = joinList(propsBeingChecked);
+
+                    const payload = {
+                        properties: dirtyProps,
+                        nodeId: editorState.current.id
+                    };
+
+                    preflightService.checkDirty(payload)
                         .then(resp => {
                             // swallowed
                         });
@@ -118,30 +156,15 @@
             }
         };
 
-
         /**
-         * Determine what data to display - content from $rootScope if it exists, otherwise updates the existing properties
-         */
-        const init = () => {
-            if ($rootScope.preflightResult) {
-                this.results = $rootScope.preflightResult;
-                delete $rootScope.preflightResult;
-            } else {
-                checkDirty();
-            }
-
-            setBadgeCount();
-        };
-
-
-        /**
-         * Watch the visibility of the app, then check rootscope for any data to display
+         * Watch the visibility of the app, then update any dirty props
          */
         $scope.$watch(
-            () => angular.element(document.getElementById('preflight-app')).is(':visible'),
+            () => angular.element(document.getElementById(appSelector)).is(':visible'),
             (newVal, oldVal) => {
                 if (newVal && newVal !== oldVal) {
-                    init();
+                    checkDirty();
+                    setBadgeCount();
                 } 
             }
         );
@@ -155,7 +178,6 @@
                 e => {
                     rebindResult(e);
                     setBadgeCount();
-                    this.loaded = true;
                 });
 
             hub.start();
@@ -166,14 +188,9 @@
          * Check all properties when the controller loads. Won't re-run when changing between apps
          */
         preflightService.check(editorState.current.id)
-            .then(resp => {
-                if (resp.status === 200) {
-                    this.results = resp.data;
-                    setBadgeCount();
-                }
-            });
+            .then(resp => {});
     }
 
-    angular.module('preflight').controller('preflight.controller', ['$scope', '$rootScope', '$timeout', 'editorState', 'preflightService', 'preflightHub', ctrl]);
+    angular.module('preflight').controller('preflight.controller', ['$scope', '$timeout', 'editorState', 'preflightService', 'preflightHub', ctrl]);
 
 })();

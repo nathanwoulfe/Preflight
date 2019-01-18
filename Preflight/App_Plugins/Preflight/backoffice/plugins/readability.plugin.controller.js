@@ -1,16 +1,19 @@
 ﻿(() => {
 
-    function overlay(preflightService) {
-        this.text = preflightService.getHelpText();
+    function overlay($scope) {
+        // there's nothing here
     }
 
-    angular.module('umbraco').controller('readability.overlay.controller', ['preflightService', overlay]);
+    angular.module('umbraco').controller('readability.overlay.controller', ['$scope', overlay]);
 
-    function ctrl() {
+    function ctrl($scope) {
         /**
         * Displays an overlay explaining what the readability test actually does
          * @param {any} e click event
         */
+
+        console.log($scope.model);
+
         this.help = e => {
             e.preventDefault();
             this.overlay = {
@@ -18,7 +21,7 @@
                 show: true,
                 title: 'Readability',
                 subtitle: 'Why should I care?',
-                text: 'Text, yo',
+                text: $scope.model.description,
                 close: () => {
                     this.overlay.show = false;
                     this.overlay = null;
@@ -27,6 +30,6 @@
         };
     }
 
-    angular.module('umbraco').controller('readability.plugin.controller', ctrl);
+    angular.module('umbraco').controller('readability.plugin.controller', ['$scope', ctrl]);
 })();
 

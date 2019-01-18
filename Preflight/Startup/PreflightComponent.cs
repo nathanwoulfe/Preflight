@@ -88,18 +88,21 @@ namespace Preflight.Startup
             List<SettingsModel> settings = _settingsService.Get().Settings;
             if (!settings.GetValue<bool>(KnownSettings.BindSaveHandler)) return;
 
+            var cancelSaveOnFail = settings.GetValue<bool>(KnownSettings.CancelSaveOnFail);
+
             IContent content = e.SavedEntities.First();
 
-            PreflightResponseModel result = _contentChecker.Check(content, true);
+            bool failed = _contentChecker.CheckContent(content, true);
 
             // at least one property on the current document fails the preflight check
-            if (!result.Failed) return;
+            if (!failed) return;
 
             // these values are retrieved in the notifications handler, and passed down to the client
-            HttpContext.Current.Items["PreflightResponse"] = result;
+            HttpContext.Current.Items["PreflightFailed"] = true;
+            HttpContext.Current.Items["PreflightCancelSaveOnFail"] = cancelSaveOnFail;
             HttpContext.Current.Items["PreflightNodeId"] = content.Id;
    
-            e.Cancel = settings.GetValue<bool>(KnownSettings.CancelSaveOnFail);
+            e.Cancel = cancelSaveOnFail;
         }
     }
 }

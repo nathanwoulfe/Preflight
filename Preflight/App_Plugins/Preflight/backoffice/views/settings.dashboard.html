@@ -2,26 +2,28 @@
 
     <umb-box>
         <umb-box-content>
-            <h3 class="bold">Preflight settings</h3>
-            <div ng-bind-html="vm.content"></div>
+            <h3 class="bold">Preflight</h3>
+            <p>Preflight provides a pluggable framework for adding pre-publishing checks to your content.</p>
+            <p>Out of the box, Preflight provides plugins for general readability (reading level, sentence length, blacklisting words), link health and text autoreplacement.</p>
         </umb-box-content>
     </umb-box>
     
     <div class="form-horizontal">
         <div class="umb-expansion-panel" ng-repeat="tab in vm.tabs">
             <div class="umb-expansion-panel__header" ng-click="tab.open = !tab.open">
-                <div ng-bind="tab.name"></div>
+                <div>{{ ::tab.name }} <span ng-if="tab.summary">{{ ' - ' + tab.summary }}</span></div>
                 <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !tab.open, 'icon-navigation-down': tab.open }">&nbsp;</ins>
             </div>
 
             <div class="umb-expansion-panel__content" ng-show="tab.open">
-                <umb-property data-element="property-{{ tab.alias }}" ng-repeat="property in vm.settings | filter: { tab: tab.name } | orderBy: 'order'" property="property">
+                <div class="umb-control-group" ng-if="tab.description" ng-bind-html="::tab.description"></div>
+                <umb-property data-element="property-{{ ::tab.alias }}" ng-repeat="property in vm.settings | filter: { tab: tab.name } | orderBy: 'order'" property="property">
                     <umb-property-editor model="property"></umb-property-editor>
                 </umb-property>
             </div>
         </div>
         
-        <button role="button" class="btn btn-success" ng-click="vm.saveSettings()">Save settings</button>
+        <button role="button" class="btn btn-success" ng-click="vm.saveSettings()" ng-if="vm.tabs">Save settings</button>
     </div>
     
     <umb-overlay ng-if="vm.overlay.show"

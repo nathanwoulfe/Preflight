@@ -7,18 +7,29 @@ namespace Preflight.Models
 {
     public class PreflightSettings
     {
-        [JsonProperty("settings")] public List<SettingsModel> Settings { get; set; }
+        [JsonProperty("settings")]
+        public List<SettingsModel> Settings { get; set; }
 
-        [JsonProperty("tabs")] internal List<SettingsTab> Tabs { get; set; }
+        [JsonProperty("tabs")]
+        internal List<SettingsTab> Tabs { get; set; }
     }
 
     public class SettingsTab
     {
-        [JsonProperty("name")] public string Name { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
-        [JsonProperty("alias")] public string Alias => Name.Camel();
+        [JsonProperty("summary")]
+        public string Summary { get; set; }
 
-        [JsonProperty("open")] public bool Open => false;
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("alias")]
+        public string Alias => Name.Camel();
+
+        [JsonProperty("open")]
+        public bool Open => false;
 
         public SettingsTab(string name)
         {
@@ -31,7 +42,8 @@ namespace Preflight.Models
     /// </summary>
     public class SettingsModel
     {
-        [JsonProperty("core")] internal bool Core { get; set; }
+        [JsonProperty("core")]
+        internal bool Core { get; set; }
 
         /// <summary>
         /// A UI-friendly label for the setting

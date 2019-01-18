@@ -21,6 +21,7 @@ namespace Preflight.Constants
         public const string HrefXPath = "//a[@href]";
 
         public const string CacheKey = "Preflight_SafeBrowsing_";
+        public const string SettingsCacheKey = "Preflight_Settings_";
 
         public const string SafeBrowsingUrl = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=";
 

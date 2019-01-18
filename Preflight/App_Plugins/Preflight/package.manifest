@@ -19,6 +19,7 @@
     "~/App_Plugins/preflight/backoffice/controllers/preflight.settings.controller.js",
 
     "~/App_Plugins/preflight/backoffice/plugins/readability.plugin.controller.js",
+    "~/App_Plugins/preflight/backoffice/plugins/linkhealth.result.directive.js",
 
     "~/App_Plugins/preflight/backoffice/interceptors/preflight.save.interceptor.js",
 

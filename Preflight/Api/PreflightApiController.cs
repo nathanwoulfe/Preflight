@@ -1,6 +1,7 @@
 ﻿using Preflight.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Preflight.Services.Interfaces;
@@ -15,6 +16,15 @@ namespace Preflight.Api
     { 
         private readonly ISettingsService _settingsService;
         private readonly IContentChecker _contentChecker;
+
+        private IHttpActionResult Error(string message)
+        {
+            return Ok(new
+            {
+                status = HttpStatusCode.InternalServerError,
+                data = message
+            });
+        }
 
         public ApiController(ISettingsService settingsService, IContentChecker contentChecker)
         {
@@ -40,11 +50,32 @@ namespace Preflight.Api
             }
             catch (Exception ex)
             {
+                return Error(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get Preflight settings object value
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getSettingValue/{id}")]
+        public IHttpActionResult GetSettingValue(string id)
+        {
+            try
+            {
+                List<SettingsModel> settings = _settingsService.Get().Settings;
+                SettingsModel model = settings.First(s => s.Alias == id);
+
                 return Ok(new
                 {
-                    status = HttpStatusCode.InternalServerError,
-                    data = ex.Message
+                    status = HttpStatusCode.OK,
+                    value = model?.Value
                 });
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
             }
         }
 
@@ -54,7 +85,7 @@ namespace Preflight.Api
         /// <returns></returns>
         [HttpPost]
         [Route("saveSettings")]
-        public IHttpActionResult SaveSettings(List<SettingsModel> settings)
+        public IHttpActionResult SaveSettings(PreflightSettings settings)
         {
             try
             {
@@ -66,11 +97,7 @@ namespace Preflight.Api
             }
             catch (Exception ex)
             {
-                return Ok(new
-                {
-                    status = HttpStatusCode.InternalServerError,
-                    data = ex.Message
-                });
+                return Error(ex.Message);
             }
         }
 
@@ -86,50 +113,41 @@ namespace Preflight.Api
             try
             {
                 IContent content = Services.ContentService.GetById(id);
-                PreflightResponseModel response = _contentChecker.Check(content);
+                bool failed = _contentChecker.CheckContent(content);
 
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
-                    data = response
+                    failed
                 });
             }
             catch(Exception ex)
             {
-                return Ok(new
-                {
-                    status = HttpStatusCode.InternalServerError,
-                    data = ex.Message
-                });
+                return Error(ex.Message);
             }
         }
 
         /// <summary>
         /// Entry point for checking sub-set of properties
         /// </summary>
-        /// <param name="data">Node id</param>
         /// <returns></returns>
         [HttpPost]
         [Route("checkdirty")]
-        public IHttpActionResult CheckDirty(IEnumerable<SimpleProperty> data)
+        public IHttpActionResult CheckDirty(DirtyProperties data)
         {
             try
             {
-                int testCount = _contentChecker.CheckDirty(data);
+                bool failed = _contentChecker.CheckDirty(data);
 
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
-                    testCount
+                    failed
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new
-                {
-                    status = HttpStatusCode.InternalServerError,
-                    data = ex.Message
-                });
+                return Error(ex.Message);
             }
         }
     }

@@ -267,7 +267,7 @@
     <Compile Include="Constants\KnownPropertyAlias.cs" />
     <Compile Include="Constants\KnownStrings.cs" />
     <Compile Include="Models\BrokenLinkModel.cs" />
-    <Compile Include="Models\PreflightResponseModel.cs" />
+    <Compile Include="Models\PreflightPropertyResponseModel.cs" />
     <Compile Include="Models\ReadabilityResponseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -290,6 +290,7 @@
     <Content Include="App_Plugins\Preflight\backoffice\interceptors\preflight.save.interceptor.js" />
     <Content Include="App_Plugins\Preflight\backoffice\lib\signalr\jquery.signalr-2.2.1.min.js" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\linkhealth.html" />
+    <Content Include="App_Plugins\Preflight\backoffice\plugins\linkhealth.result.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.html" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.plugin.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.overlay.html" />
@@ -299,6 +300,7 @@
     <Content Include="App_Plugins\Preflight\backoffice\views\contentapp.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\failed.notification.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\settings.dashboard.html" />
+    <Content Include="App_Plugins\Preflight\backoffice\views\warning.notification.html" />
     <Content Include="Gruntfile.js" />
   </ItemGroup>
   <ItemGroup>

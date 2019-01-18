@@ -22,6 +22,8 @@ namespace Preflight.Plugins
 
         public string Name => "Autoreplace";
         public string ViewPath => "";
+        public string Summary => "Automatically replace naughty words with less naughty words.";
+        public string Description { get; set; }
 
         private AutoreplacePlugin()
         {
@@ -37,6 +39,8 @@ namespace Preflight.Plugins
                     Core = true
                 }
             );
+
+            Description = Summary;
         }
 
         /// <summary>

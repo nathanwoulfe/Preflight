@@ -31,43 +31,48 @@ namespace Preflight.Services
             _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub>();
         }
 
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="properties"></param>
-        public int CheckDirty(IEnumerable<SimpleProperty> properties)
+        /// <param name="dirtyProperties"></param>
+        public bool CheckDirty(DirtyProperties dirtyProperties)
         {
+            _id = dirtyProperties.Id;
             _settings = _settingsService.Get().Settings;
 
-            var totalTests = 0;
+            var failed = false;
 
-            foreach (SimpleProperty prop in properties)
+            foreach (SimpleProperty prop in dirtyProperties.Properties)
             {
                 List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
 
                 switch (prop.Editor)
                 {
                     case KnownPropertyAlias.Grid:
-                        testResult = CheckNestedProperty(prop, KnownStrings.RteJsonPath);
+                        testResult = ExtractValuesFromSimpleProperty(prop, KnownStrings.RteJsonPath);
                         break;
                     case KnownPropertyAlias.Archetype:
-                        testResult = CheckNestedProperty(prop, KnownStrings.ArchetypeRteJsonPath);
+                        testResult = ExtractValuesFromSimpleProperty(prop, KnownStrings.ArchetypeRteJsonPath);
                         break;
                     case KnownPropertyAlias.Rte:
-                        testResult = CheckProperty(prop.Name, prop.Value).AsEnumerableOfOne().ToList();
+                        testResult = RunPluginsAgainstValue(prop.Name, prop.Value).AsEnumerableOfOne().ToList();
                         break;
                 }
 
                 foreach (PreflightPropertyResponseModel result in testResult)
                 {
+                    if (result.Failed)
+                    {
+                        failed = true;
+                    }
                     _hubContext.Clients.All.PreflightTest(result);
                 }
-
-                totalTests += testResult.Count;
             }
 
-            return totalTests;
+            return failed;
         }
+
 
         /// <summary>
         /// Checks all testable properties on the given IContent item
@@ -75,82 +80,77 @@ namespace Preflight.Services
         /// <param name="content"></param>
         /// <param name="fromSave"></param>
         /// <returns></returns>
-        public PreflightResponseModel Check(IContent content, bool fromSave)
+        public bool CheckContent(IContent content, bool fromSave)
         {
             // make this available to pass into any plugins
             _id = content.Id;
             _fromSave = fromSave;
             _settings = _settingsService.Get().Settings;
 
-            var response = new PreflightResponseModel
-            {
-                CancelSaveOnFail = _settings.GetValue<bool>(KnownSettings.CancelSaveOnFail)
-            };
+            var failed = false;
 
             IEnumerable<Property> props = content.GetPreflightProperties();
             foreach (Property prop in props)
             {
+                List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
+
+                // since the first two can return multiple, treat all three the same
                 switch (prop.PropertyType.PropertyEditorAlias)
                 {
                     case KnownPropertyAlias.Grid:
-                        response.Properties.AddRange(CheckNestedEditor(prop, KnownStrings.RteJsonPath));
+                        testResult = ExtractValuesFromUmbracoProperty(prop, KnownStrings.RteJsonPath);
                         break;
                     case KnownPropertyAlias.Archetype:
-                        response.Properties.AddRange(CheckNestedEditor(prop, KnownStrings.ArchetypeRteJsonPath));
+                        testResult = ExtractValuesFromUmbracoProperty(prop, KnownStrings.ArchetypeRteJsonPath);
                         break;
                     case KnownPropertyAlias.Rte:
-                        response.Properties.Add(CheckSingleEditor(prop));
+                        testResult = RunPluginsAgainstValue(prop.PropertyType.Name, prop.GetValue()?
+                            .ToString()).AsEnumerableOfOne().ToList();
                         break;
+                }
+
+                // return the results via signalr for perceived perf
+                foreach (PreflightPropertyResponseModel result in testResult)
+                {
+                    if (result.Failed)
+                    {
+                        failed = true;
+                    }
+                    _hubContext.Clients.All.PreflightTest(result);
                 }
             }
 
-            response.Failed = response.Properties.Any(p => p.Failed);
-
-            if (!response.Failed) return response;
-
-            response.FailedCount = response.Properties.Sum(p => p.FailedCount);
-
-            return response;
+            return failed;
         }
 
 
         /// <summary>
-        /// Extracts the testable values from a <see cref="SimpleProperty"/> and passes each to CheckProperty 
+        /// Extracts the testable values from a <see cref="SimpleProperty"/> and passes each to <see cref="ProcessJTokenValues" />
         /// </summary>
         /// <param name="prop"></param>
         /// <param name="editorPath"></param>
         /// <returns></returns>
-        private List<PreflightPropertyResponseModel> CheckNestedProperty(SimpleProperty prop, string editorPath)
+        private List<PreflightPropertyResponseModel> ExtractValuesFromSimpleProperty(SimpleProperty prop, string editorPath)
         {
+            if (prop.Value == null)
+            {
+                return new List<PreflightPropertyResponseModel>();
+            }
+
             JObject asJson = JObject.Parse(prop.Value);
             IEnumerable<JToken> rtes = asJson.SelectTokens(editorPath);
 
-            List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
-            var index = 1;
-
-            foreach (JToken rte in rtes)
-            {
-                JToken value = rte.SelectToken(KnownStrings.RteValueJsonPath);
-                if (value == null) continue;
-
-                PreflightPropertyResponseModel model = CheckProperty(prop.Name, value.ToString());
-
-                model.Label = $"{model.Name} (Editor {index})";
-                index += 1;
-
-                response.Add(model);
-            }
-
-            return response;
+            return ProcessJTokenValues(rtes, prop.Name);
         }
 
+
         /// <summary>
-        /// Extracts the testable values from a single Property, and passes each to CheckProperty
+        /// Extracts the testable values from a single Property, and passes each to <see cref="ProcessJTokenValues" />
         /// </summary>
         /// <param name="prop"></param>
         /// <param name="editorPath"></param>
         /// <returns></returns>
-        private IEnumerable<PreflightPropertyResponseModel> CheckNestedEditor(Property prop, string editorPath)
+        private List<PreflightPropertyResponseModel> ExtractValuesFromUmbracoProperty(Property prop, string editorPath)
         {
             object propValue = prop.GetValue();
 
@@ -162,8 +162,18 @@ namespace Preflight.Services
             JObject asJson = JObject.Parse(propValue.ToString());
             IEnumerable<JToken> rtes = asJson.SelectTokens(editorPath);
 
-            string name = prop.PropertyType.Name;
+            return ProcessJTokenValues(rtes, prop.PropertyType.Name);
+        }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rtes"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private List<PreflightPropertyResponseModel> ProcessJTokenValues(IEnumerable<JToken> rtes, string name)
+        {
             List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
             var index = 1;
 
@@ -172,8 +182,9 @@ namespace Preflight.Services
                 JToken value = rte.SelectToken(KnownStrings.RteValueJsonPath);
                 if (value == null) continue;
 
-                PreflightPropertyResponseModel model = CheckProperty(name, value.ToString());
-                
+                PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString());
+
+                // todo => extract the grid section, area, editor names for building the alias. Won't work for archetype though
                 model.Label = $"{model.Name} (Editor {index})";
                 index += 1;
 
@@ -183,16 +194,6 @@ namespace Preflight.Services
             return response;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="prop"></param>
-        /// <returns></returns>
-        private PreflightPropertyResponseModel CheckSingleEditor(Property prop)
-        {
-            object propValue = prop.GetValue();
-            return propValue == null ? null : CheckProperty(prop.PropertyType.Name, propValue.ToString());
-        }
 
         /// <summary>
         /// Runs the set of plugins against the given string
@@ -200,13 +201,16 @@ namespace Preflight.Services
         /// <param name="name"></param>
         /// <param name="val"></param>
         /// <returns></returns>
-        private PreflightPropertyResponseModel CheckProperty(string name, string val)
+        private PreflightPropertyResponseModel RunPluginsAgainstValue(string name, string val)
         {
             var model = new PreflightPropertyResponseModel
             {
                 Label = name,
                 Name = name
             };
+
+            if (val == null)
+                return model;
 
             var pluginProvider = new PluginProvider();
 
@@ -215,11 +219,6 @@ namespace Preflight.Services
                 // settings on the plugin are the defaults - set to correct values from _settings
                 IEnumerable<SettingsModel> pluginSettings = _settings.Where(s => s.Tab == plugin.Name).ToList();
                 plugin.Settings = pluginSettings;
-
-                //foreach (SettingsModel setting in plugin.Settings)
-                //{
-                //    setting.Value = pluginSettings.First(s => s.Alias == setting.Alias).Value;
-                //}
 
                 // ignore disabled plugins
                 if (plugin.IsDisabled()) continue;
@@ -238,6 +237,7 @@ namespace Preflight.Services
                         {
                             plugin.FailedCount = plugin.Failed ? 1 : 0;
                         }
+
                         model.Plugins.Add(plugin);
                     }
                 }

@@ -27,6 +27,8 @@
 
             getSettings: () => request('GET', `${urlBase}getSettings`),
 
+            getSettingValue: alias => request('GET', `${urlBase}getSettingValue/${alias}`),
+
             saveSettings: settings => request('POST', `${urlBase}saveSettings`, settings),
 
             getHelpText: () => helpText

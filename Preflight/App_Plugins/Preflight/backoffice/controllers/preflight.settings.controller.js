@@ -2,43 +2,37 @@
 
     function ctrl(notificationsService, preflightService) {
 
-        this.content = preflightService.getHelpText();
+        preflightService.getSettings()
+            .then(resp => {
+                this.settings = resp.data.settings;
+                this.tabs = resp.data.tabs; 
 
-        /**
-         * 
-         */
-        const getSettings = () => {
-            preflightService.getSettings()
-                .then(resp => {
-                    this.settings = resp.data.settings;
-                    this.tabs = resp.data.tabs;
+                this.settings.forEach(v => {
+                    if (v.view.indexOf('slider') !== -1) {
+                        v.config = {
+                            handle: 'round',
+                            initVal1: v.alias === 'longWordSyllables' ? 5 : 65,
+                            maxVal: v.alias === 'longWordSyllables' ? 10 : 100,
+                            minVal: 0,
+                            orientation: 'horizontal',
+                            step: 1,
+                            tooltip: 'always',
+                            tooltipPosition: 'bottom',
+                        };
+                    } else if (v.view.indexOf('multipletextbox') !== -1) {
 
-                    this.settings.forEach(v => {
-                        if (v.view.indexOf('slider') !== -1) {
-                            v.config = {
-                                handle: 'round',
-                                initVal1: v.alias === 'longWordSyllables' ? 5 : 65,
-                                maxVal: v.alias === 'longWordSyllables' ? 10 : 100,
-                                minVal: 0,
-                                orientation: 'horizontal',
-                                step: 1,
-                                tooltip: 'always',
-                                tooltipPosition: 'bottom',
-                            };
-                        } else if (v.view.indexOf('multipletextbox') !== -1) {
+                        v.value = v.value.split(',').map(val => {
+                            return { value: val };
+                        }).sort((a, b) => a < b);
 
-                            v.value = v.value.split(',').map(val => {
-                                return { value: val };
-                            }).sort((a, b) => a < b);
-
-                            v.config = {
-                                min: 0,
-                                max: 0
-                            };
-                        }
-                    });
+                        v.config = {
+                            min: 0,
+                            max: 0
+                        };
+                    }
                 });
-        };
+            });
+
 
         /**
          * 
@@ -65,20 +59,20 @@
                         v.value = v.value.map(o => o.value).join(',');
                     }
                 });
-                
-                preflightService.saveSettings(settingsToSave)
+
+                preflightService.saveSettings({ settings: settingsToSave, tabs: this.tabs })
                     .then(resp => {
                         resp.data
                             ? notificationsService.success('SUCCESS', 'Settings updated')
                             : notificationsService.error('ERROR', 'Unable to save settings');
                     });
-            } else {
+            }
+            else {
                 notificationsService.error('ERROR',
                     'Unable to save settings - readability minimum cannot be greater than readability maximum');
             }
         };
 
-        getSettings();
     }
 
     angular.module('preflight').controller('preflight.settings.controller', ['notificationsService', 'preflightService', ctrl]);

@@ -46,12 +46,6 @@ $umbGreen: #00aea2;
         }
     }
 
-    .alert {
-        *:last-child {
-            margin-bottom: 0;
-        }
-    }
-
     h5 {
         margin-top: 0;
     }
@@ -95,6 +89,18 @@ $umbGreen: #00aea2;
 
         &.pass {
             background-color: $green;
+
+            ins::before {
+                content: '\e165';
+            }
+        }
+
+        &.pending {
+            background-color: #555;
+
+            ins::before {
+                content: '';
+            }
         }
     }
 
@@ -214,6 +220,10 @@ $umbGreen: #00aea2;
 
     .umb-expansion-panel__header {
         position: relative;
+
+        div span {
+            font-weight: 400
+        }
     }
 
     .btn-help {
@@ -221,5 +231,16 @@ $umbGreen: #00aea2;
         font-size: 20px;
         position: absolute;
         right: 0;
+    }
+
+    .linkhealth-result-table {
+        th {
+            text-align:left;
+            padding:5px 10px;
+            background:rgba($grey, 0.75);
+        }
+        td {
+            padding:5px 10px;
+        }
     }
 }

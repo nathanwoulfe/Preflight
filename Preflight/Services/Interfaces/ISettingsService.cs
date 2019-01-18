@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Preflight.Models;
+﻿using Preflight.Models;
 
 namespace Preflight.Services.Interfaces
 {
@@ -7,6 +6,6 @@ namespace Preflight.Services.Interfaces
     {
         PreflightSettings Get();
 
-        bool Save(List<SettingsModel> settings);
+        bool Save(PreflightSettings settings);
     }
 }

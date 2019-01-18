@@ -26,7 +26,10 @@ namespace Preflight.Plugins
 
         public string Name => "Link health";
         public string ViewPath => "/app_plugins/preflight/backoffice/plugins/linkhealth.html";
- 
+
+        public string Summary => "Check links resolve correctly. Optionally check URLs against Google's SafeBrowsing API";
+        public string Description { get; set; }
+
         public LinkCheckerPlugin() : this(new LinksService(), new SafeBrowsingService())
         {
         }
@@ -56,6 +59,8 @@ namespace Preflight.Plugins
                     Core = true
                 }
             );
+
+            Description = Summary;
         }
 
         public void Check(int id, string val, List<SettingsModel> settings)

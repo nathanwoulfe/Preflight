@@ -1,37 +1,33 @@
 ﻿<div ng-controller="preflight.controller as vm" class="preflight" id="preflight-app" ng-cloak>
+    <div ng-show="!vm.results.failed">
+        <h3 class="title">Content on this page passes all preflight checks.</h3>
+        <h4 class="intro-text">Good job! Check back after updating the content for fresh test results.</h4>
+    </div>
 
-    <!--<div class="alert alert-warning" ng-if="dialogOptions.results.introText">
-        <span ng-bind="dialogOptions.results.introText"></span>
-    </div>-->
+    <div ng-show="vm.results.failed">
+        <h3 class="title">That's not great...</h3>
+        <h4 class="intro-text">Content on this page fails {{ vm.results.failedCount }} preflight {{ vm.results.failedCount === 1 ? 'check' : 'checks' }}.</h4>
+    </div>
+    
+    <div ng-show="vm.propsBeingCheckedStr.length">
+        <h4 class="intro-text">Preflight found modified content - testing {{ vm.propsBeingCheckedStr }}</h4>
+    </div>
 
-    <div>
-        <div ng-show="!vm.results.failed" class="alert alert-success">
-            <h3 class="title">Content on this page passes all preflight checks. Good job!</h3>
-        </div>
-
-        <div ng-show="vm.results.failed">
-            <h3 class="title">That's not great...</h3>
-            <h4 class="intro-text">Content on this page fails {{ vm.results.failedCount }} preflight checks.</h4>
-        </div>
-
-        <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties track by $index" ng-if="vm.results.failed" ng-class="{'loading': prop.loading}">
-            <div class="umb-expansion-panel__header" ng-click="prop.open = !prop.open">
-                <div>
-                    <span class="count-badge" ng-bind="prop.failedCount" ng-if="prop.failedCount"></span>
-                    <span class="count-badge pass" ng-if="!prop.failedCount">
-                        <ins class="icon-check"></ins>
-                    </span>
-
-                    {{ prop.label }}
-                </div>
-                <umb-load-indicator ng-if="prop.loading"></umb-load-indicator>
-                <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !prop.open, 'icon-navigation-down': prop.open }">&nbsp;</ins>
+    <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties | orderBy: prop.label track by $index" ng-if="vm.results.failed" ng-class="{'loading': prop.loading}">
+        <div class="umb-expansion-panel__header" ng-click="prop.open = !prop.open">
+            <div>
+                <span class="count-badge" ng-bind="prop.failedCount" ng-if="prop.failedCount"></span>
+                <span class="count-badge pass" ng-if="prop.failedCount <= 0" ng-class="{'pass' : prop.failedCount === 0, 'pending' : prop.failedCount === -1}">
+                    <ins class="icon-"></ins>
+                </span>
+                {{ prop.label }}
             </div>
+            <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !prop.open, 'icon-navigation-down': prop.open }">&nbsp;</ins>
+        </div>
 
-            <div class="umb-expansion-panel__content" ng-show="prop.open">
-                <div class="flex mt-30" ng-repeat="plugin in prop.plugins">
-                    <div ng-include="plugin.viewPath" ng-repeat="model in [plugin]" class="preflight-plugin-wrapper"></div>
-                </div>
+        <div class="umb-expansion-panel__content" ng-show="prop.open">
+            <div class="flex mt-30" ng-repeat="plugin in prop.plugins">
+                <div ng-include="plugin.viewPath" ng-repeat="model in [plugin]" class="preflight-plugin-wrapper"></div>
             </div>
         </div>
     </div>
