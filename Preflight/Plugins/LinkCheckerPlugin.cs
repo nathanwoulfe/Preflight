@@ -54,7 +54,7 @@ namespace Preflight.Plugins
                 {
                     Description = "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites.",
                     View = SettingType.String,
-                    Value = "AIzaSyAsgxlMCWp1WWyC5gB9odC043ZZ3jXZpUw",
+                    Value = "Get your key from the Google API Console",
                     Order = 2,
                     Core = true
                 }
