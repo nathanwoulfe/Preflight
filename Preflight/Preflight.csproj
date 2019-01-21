@@ -259,8 +259,6 @@
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Startup\PreflightComponent.cs" />
     <Compile Include="Startup\PreflightComposer.cs" />
-    <Compile Include="Startup\Uninstaller.cs" />
-    <Compile Include="Startup\Installer.cs" />
     <Compile Include="Models\SafeBrowsingRequestModel.cs" />
     <Compile Include="Models\SafeBrowsingResponseModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />

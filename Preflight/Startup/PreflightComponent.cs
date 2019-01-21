@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Routing;
 using ClientDependency.Core;
@@ -35,21 +32,6 @@ namespace Preflight.Startup
         public void Initialize()
         {
             GlobalConfiguration.Configuration.MessageHandlers.Add(new NotificationsHandler());
-
-            //Check to see if appSetting PreflightInstalled is true or even present
-            string installAppSetting = WebConfigurationManager.AppSettings[KnownStrings.AppSettingKey];
-
-            if (!installAppSetting.HasValue() || installAppSetting != true.ToString())
-            {
-                //Add Content dashboard XML
-                Installer.AddSettingsSectionDashboard();
-
-                //All done installing our custom stuff
-                //As we only want this to run once - not every startup of Umbraco
-                Configuration webConfig = WebConfigurationManager.OpenWebConfiguration("/");
-                webConfig.AppSettings.Settings.Add(KnownStrings.AppSettingKey, true.ToString());
-                webConfig.Save();
-            }
 
             ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
             ContentService.Saving += ContentService_Saving;
