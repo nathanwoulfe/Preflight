@@ -62,9 +62,9 @@
 
                 preflightService.saveSettings({ settings: settingsToSave, tabs: this.tabs })
                     .then(resp => {
-                        resp.data
-                            ? notificationsService.success('SUCCESS', 'Settings updated')
-                            : notificationsService.error('ERROR', 'Unable to save settings');
+                        resp.data ?
+                            notificationsService.success('SUCCESS', 'Settings updated') :
+                            notificationsService.error('ERROR', 'Unable to save settings');
                     });
             }
             else {
