@@ -1,4 +1,9 @@
 # Preflight - Pre-publishing checks for Umbraco
+
+[![Latest build](https://ci.appveyor.com/api/projects/status/mhwi63lfxdqglrlk?svg=true)](https://ci.appveyor.com/project/nathanwoulfe/preflight/build/artifacts)
+[![NuGet release](https://img.shields.io/nuget/dt/Preflight.Umbraco.svg)](https://www.nuget.org/packages/Preflight.Umbraco)
+[![Our Umbraco project page](https://img.shields.io/badge/our-umbraco-brightgreen.svg)](https://our.umbraco.org/projects/backoffice-extensions/preflight)
+
 Preflight is a pluggable framework for content quality assurance. Out of the box, Preflight tests general readability (including Flesch reading level; sentence length; and word length and complexity), checks links, and provides a text replacement mechanism.
 
 Preflight is available as an Umbraco 8 content app only, and currently supports content in RTE editors, including those nested in Grid or Archetype editors. 
