@@ -8,7 +8,7 @@ cache:
   - c:\projects\umbracoworkflow\preflight\node_modules -> **\packages.json
   
 install:
-  - set PATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe;C:\Ruby22\bin;%PATH%
+  - set PATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe;C:\Ruby25\bin;%PATH%
   - cmd: gem install sassc
   - cmd: npm install -g grunt-cli
   - cmd: set UMBRACO_PACKAGE_MIN_VERSION=8.0.0
