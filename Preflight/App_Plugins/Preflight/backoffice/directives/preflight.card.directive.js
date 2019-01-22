@@ -9,17 +9,32 @@
             </span>
         </div>`;
 
-    function preflightCard() {
+    function preflightCard(locale) {
         const dir = {
             restrict: 'E',
             scope: {
                 title: '@?',
                 subtitle: '@?',
                 failed: '=',
-                score: '='
+                score: '=',
+                tokens: '='
             },
             template: template,
             link: scope => {
+
+                if (scope.title[0] === '@') {
+                    locale.localize(scope.title, scope.tokens)
+                        .then(localizedTitle => {
+                            scope.title = localizedTitle;
+                        });
+                }
+
+                if (scope.subtitle[0] === '@') {
+                    locale.localize(scope.subtitle, scope.tokens)
+                        .then(localizedSubtitle => {
+                            scope.subtitle = localizedSubtitle;
+                        });
+                }
 
                 scope.$watch('failed',
                     () => {
@@ -37,6 +52,6 @@
         return dir;
     }
 
-    angular.module('preflight.directives').directive('preflightCard', preflightCard);
+    angular.module('preflight.directives').directive('preflightCard', ['localizationService', preflightCard]);
 
 })();

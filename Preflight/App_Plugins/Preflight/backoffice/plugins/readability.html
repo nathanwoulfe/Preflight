@@ -1,17 +1,18 @@
 ﻿<div class="preflight-cards" ng-controller="readability.plugin.controller as vm">
-    <preflight-card title="Reading ease score"
-                    subtitle="Target {{ model.result.targetMin }}-{{ model.result.targetMax }}"
+    <preflight-card tokens="[model.result.targetMin, model.result.targetMax]"
+                    title="@preflightReadability_readingEaseScore"
+                    subtitle="@preflightReadability_readingEaseRange"
                     score="model.result.score"
                     failed="model.result.failedReadability">
     </preflight-card>
 
-    <preflight-card title="Average syllables"
-                    subtitle="per word"
+    <preflight-card title="@preflightReadability_averageSyllables"
+                    subtitle="@preflightReadability_perWord"
                     score="model.result.averageSyllables">
     </preflight-card>
 
-    <preflight-card title="Average sentence"
-                    subtitle="length"
+    <preflight-card title="@preflightReadability_averageSentence"
+                    subtitle="@preflightReadability_length"
                     score="model.result.sentenceLength">
     </preflight-card>
     
@@ -27,9 +28,9 @@
 <div class="flex mt-30">
     <preflight-state-icon failed="model.result.longWords.length > 0"></preflight-state-icon>
     <div class="preflight-result">
-        <preflight-result-intro active="true"
-                                heading="Long words ({{ model.result.longWordSyllables }} or more syllables)"
-                                pass-text="No long words found for this property"
+        <preflight-result-intro tokens="[model.result.longWordSyllables]"
+                                heading="@preflightReadability_longWordsHeading"
+                                pass-text="@preflightReadability_longWordsPassText"
                                 pass="model.result.longWords.length === 0">
         </preflight-result-intro>
         <ul class="badge-list" ng-if="model.result.longWords.length">
@@ -40,7 +41,7 @@
             <li class="umb-badge umb-badge--primary" role="button"
                 ng-show="model.result.longWords.length > 5 && !showAllLong"
                 ng-click="showAllLong = true">
-                plus {{ model.result.longWords.length - 5 }} more...
+                <localize key="preflight_plusMore" tokens="[model.result.longWords.length - 5]"></localize>
             </li>
         </ul>
     </div>
@@ -49,9 +50,8 @@
 <div class="flex mt-30">
     <preflight-state-icon failed="model.result.blacklist.length > 0"></preflight-state-icon>
     <div class="preflight-result">
-        <preflight-result-intro active="true"
-                                heading="Blacklisted terms"
-                                pass-text="No blacklisted words/phrases for this property."
+        <preflight-result-intro heading="@preflightReadability_blacklistHeading"
+                                pass-text="@preflightReadability_blacklistPassText"
                                 pass="model.result.blacklist.length === 0">
         </preflight-result-intro>
         <ul class="badge-list" ng-if="model.result.blacklist.length">
@@ -62,7 +62,7 @@
             <li class="umb-badge umb-badge--primary" role="button"
                 ng-show="model.result.blacklist.length > 5 && !showAllBlacklist"
                 ng-click="showAllBlacklist = true">
-                plus {{ model.result.blacklist.length - 5 }} more...
+                <localize key="preflight_plusMore" tokens="[model.result.blacklist.length - 5]"></localize>
             </li>
         </ul>
     </div>

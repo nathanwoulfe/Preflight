@@ -12,8 +12,6 @@
          * @param {any} e click event
         */
 
-        console.log($scope.model);
-
         this.help = e => {
             e.preventDefault();
             this.overlay = {

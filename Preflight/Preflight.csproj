@@ -286,7 +286,6 @@
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.stateicon.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\directives\preflight.resultintro.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\interceptors\preflight.save.interceptor.js" />
-    <Content Include="App_Plugins\Preflight\backoffice\lib\signalr\jquery.signalr-2.2.1.min.js" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\linkhealth.html" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\linkhealth.result.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\plugins\readability.html" />
@@ -299,11 +298,10 @@
     <Content Include="App_Plugins\Preflight\backoffice\views\failed.notification.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\settings.dashboard.html" />
     <Content Include="App_Plugins\Preflight\backoffice\views\warning.notification.html" />
+    <Content Include="App_Plugins\Preflight\lang\en-US.xml" />
     <Content Include="Gruntfile.js" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Plugins\Preflight\lang\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>RD /S /Q "$(ProjectDir)..\Preflight.Site.V8\App_Plugins\Preflight"

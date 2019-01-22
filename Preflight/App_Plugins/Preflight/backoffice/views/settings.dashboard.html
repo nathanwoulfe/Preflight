@@ -23,7 +23,9 @@
             </div>
         </div>
         
-        <button role="button" class="btn btn-success" ng-click="vm.saveSettings()" ng-if="vm.tabs">Save settings</button>
+        <button role="button" class="btn btn-success" ng-click="vm.saveSettings()" ng-if="vm.tabs">
+            <localize key="preflight_saveSettings">Save settings</localize>
+        </button>
     </div>
     
     <umb-overlay ng-if="vm.overlay.show"
