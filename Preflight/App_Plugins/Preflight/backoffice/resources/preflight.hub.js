@@ -3,13 +3,12 @@
     function preflightHub($rootScope, $q, assetsService) {
 
         const scripts = [
-            '../App_Plugins/preflight/backoffice/lib/signalr/jquery.signalr-2.2.1.min.js',
+            '/umbraco/lib/signalr/jquery.signalr.js',
             '/umbraco/backoffice/signalr/hubs'
         ];
 
         function initHub(callback) {
-            if ($.connection == undefined) {
-
+            if ($.connection === undefined) {
                 const promises = [];
                 scripts.forEach(script => {
                     promises.push(assetsService.loadJs(script));
