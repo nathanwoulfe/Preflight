@@ -83,8 +83,11 @@ namespace Preflight.Startup
             HttpContext.Current.Items["PreflightFailed"] = true;
             HttpContext.Current.Items["PreflightCancelSaveOnFail"] = cancelSaveOnFail;
             HttpContext.Current.Items["PreflightNodeId"] = content.Id;
-   
-            e.Cancel = cancelSaveOnFail;
+
+            if (e.CanCancel && cancelSaveOnFail)
+            {
+                e.CancelOperation(new EventMessage("PreflightFailed", content.Id.ToString()));
+            }
         }
     }
 }

@@ -37,12 +37,13 @@ namespace Preflight
                             if (content != null && context.Items["PreflightNodeId"] as int? == content.Id)
                             {
                                 // if preflight response exists, ditch all other notifications
+                                // this exists as a hook for interception on the client
                                 content.Notifications.Clear();
                                 content.Notifications.Add(new Notification
                                 {
                                     Header = KnownStrings.ContentFailedChecks,
                                     Message = $"PreflightCancelSaveOnFail_{context.Items["PreflightCancelSaveOnFail"]}",
-                                    NotificationType = SpeechBubbleIcon.Error
+                                    NotificationType = NotificationStyle.Error
                                 });
                                 
                             }
