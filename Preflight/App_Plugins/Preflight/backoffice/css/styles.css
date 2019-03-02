@@ -23,22 +23,23 @@
       margin-top: 0; }
   .preflight h5 {
     margin-top: 0; }
-  .preflight .state-icon {
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 15px;
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    border-radius: 50%;
+  .preflight preflight-state-icon {
     position: absolute;
     top: 0;
     left: 0; }
-    .preflight .state-icon .icon {
+    .preflight preflight-state-icon .state-icon {
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 15px;
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      border-radius: 50%; }
+    .preflight preflight-state-icon .icon {
       font-size: 22px; }
-    .preflight .state-icon + .preflight-result {
+    .preflight preflight-state-icon + .preflight-result {
       padding-left: 77px; }
   .preflight .count-badge {
     color: #fff;

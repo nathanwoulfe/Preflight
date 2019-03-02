@@ -8,13 +8,13 @@ using Preflight.Constants;
 using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
-using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
-using Umbraco.Web.UI.JavaScript;
+using Umbraco.Web.JavaScript;
 
 namespace Preflight.Startup
 {

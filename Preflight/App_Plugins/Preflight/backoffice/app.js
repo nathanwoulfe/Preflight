@@ -1,10 +1,10 @@
 ﻿(() => {
 
-    angular.module('preflight.directives', []);
+    angular.module('preflight.components', []);
     angular.module('preflight.services', []);
 
     angular.module('preflight', [
-        'preflight.directives',
+        'preflight.components',
         'preflight.services'
     ]);
 

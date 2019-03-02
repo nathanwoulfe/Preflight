@@ -107,7 +107,7 @@
 
                         dirtyProps.push({
                             name: elmScope.property.label,
-                            value: elmScope.property.editor === 'Umbraco.TinyMCEv3' ? elmScope.property.value : valAsString,
+                            value: elmScope.property.editor === 'Umbraco.TinyMCE' ? elmScope.property.value : valAsString,
                             editor: elmScope.property.editor
                         });
 

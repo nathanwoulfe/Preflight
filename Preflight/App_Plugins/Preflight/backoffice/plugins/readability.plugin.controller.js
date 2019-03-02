@@ -6,7 +6,7 @@
 
     angular.module('umbraco').controller('readability.overlay.controller', ['$scope', overlay]);
 
-    function ctrl($scope) {
+    function ctrl($scope, editorService) {
         /**
         * Displays an overlay explaining what the readability test actually does
          * @param {any} e click event
@@ -14,20 +14,20 @@
 
         this.help = e => {
             e.preventDefault();
-            this.overlay = {
+            const helpOverlay = {
                 view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/plugins/readability.overlay.html`,
-                show: true,
                 title: 'Readability',
-                subtitle: 'Why should I care?',
+                description: 'Why should I care?',
                 text: $scope.model.description,
                 close: () => {
-                    this.overlay.show = false;
-                    this.overlay = null;
+                    editorService.close();
                 }
             };
+
+            editorService.open(helpOverlay);
         };
     }
 
-    angular.module('umbraco').controller('readability.plugin.controller', ['$scope', ctrl]);
+    angular.module('umbraco').controller('readability.plugin.controller', ['$scope', 'editorService', ctrl]);
 })();
 

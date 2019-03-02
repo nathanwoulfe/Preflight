@@ -5,7 +5,7 @@
       "alias": "preflight", // required - unique alias for your app
       "weight": 0, // optional, default is 0, use values between -99 and +99 to appear between the existing Content (-100) and Info (100) apps
       "icon": "icon-paper-plane", // required - the icon to use
-      "view": "~/app_plugins/preflight/backoffice/views/contentapp.html" // required - the location of the view file
+      "view": "~/app_plugins/preflight/backoffice/views/app.html" // required - the location of the view file
     }
   ],
   "javascript": [
@@ -19,13 +19,13 @@
     "~/App_Plugins/preflight/backoffice/controllers/preflight.settings.controller.js",
 
     "~/App_Plugins/preflight/backoffice/plugins/readability.plugin.controller.js",
-    "~/App_Plugins/preflight/backoffice/plugins/linkhealth.result.directive.js",
+    "~/App_Plugins/preflight/backoffice/plugins/linkhealth.result.component.js",
 
     "~/App_Plugins/preflight/backoffice/interceptors/preflight.save.interceptor.js",
 
-    "~/App_Plugins/preflight/backoffice/directives/preflight.card.directive.js",
-    "~/App_Plugins/preflight/backoffice/directives/preflight.resultintro.directive.js",
-    "~/App_Plugins/preflight/backoffice/directives/preflight.stateicon.directive.js"
+    "~/App_Plugins/preflight/backoffice/components/card.component.js",
+    "~/App_Plugins/preflight/backoffice/components/resultintro.component.js",
+    "~/App_Plugins/preflight/backoffice/components/stateicon.component.js"
   ],
   "css": [
     "~/App_Plugins/preflight/backoffice/css/styles.css"

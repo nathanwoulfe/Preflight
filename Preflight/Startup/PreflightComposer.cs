@@ -1,6 +1,6 @@
 ﻿using Preflight.Services;
 using Preflight.Services.Interfaces;
-using Umbraco.Core.Components;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 
 namespace Preflight.Startup

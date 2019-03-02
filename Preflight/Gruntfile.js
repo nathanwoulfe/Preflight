@@ -45,8 +45,9 @@
         concat: {
             dist: {
                 src: [
-                    '<%= backoffice %>/controllers/**/*.js',
-                    '<%= backoffice %>/directives/*.js',
+                    '<%= backoffice %>/app.js',
+                    '<%= backoffice %>/controllers/*.js',
+                    '<%= backoffice %>/components/*.js',
                     '<%= backoffice %>/interceptors/*.js',
                     '<%= backoffice %>/resources/*.js'
                 ],

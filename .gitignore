@@ -206,3 +206,4 @@ BuildPackage/artifacts/*
 Preflight.Site.v8/umbraco
 Preflight.Site.v8/umbraco_client
 Preflight.Site.v8/Media/
+/Preflight.Site.V8/App_Data/NuGetBackup/20190302-092659

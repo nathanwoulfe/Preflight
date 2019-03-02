@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
+  <area alias="dashboardTabs">
+    <key alias="preflight">Preflight</key>
+  </area>
   <area alias="preflight">
 
     <key alias="passIntro">Content on this page passes all preflight checks</key>
