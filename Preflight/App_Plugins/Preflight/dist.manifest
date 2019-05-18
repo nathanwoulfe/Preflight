@@ -9,9 +9,7 @@
     }
   ],
   javascript: [
-    "~/App_Plugins/preflight/backoffice/js/preflight.js",
-    "~/App_Plugins/preflight/backoffice/plugins/linkhealth.result.component.js",
-    "~/App_Plugins/preflight/backoffice/plugins/readability.plugin.controller.js"
+    "~/App_Plugins/preflight/backoffice/js/preflight.js"
   ],
   css: [
     "~/App_Plugins/preflight/backoffice/css/styles.min.css"

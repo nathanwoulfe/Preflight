@@ -49,6 +49,7 @@
                     '<%= backoffice %>/controllers/*.js',
                     '<%= backoffice %>/components/*.js',
                     '<%= backoffice %>/interceptors/*.js',
+                    '<%= backoffice %>/plugins/*.js',
                     '<%= backoffice %>/resources/*.js'
                 ],
                 dest: '<%= backoffice %>/Preflight.es6',
@@ -128,7 +129,7 @@
 
             html: {
                 files: ['<%= backoffice %>/**/*.html'],
-                tasks: ['copy:views']
+                tasks: ['copy:html']
             },
 
             config: {
@@ -172,16 +173,9 @@
                 dest: '<%= dest %>/<%= backoffice %>/',
             },
 
-            plugins: {
-                expand: true,
-                cwd: '<%= backoffice %>/plugins',
-                src: '*.*',
-                dest: '<%= dest %>/<%= backoffice %>/plugins',
-            },
-
             html: {
                 expand: true,
-                cwd: '<%= backoffice %>/',
+                cwd: '<%= backoffice %>/**',
                 src: '**/*.html',
                 dest: '<%= dest %>/<%= backoffice %>/',
             },
@@ -198,20 +192,6 @@
                 cwd: '<%= basePath %>/lang/',
                 src: '**',
                 dest: '<%= dest %>/<%= basePath %>/lang',
-            },
-
-            lib: {
-                expand: true,
-                cwd: '<%= backoffice %>/lib/',
-                src: '**',
-                dest: '<%= dest %>/<%= backoffice %>/lib/'
-            },
-
-            tours: {
-                expand: true,
-                cwd: '<%= backoffice %>/tours/',
-                src: '**',
-                dest: '<%= dest %>/<%= backoffice %>/tours/'
             },
 
             nuget: {
@@ -325,7 +305,7 @@
         }
     });
 
-    grunt.registerTask('default', ['jshint', 'concat', 'browserify', 'sass', 'cssmin', 'copy:config', 'copy:plugins', 'copy:tours', 'copy:json', 'copy:html', 'copy:lib', 'copy:lang']);
+    grunt.registerTask('default', ['jshint', 'concat', 'browserify', 'sass', 'cssmin', 'copy:config', 'copy:json', 'copy:html', 'copy:lang']);
     grunt.registerTask('nuget', ['clean', 'default', 'copy:nuget', 'template:nuspec', 'mkdir:pkg', 'nugetpack']);
     grunt.registerTask('package', ['clean', 'default', 'copy:umbraco', 'copy:umbracoBin', 'mkdir:pkg', 'umbracoPackage']);
 
