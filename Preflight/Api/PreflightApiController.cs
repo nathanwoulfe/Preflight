@@ -11,6 +11,7 @@ using Umbraco.Web.WebApi;
 
 namespace Preflight.Api
 {
+    [RoutePrefix("umbraco/backoffice/preflight/api")]
     [PluginController("preflight")]
     public class ApiController : UmbracoAuthorizedApiController 
     { 

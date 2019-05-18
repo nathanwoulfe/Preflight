@@ -108,9 +108,9 @@
         watch: {
 
             // dev watches everything, copies everything
-            dev8: {
+            dev: {
                 files: ['<%= backoffice %>/**/*'],
-                tasks: ['sass:dist', 'copy:dev8', 'copy:configDev8'],
+                tasks: ['sass:dist', 'copy:dev', 'copy:configDev'],
                 options: {
                     livereload: true
                 }
@@ -143,7 +143,7 @@
         },
 
         copy: {
-            dev8: {
+            dev: {
                 expand: true,
                 cwd: '<%= backoffice %>/',
                 src: '**/*',
@@ -155,9 +155,9 @@
                 dest: '<%= dest %>/<%= basePath %>/package.manifest',
             },
 
-            configDev8: {
+            configDev: {
                 src: '<%= basePath %>/package.manifest',
-                dest: '../Preflight.site.v8/<%= basePath %>/package.manifest',
+                dest: '../preflight.site.v8/<%= basePath %>/package.manifest',
             },
 
             css: {
@@ -172,10 +172,24 @@
                 dest: '<%= dest %>/<%= backoffice %>/',
             },
 
+            plugins: {
+                expand: true,
+                cwd: '<%= backoffice %>/plugins',
+                src: '*.*',
+                dest: '<%= dest %>/<%= backoffice %>/plugins',
+            },
+
             html: {
                 expand: true,
                 cwd: '<%= backoffice %>/',
                 src: '**/*.html',
+                dest: '<%= dest %>/<%= backoffice %>/',
+            },
+
+            json: {
+                expand: true,
+                cwd: '<%= backoffice %>/',
+                src: '**/*.json',
                 dest: '<%= dest %>/<%= backoffice %>/',
             },
 
@@ -311,9 +325,9 @@
         }
     });
 
-    grunt.registerTask('default', ['jshint', 'concat', 'browserify', 'sass', 'cssmin', 'copy:config', 'copy:tours', 'copy:html', 'copy:lib', 'copy:lang']);
+    grunt.registerTask('default', ['jshint', 'concat', 'browserify', 'sass', 'cssmin', 'copy:config', 'copy:plugins', 'copy:tours', 'copy:json', 'copy:html', 'copy:lib', 'copy:lang']);
     grunt.registerTask('nuget', ['clean', 'default', 'copy:nuget', 'template:nuspec', 'mkdir:pkg', 'nugetpack']);
     grunt.registerTask('package', ['clean', 'default', 'copy:umbraco', 'copy:umbracoBin', 'mkdir:pkg', 'umbracoPackage']);
 
-    grunt.registerTask('dev-v8', ['watch:dev8']);
+    grunt.registerTask('dev', ['watch:dev']);
 };

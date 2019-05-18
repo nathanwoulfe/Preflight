@@ -4,7 +4,7 @@
 
         const dirtyHashes = {};
         const propsBeingChecked = [];
-        const validPropTypes = ['Umbraco.TinyMCEv3', 'Umbraco.Grid', 'Imulus.Archetype'];
+        const validPropTypes = Umbraco.Sys.ServerVariables.Preflight.PropertyTypesToCheck;
 
         // cache these for the trivial perf benefit
         const formSelector = '.umb-property ng-form[name="propertyForm"]';

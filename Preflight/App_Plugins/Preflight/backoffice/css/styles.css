@@ -10,8 +10,10 @@
     opacity: .025; }
   .preflight > div {
     position: relative; }
-  .preflight-settings .umb-control-group {
-    position: relative; }
+  .preflight-settings {
+    overflow: hidden; }
+    .preflight-settings .umb-control-group {
+      position: relative; }
   .preflight-overlay, .preflight .umb-overlay-header {
     text-align: left; }
   .preflight .flex {

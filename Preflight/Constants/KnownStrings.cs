@@ -11,7 +11,7 @@ namespace Preflight.Constants
 
         public const string RteJsonPath = "$..controls[?(@.editor.alias == 'rte')]";
         public const string RteValueJsonPath = "$..value";
-        public const string ArchetypeRteJsonPath = "$..[?(@.propertyEditorAlias == 'Umbraco.TinyMCEv3')]";
+        public const string ArchetypeRteJsonPath = "$..[?(@.propertyEditorAlias == 'Umbraco.TinyMCE')]";
 
         public const string ClosingHtmlTags = @"(<\/li>|<\/h[1-6]{1}>)";
         public const string CharsToRemove = @"(<.*?>|\(|\)|\[|\]|,|\w'|'\w|\w""|""\w)";

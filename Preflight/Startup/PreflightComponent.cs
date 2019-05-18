@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using System.Web.Routing;
@@ -52,10 +54,17 @@ namespace Preflight.Startup
             var urlHelper = new System.Web.Mvc.UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
             IDictionary<string, object> settings = dictionary["umbracoSettings"].ToDictionary();
 
+            List<string> typesToCheck = new List<string>();
+            foreach (FieldInfo field in typeof(KnownPropertyAlias).GetFields())
+            {
+                typesToCheck.Add(field.GetValue(null).ToString());
+            }
+
             dictionary.Add("Preflight", new Dictionary<string, object>
             {
                 { "ContentFailedChecks", KnownStrings.ContentFailedChecks },
-                { "PluginPath",$"{settings["appPluginsPath"]}/preflight/backoffice" },
+                { "PluginPath", $"{settings["appPluginsPath"]}/preflight/backoffice" },
+                { "PropertyTypesToCheck", typesToCheck },
                 { "ApiPath", urlHelper.GetUmbracoApiServiceBaseUrl<Api.ApiController>(controller => controller.GetSettings()) }
             });
         }
