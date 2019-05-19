@@ -16,7 +16,7 @@
     "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
     "value": "bannedword,never_use_this",
     "core": true
-  },
+  }, 
   {
     "label": "Run Preflight on save",
     "description": "Set to true and Preflight will run on all saves, and alert users to any errors.",
