@@ -175,7 +175,7 @@
 
             html: {
                 expand: true,
-                cwd: '<%= backoffice %>/**',
+                cwd: '<%= backoffice %>/',
                 src: '**/*.html',
                 dest: '<%= dest %>/<%= backoffice %>/',
             },

@@ -1,4 +1,4 @@
-/*! preflight - v0.1.0-build50 - 2019-05-19
+/*! preflight - v0.1.0-build51 - 2019-05-19
  * Copyright (c) 2019 Nathan Woulfe;
  * Licensed MIT
  */
@@ -279,10 +279,8 @@
          */
         this.saveSettings = () => {
 
-            //const min = parseInt(getSettingByAlias('readabilityTargetMin').value);
-            //const max = parseInt(getSettingByAlias('readabilityTargetMax').value);
-            const min = 1;
-            const max = 100;
+            const min = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMinimum')[0].value);
+            const max = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMaximum')[0].value);
 
             if (min < max) {
 
