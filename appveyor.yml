@@ -30,7 +30,7 @@ deploy:
   - provider: NuGet
     server:
     api_key:
-      secure: 0NpBePahJSE05yOwqbFIKfbfEv83bju7OKvYpHH6FeROlps+UjZcoKk7a4ToEHOG
+      secure: DvzN77++eNMBd8IMR7bYlCiJV7D2M3bpk5kigX8yYwgDfnX12BkbL4w0OAJiFdQa
     skip_symbols: false      
     symbol_server:    
     artifact: /.*\.nupkg/
@@ -48,4 +48,4 @@ deploy:
     artifact: /.*\.zip/     
     on:
         branch: master
-        appveyor_repo_tag: true     
+        appveyor_repo_tag: true    
