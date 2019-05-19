@@ -1,4 +1,4 @@
-/*! preflight - v0.1.0-build46 - 2019-05-18
+/*! preflight - v0.1.0-build50 - 2019-05-19
  * Copyright (c) 2019 Nathan Woulfe;
  * Licensed MIT
  */
@@ -358,7 +358,7 @@
         this.$onInit = () => {
             init();
         };
-    };
+    }
 
     const component = {
         transclude: true,
@@ -383,7 +383,7 @@
     /**
      * Directive used to render the heading for a plugin in the results view
      * Send a stringified array as the tokens attribute to replace %0%, %1% .. %n% in the localized string
-     */
+     */ 
 
     const template = `
            <h5 ng-bind="::$ctrl.heading"></h5>
@@ -405,12 +405,12 @@
                         this.heading = localizedHeading;
                     });
             }
-        }
+        };
 
         this.$onInit = () => {
             init();
-        }
-    };
+        };
+    }
 
     const component = {
         transclude: true,
@@ -446,7 +446,7 @@
                 this.className = this.failed ? 'fail' : 'pass';
             }
         };
-    };
+    }
 
     const component = {
         transclude: true,
@@ -464,9 +464,6 @@
 (() => {
 
     const postSaveUrl = '/umbracoapi/content/postsave';
-    let warningNotification = {
-        key: 'preflight_notice'
-    };
 
     function interceptor(notificationsService, $q, $injector) {
         return {
@@ -476,8 +473,10 @@
                         s.getSettingValue('runPreflightOnSave')
                             .then(resp => {
                                 if (resp.value === '1') {
-                                    warningNotification.view = `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/views/warning.notification.html`;
-                                    notificationsService.add(warningNotification);
+                                    notificationsService.add({
+                                        key: 'preflight_notice',
+                                        view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/views/warning.notification.html`
+                                    });
                                 }
                             });
                     }]);

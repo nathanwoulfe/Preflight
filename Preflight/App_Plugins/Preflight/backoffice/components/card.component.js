@@ -38,7 +38,7 @@
         this.$onInit = () => {
             init();
         };
-    };
+    }
 
     const component = {
         transclude: true,

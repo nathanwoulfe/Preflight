@@ -1,5 +1,5 @@
 # version format
-version: 1.0.0.{build}
+version: 1.0.1.{build}
 
 image: Visual Studio 2017
 
@@ -39,9 +39,9 @@ deploy:
         appveyor_repo_tag: true      
     
   - provider: GitHub
-    tag: v1.0.0
-    release: Release 1.0.0
-    description: "Initial release"
+    tag: v1.0.1
+    release: Release 1.0.1
+    description: "Fixes all the stuff I broke in v1"
     force_update: true
     auth_token:
         secure: Otbl8p8qCwciDqJgSWCyN0Arfs5XS1CwiHcK+r0F6uz9Rxt4gzBFvlc3cjPV3NxR

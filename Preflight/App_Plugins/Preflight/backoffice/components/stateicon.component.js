@@ -15,7 +15,7 @@
                 this.className = this.failed ? 'fail' : 'pass';
             }
         };
-    };
+    }
 
     const component = {
         transclude: true,

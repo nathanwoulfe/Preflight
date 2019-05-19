@@ -14,7 +14,7 @@
     "tab": "Black/white lists",
     "order": 2,
     "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
-    "value": "peen,donger",
+    "value": "bannedword,never_use_this",
     "core": true
   },
   {

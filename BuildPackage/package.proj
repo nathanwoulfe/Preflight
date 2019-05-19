@@ -17,7 +17,7 @@
 	<!-- SHARED PROPERTIES -->
 	<PropertyGroup>
 		<PackageName>Preflight</PackageName>
-		<MinUmbracoVersion>8.0.0</MinUmbracoVersion>
+		<MinUmbracoVersion>8.0.2</MinUmbracoVersion>
 		<Readme>Add pre-publishing checks to Umbraco.</Readme>
 		<AuthorName>Nathan Woulfe</AuthorName>
 		<AuthorUrl>https://github.com/nathanwoulfe</AuthorUrl>

@@ -299,7 +299,6 @@
                     globals: {},
                     force: true,
                     loopfunc: true,
-                    ignores: ['**/lib/**/*.js']
                 }
             }
         }

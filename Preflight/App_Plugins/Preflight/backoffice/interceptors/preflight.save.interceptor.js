@@ -1,9 +1,6 @@
 ﻿(() => {
 
     const postSaveUrl = '/umbracoapi/content/postsave';
-    let warningNotification = {
-        key: 'preflight_notice'
-    };
 
     function interceptor(notificationsService, $q, $injector) {
         return {
@@ -13,8 +10,10 @@
                         s.getSettingValue('runPreflightOnSave')
                             .then(resp => {
                                 if (resp.value === '1') {
-                                    warningNotification.view = `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/views/warning.notification.html`;
-                                    notificationsService.add(warningNotification);
+                                    notificationsService.add({
+                                        key: 'preflight_notice',
+                                        view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/views/warning.notification.html`
+                                    });
                                 }
                             });
                     }]);

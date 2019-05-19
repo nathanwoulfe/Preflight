@@ -3,7 +3,7 @@
     /**
      * Directive used to render the heading for a plugin in the results view
      * Send a stringified array as the tokens attribute to replace %0%, %1% .. %n% in the localized string
-     */
+     */ 
 
     const template = `
            <h5 ng-bind="::$ctrl.heading"></h5>
@@ -25,12 +25,12 @@
                         this.heading = localizedHeading;
                     });
             }
-        }
+        };
 
         this.$onInit = () => {
             init();
-        }
-    };
+        };
+    }
 
     const component = {
         transclude: true,
