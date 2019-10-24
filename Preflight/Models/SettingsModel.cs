@@ -2,6 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 using Preflight.Extensions;
+using Preflight.Plugins;
 
 namespace Preflight.Models
 {
@@ -34,6 +35,13 @@ namespace Preflight.Models
         public SettingsTab(string name)
         {
             Name = name;
+        }
+
+        public SettingsTab(IPreflightPlugin plugin)
+        {
+            Name = plugin.Name;
+            Summary = plugin.Summary;
+            Description = plugin.Description;
         }
     }
 
@@ -112,7 +120,7 @@ namespace Preflight.Models
             Value = val ? "1" : "0";
             Label = "Disabled";
             Alias = tab.DisabledAlias();
-            Description = "Disable this plugin";
+            Description = $"Disable the {tab} plugin";
             View = "views/propertyeditors/boolean/boolean.html";
             Order = -10;
             Core = true;

@@ -32,7 +32,6 @@
   ],
   "dashboards": [
     {
-      "name": "Preflight",
       "alias": "preflight",
       "view": "~/App_Plugins/preflight/backoffice/views/settings.dashboard.html",
       "sections": ["settings"] 

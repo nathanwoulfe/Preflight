@@ -98,7 +98,7 @@ namespace Preflight.Services
         /// <returns></returns>
         private static HttpStatusCode GetHeaders(string url)
         {
-            HttpStatusCode result = default(HttpStatusCode);
+            HttpStatusCode result = default;
             WebRequest request = WebRequest.Create(url);
 
             request.Method = WebRequestMethods.Http.Head;

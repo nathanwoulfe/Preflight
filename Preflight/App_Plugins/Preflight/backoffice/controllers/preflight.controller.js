@@ -1,6 +1,6 @@
 ﻿(() => {
 
-    function ctrl($scope, $timeout, editorState, preflightService, preflightHub) {
+    function ctrl($scope, $rootScope, $element, $timeout, editorState, preflightService, preflightHub) {
 
         const dirtyHashes = {};
         const propsBeingChecked = [];
@@ -47,7 +47,9 @@
                     type: 'alert'
                 };
             } else {
-                $scope.model.badge = {};
+                $scope.model.badge = {
+                    type: 'success icon-'
+                };
             }
         };
 
@@ -135,7 +137,7 @@
                                 failed: false,
                                 failedCount: -1,
                                 name: `${prop.name}_temp`
-                            });
+                            }); 
                         }
 
                         propsBeingChecked.push(prop.name);
@@ -149,9 +151,7 @@
                     };
 
                     preflightService.checkDirty(payload)
-                        .then(resp => {
-                            // swallowed
-                        });
+                        .then(() => { /* swallowed */ });
                 });
             }
         };
@@ -169,6 +169,19 @@
             }
         );
 
+        /*
+         * 
+         */
+        $rootScope.$on('showPreflight', (event, data) => {
+            if (data.nodeId === $scope.content.id) {
+                // needs to find app closest to current scope
+                const appLink = $element.closest('form').find('[data-element="sub-view-preflight"]');
+
+                if (appLink) {
+                    appLink.click();
+                }          
+            }
+        });
 
         /**
          * Initiates the signalr hub for returning test results
@@ -191,6 +204,6 @@
             .then(resp => {});
     }
 
-    angular.module('preflight').controller('preflight.controller', ['$scope', '$timeout', 'editorState', 'preflightService', 'preflightHub', ctrl]);
+    angular.module('preflight').controller('preflight.controller', ['$scope', '$rootScope', '$element', '$timeout', 'editorState', 'preflightService', 'preflightHub', ctrl]);
 
 })();

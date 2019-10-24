@@ -9,7 +9,7 @@
 
                 this.settings.forEach(v => {
                     if (v.view.indexOf('slider') !== -1) {
-                        v.config = {
+                        v.config = { 
                             handle: 'round',
                             initVal1: v.alias === 'longWordSyllables' ? 5 : 65,
                             maxVal: v.alias === 'longWordSyllables' ? 10 : 100,
@@ -29,6 +29,8 @@
                             min: 0,
                             max: 0
                         };
+
+                        v.validation = {};
                     }
                 });
             });
@@ -36,9 +38,9 @@
 
         /**
          * 
-         */
-        this.saveSettings = () => {
-
+         */ 
+        this.saveSettings = () => {  
+             
             const min = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMinimum')[0].value);
             const max = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMaximum')[0].value);
 

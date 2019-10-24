@@ -52,10 +52,9 @@ namespace Preflight.Services
                     case KnownPropertyAlias.Grid:
                         testResult = ExtractValuesFromSimpleProperty(prop, KnownStrings.RteJsonPath);
                         break;
-                    case KnownPropertyAlias.Archetype:
-                        testResult = ExtractValuesFromSimpleProperty(prop, KnownStrings.ArchetypeRteJsonPath);
-                        break;
                     case KnownPropertyAlias.Rte:
+                    case KnownPropertyAlias.Textarea:
+                    case KnownPropertyAlias.Textbox:
                         testResult = RunPluginsAgainstValue(prop.Name, prop.Value).AsEnumerableOfOne().ToList();
                         break;
                 }
@@ -100,10 +99,9 @@ namespace Preflight.Services
                     case KnownPropertyAlias.Grid:
                         testResult = ExtractValuesFromUmbracoProperty(prop, KnownStrings.RteJsonPath);
                         break;
-                    case KnownPropertyAlias.Archetype:
-                        testResult = ExtractValuesFromUmbracoProperty(prop, KnownStrings.ArchetypeRteJsonPath);
-                        break;
                     case KnownPropertyAlias.Rte:
+                    case KnownPropertyAlias.Textarea:
+                    case KnownPropertyAlias.Textbox:
                         testResult = RunPluginsAgainstValue(prop.PropertyType.Name, prop.GetValue()?
                             .ToString()).AsEnumerableOfOne().ToList();
                         break;

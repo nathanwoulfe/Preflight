@@ -1,17 +1,17 @@
 ﻿[
   {
-    "label": "Whitelisted words",
+    "label": "Nice words",
     "description": "These words will be excluded from the readability check",
-    "tab": "Black/white lists",
+    "tab": "Naughty and nice",
     "order": 1,
     "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
     "value": "Umbraco,preflight,hippopotamus",
     "core": true
   },
   {
-    "label": "Blacklisted words",
+    "label": "Naughty words",
     "description": "These words should never be used",
-    "tab": "Black/white lists",
+    "tab": "Naughty and nice",
     "order": 2,
     "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
     "value": "bannedword,never_use_this",

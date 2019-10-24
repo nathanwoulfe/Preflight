@@ -1,12 +1,27 @@
+.umb-sub-views-nav-item .badge.-type-success {
+  background-color: #00aea2; }
+  .umb-sub-views-nav-item .badge.-type-success::before {
+    transform: translateY(-2px);
+    content: '\e165'; }
+
 .preflight {
-  position: relative; }
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+  left: 20px; }
+  .preflight-passed {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; }
   .preflight::before {
     content: '\e0c7';
     font-family: icomoon;
     font-size: 55vw;
     position: absolute;
     left: 0;
-    top: 120%;
+    top: 100px;
     opacity: .025; }
   .preflight > div {
     position: relative; }
@@ -25,11 +40,11 @@
       margin-top: 0; }
   .preflight h5 {
     margin-top: 0; }
-  .preflight preflight-state-icon {
+  .preflight-state-icon {
     position: absolute;
     top: 0;
     left: 0; }
-    .preflight preflight-state-icon .state-icon {
+    .preflight-state-icon .state-icon {
       padding: 10px;
       display: flex;
       justify-content: center;
@@ -39,9 +54,9 @@
       height: 42px;
       min-width: 42px;
       border-radius: 50%; }
-    .preflight preflight-state-icon .icon {
+    .preflight-state-icon .icon {
       font-size: 22px; }
-    .preflight preflight-state-icon + .preflight-result {
+    .preflight-state-icon + .preflight-result {
       padding-left: 77px; }
   .preflight .count-badge {
     color: #fff;
@@ -68,6 +83,11 @@
     color: #f9b945; }
     .preflight .broken-link-type.unsafe {
       color: #fe6561; }
+  .preflight-alert {
+    background: #1b264f;
+    padding-right: 14px; }
+    .preflight-alert h4.intro-text {
+      color: #fff; }
   .preflight .title {
     font-size: 30px;
     color: #363636;

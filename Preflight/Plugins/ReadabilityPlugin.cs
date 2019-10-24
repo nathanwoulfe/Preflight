@@ -28,10 +28,12 @@ namespace Preflight.Plugins
         public string Summary => "Ensure content meets minimum readability measures, using the Flesch reading ease algorithm.";
         public string ViewPath => "/app_plugins/preflight/backoffice/plugins/readability.html";
 
-        public ReadabilityPlugin() : this(new ReadabilityService())
-        {
-        }
+        public ReadabilityPlugin() : this(new ReadabilityService()) { }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="readabilityService"></param>
         private ReadabilityPlugin(IReadabilityService readabilityService)
         {
             _readabilityService = readabilityService;

@@ -26,7 +26,7 @@
   </area>
 
   <area alias="preflightLinkHealth">
-    <key alias="brokenLinksHeading">Broken links key value</key>
+    <key alias="brokenLinksHeading">Broken links</key>
     <key alias="brokenLinksPassText">No broken links found for this property</key>
 
     <key alias="safeBrowsingHeading">Safe Browsing key value</key>
@@ -41,8 +41,8 @@
     <key alias="averageSentence">Average sentence</key>
     <key alias="length">length</key>
     <key alias="longWordsPassText">No long words found for this property</key>
-    <key alias="blacklistPassText">No blacklisted words/phrases for this property</key>
-    <key alias="longWordsHeading">Long words (%0% or more syllables)</key>
-    <key alias="blacklistHeading">Blacklisted terms</key>
+    <key alias="blacklistPassText">No naughty words/phrases for this property</key>
+    <key alias="longWordsHeading">Long words</key>
+    <key alias="blacklistHeading">Naughty words</key>
   </area>
 </language>

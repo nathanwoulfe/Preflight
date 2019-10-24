@@ -1,17 +1,11 @@
 ﻿(() => {
 
-    function notificationController(notificationsService) {
+    function notificationController($rootScope, notificationsService, editorState) {
 
-        this.saveCancelled = notificationsService.current[0].args.saveCancelled == 1;
+        this.saveCancelled = +notificationsService.current[0].args.saveCancelled === 1;
 
         this.switch = n => {
-            const tabScope = angular
-                .element(document.querySelector('[data-element="sub-view-preflight"]')).scope();
-
-            if (tabScope) {
-                tabScope.$parent.clickNavigationItem(tabScope.item);
-            }
-
+            $rootScope.$emit('showPreflight', { nodeId: editorState.current.id });
             this.discard(n);
         };
 
@@ -22,5 +16,5 @@
     }
 
     // register controller 
-    angular.module('preflight').controller('preflight.notification.controller', ['notificationsService', notificationController]);
+    angular.module('preflight').controller('preflight.notification.controller', ['$rootScope', 'notificationsService', 'editorState', notificationController]);
 })();

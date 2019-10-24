@@ -8,9 +8,9 @@
         public const string ReadabilityMin = "Readability target - minimum";
         public const string ReadabilityMax = "Readability target - maximum";
         public const string LongWordSyllables = "Long word syllable count";
-        public const string Whitelist = "Whitelisted words";
-        public const string Blacklist = "Blacklisted words";
-        public const string AutoreplaceTerms = "Auto-replace terms";
+        public const string NiceList = "Nice words";
+        public const string NaughtyList = "Naughty words";
+        public const string AutocorrectTerms = "Autocorrect terms";
         public const string GoogleApiKey = "Google SafeBrowsing API key";
     }
 }

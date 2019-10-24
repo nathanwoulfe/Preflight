@@ -9,7 +9,7 @@ using Preflight.Models;
 namespace Preflight.Plugins
 {
     [Export(typeof(IPreflightPlugin))]
-    public class AutoreplacePlugin : IPreflightCorePlugin
+    public class AutocorrectPlugin : IPreflightCorePlugin
     {
         public object Result { get; set; }
         public IEnumerable<SettingsModel> Settings { get; set; }
@@ -20,31 +20,32 @@ namespace Preflight.Plugins
         public int SortOrder => -1;
         public int FailedCount { get; set; }
 
-        public string Name => "Autoreplace";
+        public string Name => "Autocorrect";
         public string ViewPath => "";
-        public string Summary => "Automatically replace naughty words with less naughty words.";
+        public string Summary => "Automatically replace naughty words with less naughty words, or fix common spelling mistakes.";
         public string Description { get; set; }
 
-        private AutoreplacePlugin()
+        /// <summary>
+        /// 
+        /// </summary>
+        public AutocorrectPlugin()
         {
             Settings = PluginSettingsList.Populate(Name,
                 false,
                 true,
-                new GenericSettingModel("Autoreplace terms")
+                new GenericSettingModel("Autocorrect terms")
                 {
-                    Description = "Pipe-separated list of terms to auto-replace in preflight checks - eg 'replace me|new text'.",
+                    Description = "Pipe-separated list of terms to autocorrect in Preflight checks - eg 'replace me|new text'.",
                     View = SettingType.MultipleTextbox,
                     Value = "replacethis|new term",
                     Order = 1,
                     Core = true
                 }
             );
-
-            Description = Summary;
         }
 
         /// <summary>
-        /// perform autoreplace before readability check
+        /// perform autocorrect before readability check
         /// only do this in save handler as there's no point in updating if it's not being saved (potentially)
         /// </summary>
         /// <param name="id"></param>
@@ -52,16 +53,16 @@ namespace Preflight.Plugins
         /// <param name="settings"></param>
         public void Check(int id, string val, List<SettingsModel> settings)
         {
-            Dictionary<string, string> autoreplace = settings.GetValue<string>(KnownSettings.AutoreplaceTerms)?.Split(',')
+            Dictionary<string, string> autocorrect = settings.GetValue<string>(KnownSettings.AutocorrectTerms)?.Split(',')
                 .ToDictionary(
                     s => s.Split('|')[0],
                     s => s.Split('|')[1]
                 );
 
-            if (autoreplace == null || !autoreplace.Any())
+            if (autocorrect == null || !autocorrect.Any())
                 return;
 
-            foreach (KeyValuePair<string, string> term in autoreplace)
+            foreach (KeyValuePair<string, string> term in autocorrect)
             {
                 string pattern = $@"\b{term.Key}\b";
                 Regex.Replace(val, pattern, term.Value, RegexOptions.IgnoreCase);

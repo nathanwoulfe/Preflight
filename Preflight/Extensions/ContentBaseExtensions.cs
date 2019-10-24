@@ -11,7 +11,8 @@ namespace Preflight.Extensions
         {
             return content.Properties
                 .Where(p => p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Grid ||
-                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Archetype ||
+                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Textbox ||
+                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Textarea ||
                             p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Rte);
         }
     }

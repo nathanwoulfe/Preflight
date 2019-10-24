@@ -6,6 +6,7 @@ using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services;
 using Preflight.Services.Interfaces;
+using Umbraco.Core;
 
 namespace Preflight.Plugins
 {
@@ -30,9 +31,7 @@ namespace Preflight.Plugins
         public string Summary => "Check links resolve correctly. Optionally check URLs against Google's SafeBrowsing API";
         public string Description { get; set; }
 
-        public LinkCheckerPlugin() : this(new LinksService(), new SafeBrowsingService())
-        {
-        }
+        public LinkCheckerPlugin() : this(new LinksService(), new SafeBrowsingService()) { }
 
         private LinkCheckerPlugin(ILinksService linksService, ISafeBrowsingService safeBrowsingService)
         {
@@ -59,8 +58,6 @@ namespace Preflight.Plugins
                     Core = true
                 }
             );
-
-            Description = Summary;
         }
 
         public void Check(int id, string val, List<SettingsModel> settings)

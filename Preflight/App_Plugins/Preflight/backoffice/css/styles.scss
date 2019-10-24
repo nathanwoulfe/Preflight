@@ -5,9 +5,30 @@ $purple: #413659;
 $grey: #f3f3f5;
 
 $umbGreen: #00aea2;
+$umbBlue: #1b264f;
+
+.umb-sub-views-nav-item .badge.-type-success {
+    background-color: $umbGreen;
+
+    &::before {
+        transform:translateY(-2px);
+        content: '\e165';
+    }
+}
 
 .preflight {
-    position: relative;
+    position: absolute;
+    top:20px;
+    right:20px;
+    bottom:20px;
+    left:20px;
+
+    &-passed {
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+    }
 
     &::before {
         content: '\e0c7';
@@ -15,7 +36,7 @@ $umbGreen: #00aea2;
         font-size: 55vw;
         position: absolute;
         left: 0;
-        top: 120%;
+        top: 100px;
         opacity: .025;
     }
 
@@ -52,7 +73,7 @@ $umbGreen: #00aea2;
         margin-top: 0;
     }
 
-    preflight-state-icon {
+    &-state-icon {
         position: absolute;
         top: 0;
         left: 0;
@@ -114,6 +135,15 @@ $umbGreen: #00aea2;
 
         &.unsafe {
             color: $red;
+        }
+    }
+
+    &-alert {
+        background:$umbBlue;
+        padding-right:14px;
+
+        h4.intro-text {
+            color:#fff;
         }
     }
 

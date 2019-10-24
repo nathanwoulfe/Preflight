@@ -8,8 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Runtime.Caching;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Web.Composing;
 
 namespace Preflight.Services
 {
@@ -38,18 +39,16 @@ namespace Preflight.Services
                 .Where(l => l.StartsWith("http")).ToArray();
 
             // check for cached responses - avoids request when page is being resaved
-            MemoryCache cache = MemoryCache.Default;
             List<BrokenLinkModel> fromCache = new List<BrokenLinkModel>();
 
             foreach (string href in hrefs)
             {
-                var cacheItem = (BrokenLinkModel)cache.Get(KnownStrings.CacheKey + href);
+                var cacheItem = Current.AppCaches.RuntimeCache.GetCacheItem<BrokenLinkModel>(KnownStrings.CacheKey + href);
                 if (null == cacheItem) continue;
 
                 fromCache.Add(cacheItem);
                 hrefs = hrefs.Except(href.AsEnumerableOfOne()).ToArray();
             }
-
 
             SafeBrowsingResponseModel safeBrowsingResult = SafeBrowsingLookup(hrefs, apiKey);
 
@@ -66,8 +65,7 @@ namespace Preflight.Services
 
                 foreach (BrokenLinkModel item in response)
                 {
-                    cache.Add(KnownStrings.CacheKey + item.Href, item,
-                        new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(3600) });
+                    Current.AppCaches.RuntimeCache.InsertCacheItem(KnownStrings.CacheKey + item.Href, () => item, new TimeSpan(24, 0, 0), false);
                 }
             }
 

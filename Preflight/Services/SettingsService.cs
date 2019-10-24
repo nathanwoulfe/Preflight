@@ -1,14 +1,16 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Preflight.Constants;
+using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Plugins;
 using Preflight.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Caching;
-using Preflight.Extensions;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Web.Composing;
 
 namespace Preflight.Services
 {
@@ -20,10 +22,9 @@ namespace Preflight.Services
         /// </summary>
         public PreflightSettings Get()
         {
-            MemoryCache cache = MemoryCache.Default;
-            object fromCache = cache.Get(KnownStrings.SettingsCacheKey);
+            var fromCache = Current.AppCaches.RuntimeCache.GetCacheItem<PreflightSettings>(KnownStrings.SettingsCacheKey);
             if (fromCache != null)
-                return fromCache as PreflightSettings;
+                return fromCache;
 
             // only get here when nothing is cached 
             List<SettingsModel> settings;
@@ -38,36 +39,40 @@ namespace Preflight.Services
 
             // add tabs for core items
             List<SettingsTab> tabs = new List<SettingsTab>();
-            foreach (SettingsModel s in settings)
-            {
-                if (!s.Alias.HasValue()) { 
-                    s.Alias = s.Label.Camel();
-                }
 
-                tabs.Add(new SettingsTab(s.Tab));
-            }
 
             // get any plugins and add their settings
             // once settings have been saved from the backoffice, need to check that plugins aren't added twice
             var pluginProvider = new PluginProvider();
+            var plugins = pluginProvider.Get();
 
-            foreach (IPreflightPlugin plugin in pluginProvider.Get())
+            foreach (IPreflightPlugin plugin in plugins)
             {
                 foreach (SettingsModel setting in plugin.Settings)
                 {
-                    setting.Tab = plugin.Name;
-                    settings.Add(setting);
+                    if (!settings.Any(x => x.Alias == setting.Alias))
+                    {
+                        setting.Tab = plugin.Name;
+                        settings.Add(setting);
+                    }
                 }
 
-                // generate a tab from the setting - this list is filtered later
+                // generate a tab from the plugin if not added already
                 // send back the summary and description for the plugin as part of the tab object for display in the settings view
-                var pluginTab = new SettingsTab(plugin.Name)
-                {
-                    Summary = plugin.Summary,
-                    Description = plugin.Description
-                };
+                tabs.Add(new SettingsTab(plugin));                
+            }
 
-                tabs.Add(pluginTab);
+            foreach (SettingsModel s in settings)
+            {
+                if (!s.Alias.HasValue())
+                {
+                    s.Alias = s.Label.Camel();
+                }
+
+                if (!tabs.Any(x => x.Name == s.Tab))
+                {
+                    tabs.Add(new SettingsTab(s.Tab));
+                }
             }
 
             // tabs are sorted alpha, with general first
@@ -81,7 +86,7 @@ namespace Preflight.Services
             };
 
             // if we are here, cache should be set
-            cache.Set(KnownStrings.SettingsCacheKey, response, DateTimeOffset.UtcNow.AddMinutes(120));
+            Current.AppCaches.RuntimeCache.InsertCacheItem(KnownStrings.SettingsCacheKey, () => response, new TimeSpan(24, 0, 0), false);
 
             return response;
         }
@@ -93,13 +98,13 @@ namespace Preflight.Services
         {
             try
             {
-                MemoryCache cache = MemoryCache.Default;
-                cache.Set(KnownStrings.SettingsCacheKey, settings, DateTimeOffset.UtcNow.AddMinutes(120));
+                Current.AppCaches.RuntimeCache.InsertCacheItem(KnownStrings.SettingsCacheKey, () => settings, new TimeSpan(24, 0, 0), false);
 
+                // only persist the settings, tabs can be regenerated on startup
                 using (var file = new StreamWriter(KnownStrings.SettingsFilePath, false))
                 {
                     var serializer = new JsonSerializer();
-                    serializer.Serialize(file, settings);
+                    serializer.Serialize(file, settings.Settings);
                 }
                 return true;
             }
