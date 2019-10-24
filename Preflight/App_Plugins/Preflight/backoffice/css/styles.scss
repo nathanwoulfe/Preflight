@@ -1,4 +1,4 @@
-﻿$red: #fe6561;
+﻿$red: #d42054;
 $orange: #f9b945;
 $green: #35c786;
 $purple: #413659;
@@ -8,7 +8,7 @@ $umbGreen: #00aea2;
 $umbBlue: #1b264f;
 
 .umb-sub-views-nav-item .badge.-type-success {
-    background-color: $umbGreen;
+    background-color: $green;
 
     &::before {
         transform:translateY(-2px);
@@ -73,7 +73,7 @@ $umbBlue: #1b264f;
         margin-top: 0;
     }
 
-    &-state-icon {
+    preflight-state-icon {
         position: absolute;
         top: 0;
         left: 0;

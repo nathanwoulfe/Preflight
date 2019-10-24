@@ -1,5 +1,5 @@
 .umb-sub-views-nav-item .badge.-type-success {
-  background-color: #00aea2; }
+  background-color: #35c786; }
   .umb-sub-views-nav-item .badge.-type-success::before {
     transform: translateY(-2px);
     content: '\e165'; }
@@ -40,11 +40,11 @@
       margin-top: 0; }
   .preflight h5 {
     margin-top: 0; }
-  .preflight-state-icon {
+  .preflight preflight-state-icon {
     position: absolute;
     top: 0;
     left: 0; }
-    .preflight-state-icon .state-icon {
+    .preflight preflight-state-icon .state-icon {
       padding: 10px;
       display: flex;
       justify-content: center;
@@ -54,13 +54,13 @@
       height: 42px;
       min-width: 42px;
       border-radius: 50%; }
-    .preflight-state-icon .icon {
+    .preflight preflight-state-icon .icon {
       font-size: 22px; }
-    .preflight-state-icon + .preflight-result {
+    .preflight preflight-state-icon + .preflight-result {
       padding-left: 77px; }
   .preflight .count-badge {
     color: #fff;
-    background-color: #fe6561;
+    background-color: #d42054;
     border: 2px solid #fff;
     border-radius: 50%;
     font-size: 10px;
@@ -82,7 +82,7 @@
   .preflight .broken-link-type {
     color: #f9b945; }
     .preflight .broken-link-type.unsafe {
-      color: #fe6561; }
+      color: #d42054; }
   .preflight-alert {
     background: #1b264f;
     padding-right: 14px; }
@@ -143,12 +143,12 @@
       color: #68676b;
       background: #f3f3f5; }
   .preflight .fail {
-    background: rgba(254, 101, 97, 0.1); }
+    background: rgba(212, 32, 84, 0.1); }
     .preflight .fail-color, .preflight .fail .icon {
-      color: #fe6561; }
+      color: #d42054; }
     .preflight .fail-bg {
       color: #fff;
-      background: #fe6561; }
+      background: #d42054; }
   .preflight .pass {
     background: rgba(53, 199, 134, 0.1); }
     .preflight .pass-color, .preflight .pass .icon {
