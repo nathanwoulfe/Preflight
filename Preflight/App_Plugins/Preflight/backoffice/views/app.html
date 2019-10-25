@@ -1,4 +1,4 @@
-﻿<div ng-controller="preflight.controller as vm" class="preflight" id="preflight-app" ng-cloak ng-class="{ 'preflight-passed' : !vm.results.failed }">
+﻿<div ng-controller="preflight.controller as vm" class="preflight preflight-app" id="preflight-app" ng-cloak ng-class="{ 'preflight-passed' : !vm.results.failed }">
     <div ng-show="!vm.results.failed && !vm.propsBeingCheckedStr.length">
         <h3 class="title"><localize key="preflight_passIntro"></localize></h3>
         <h4 class="intro-text"><localize key="preflight_passText"></localize></h4>
@@ -11,12 +11,8 @@
             <localize ng-if="vm.results.failedCount > 1" key="preflight_failTextPlural"></localize>
         </h4>
     </div>
-    
-    <div ng-show="vm.propsBeingCheckedStr.length" class="alert preflight-alert">
-        <h4 class="intro-text"><localize key="preflight_runningChecks"></localize> {{ vm.propsBeingCheckedStr }}</h4>
-    </div>
 
-    <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties | orderBy: prop.label track by $index" ng-if="vm.results.failed" ng-class="{'loading': prop.loading}">
+    <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties | orderBy: prop.label track by $index" ng-if="vm.results" ng-class="{'loading': prop.loading}">
         <div class="umb-expansion-panel__header" ng-click="prop.open = !prop.open">
             <div>
                 <span class="count-badge" ng-bind="prop.failedCount" ng-if="prop.failedCount"></span>
@@ -27,12 +23,16 @@
             </div>
             <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !prop.open, 'icon-navigation-down': prop.open }">&nbsp;</ins>
         </div>
-        
+
         <div class="umb-expansion-panel__content" ng-show="prop.open">
             <div class="flex mt-30" ng-repeat="plugin in prop.plugins">
                 <div ng-include="plugin.viewPath" ng-repeat="model in [plugin]" class="preflight-plugin-wrapper"></div>
             </div>
         </div>
+    </div>
+
+    <div ng-show="vm.propsBeingCheckedStr.length" class="alert preflight-alert">
+        <h4 class="intro-text"><localize key="preflight_runningChecks"></localize> {{ vm.propsBeingCheckedStr }}</h4>
     </div>
 
 </div>

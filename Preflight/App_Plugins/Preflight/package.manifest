@@ -34,7 +34,8 @@
     {
       "alias": "preflight",
       "view": "~/App_Plugins/preflight/backoffice/views/settings.dashboard.html",
-      "sections": ["settings"] 
+      "sections": [ "settings" ],
+      "weight":  -99
     }
   ] 
 }

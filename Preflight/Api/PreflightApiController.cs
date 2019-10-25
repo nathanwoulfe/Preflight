@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Preflight.Services.Interfaces;
-using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -17,15 +16,6 @@ namespace Preflight.Api
     { 
         private readonly ISettingsService _settingsService;
         private readonly IContentChecker _contentChecker;
-
-        private IHttpActionResult Error(string message)
-        {
-            return Ok(new
-            {
-                status = HttpStatusCode.InternalServerError,
-                data = message
-            });
-        }
 
         public ApiController(ISettingsService settingsService, IContentChecker contentChecker)
         {
@@ -113,13 +103,10 @@ namespace Preflight.Api
         {            
             try
             {
-                IContent content = Services.ContentService.GetById(id);
-                bool failed = _contentChecker.CheckContent(content);
-
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
-                    failed
+                    failed = _contentChecker.CheckContent(id)
                 });
             }
             catch(Exception ex)
@@ -138,18 +125,30 @@ namespace Preflight.Api
         {
             try
             {
-                bool failed = _contentChecker.CheckDirty(data);
-
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
-                    failed
+                    failed = _contentChecker.CheckDirty(data)
                 });
             }
             catch (Exception ex)
             {
                 return Error(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private IHttpActionResult Error(string message)
+        {
+            return Ok(new
+            {
+                status = HttpStatusCode.InternalServerError,
+                data = message
+            });
         }
     }
 }

@@ -6,7 +6,7 @@
 
 Preflight is a pluggable framework for content quality assurance. Out of the box, Preflight tests general readability (including Flesch reading level; sentence length; and word length and complexity), checks links, and provides a text replacement mechanism.
 
-Preflight is available as an Umbraco 8 content app only, and currently supports content in RTE editors, including those nested in Grid or Archetype editors. 
+Preflight is an Umbraco 8 (8.1+) content app, and supports content in RTEs and textareas, including those nested in the Grid. 
 
 ## Plugins
 Preflight plugins are defined in C# classes deriving the `IPreflightPlugin` interface. All plugins MUST be decorated with an `ExportAttribute` (found in the `System.ComponentModel.Composition` namespace), per the example below:

@@ -2,7 +2,6 @@
 using System.Linq;
 using Newtonsoft.Json;
 using Preflight.Extensions;
-using Preflight.Plugins;
 
 namespace Preflight.Models
 {
@@ -12,7 +11,7 @@ namespace Preflight.Models
         public List<SettingsModel> Settings { get; set; }
 
         [JsonProperty("tabs")]
-        internal List<SettingsTab> Tabs { get; set; }
+        public List<SettingsTab> Tabs { get; set; }
     }
 
     public class SettingsTab
@@ -25,24 +24,6 @@ namespace Preflight.Models
 
         [JsonProperty("description")]
         public string Description { get; set; }
-
-        [JsonProperty("alias")]
-        public string Alias => Name.Camel();
-
-        [JsonProperty("open")]
-        public bool Open => false;
-
-        public SettingsTab(string name)
-        {
-            Name = name;
-        }
-
-        public SettingsTab(IPreflightPlugin plugin)
-        {
-            Name = plugin.Name;
-            Summary = plugin.Summary;
-            Description = plugin.Description;
-        }
     }
 
     /// <summary>

@@ -7,45 +7,27 @@ $grey: #f3f3f5;
 $umbGreen: #00aea2;
 $umbBlue: #1b264f;
 
-.umb-sub-views-nav-item .badge.-type-success {
-    background-color: $green;
+[data-element="sub-view-preflight"] .badge {
+    transition:background-color ease-in-out .5s;
 
-    &::before {
-        transform:translateY(-2px);
-        content: '\e165';
+    &.-type-success {
+        background-color: $green;
+
+        &::before {
+            transform: translateY(-2px);
+            content: '\e165';
+        }
     }
 }
 
 .preflight {
-    position: absolute;
-    top:20px;
-    right:20px;
-    bottom:20px;
-    left:20px;
-
-    &-passed {
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-    }
-
-    &::before {
-        content: '\e0c7';
-        font-family: icomoon;
-        font-size: 55vw;
-        position: absolute;
-        left: 0;
-        top: 100px;
-        opacity: .025;
-    }
 
     > div {
         position: relative;
     }
 
     &-settings {
-        overflow:hidden;
+        overflow: hidden;
 
         .umb-control-group {
             position: relative;
@@ -84,14 +66,15 @@ $umbBlue: #1b264f;
             justify-content: center;
             align-items: center;
             margin-right: 15px;
-            width: 42px;
-            height: 42px;
-            min-width: 42px;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
             border-radius: 50%;
         }
 
         .icon {
             font-size: 22px;
+            color: #fff;
         }
 
         + .preflight-result {
@@ -122,7 +105,7 @@ $umbBlue: #1b264f;
         }
 
         &.pending {
-            background-color: #555;
+            background-color: $orange;
 
             ins::before {
                 content: '';
@@ -139,11 +122,11 @@ $umbBlue: #1b264f;
     }
 
     &-alert {
-        background:$umbBlue;
-        padding-right:14px;
+        background: $umbBlue;
+        padding-right: 14px;
 
         h4.intro-text {
-            color:#fff;
+            color: #fff;
         }
     }
 
@@ -187,10 +170,6 @@ $umbBlue: #1b264f;
         width: 100%;
     }
 
-    &-result {
-        min-height: 62px;
-    }
-
     &-cards {
         display: flex;
         justify-content: center;
@@ -204,8 +183,18 @@ $umbBlue: #1b264f;
         flex-direction: column;
         padding: 20px;
         border-radius: 6px;
-        background: rgba($grey, 0.75);
+        border-width: 2px;
+        border-style: solid;
+        background: rgba($grey, 0.75) !important;
         margin: 0 10px;
+
+        &.pass {
+            border-color: $green;
+        }
+
+        &.fail {
+            border-color: $red;
+        }
 
         &-score {
             font-size: 36px;
@@ -215,41 +204,26 @@ $umbBlue: #1b264f;
     }
 
     .disabled {
-        background: rgba($grey, 0.75);
+        background: $grey;
 
-        &-color, .icon {
-            color: #68676b;
-        }
-
-        &-bg {
-            color: #68676b;
-            background: $grey;
+        &-color {
+            color: $grey;
         }
     }
 
     .fail {
-        background: rgba($red, 0.1);
+        background: $red;
 
-        &-color, .icon {
+        &-color {
             color: $red;
-        }
-
-        &-bg {
-            color: #fff;
-            background: $red;
         }
     }
 
     .pass {
-        background: rgba($green, 0.1);
+        background: $green;
 
-        &-color, .icon {
+        &-color {
             color: $green;
-        }
-
-        &-bg {
-            color: #fff;
-            background: $green;
         }
     }
 

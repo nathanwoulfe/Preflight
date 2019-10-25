@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json.Linq;
 using Preflight.Constants;
+using Preflight.Extensions;
 using Preflight.Models;
+using Preflight.Plugins;
 using Preflight.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNet.SignalR;
-using Preflight.Extensions;
-using Preflight.Plugins;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
 namespace Preflight.Services
 {
@@ -18,16 +19,19 @@ namespace Preflight.Services
     /// </summary>
     internal class ContentChecker : IContentChecker
     {
+        private readonly IContentService _contentService;
         private readonly ISettingsService _settingsService;
-        private readonly IHubContext _hubContext;
+        private IHubContext _hubContext;
 
         private int _id;
         private bool _fromSave;
         private List<SettingsModel> _settings;
 
-        public ContentChecker(ISettingsService settingsService)
+        public ContentChecker(ISettingsService settingsService, IContentService contentService)
         {
-            _settingsService = settingsService;
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+            _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+
             _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub>();
         }
 
@@ -45,32 +49,28 @@ namespace Preflight.Services
 
             foreach (SimpleProperty prop in dirtyProperties.Properties)
             {
-                List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
+                string propName = prop.Name;
+                string propValue = prop.Value?.ToString();
+                string propAlias = prop.Editor;
 
-                switch (prop.Editor)
-                {
-                    case KnownPropertyAlias.Grid:
-                        testResult = ExtractValuesFromSimpleProperty(prop, KnownStrings.RteJsonPath);
-                        break;
-                    case KnownPropertyAlias.Rte:
-                    case KnownPropertyAlias.Textarea:
-                    case KnownPropertyAlias.Textbox:
-                        testResult = RunPluginsAgainstValue(prop.Name, prop.Value).AsEnumerableOfOne().ToList();
-                        break;
-                }
+                // only continue if the prop has a value
+                if (!propValue.HasValue())
+                    continue;
 
-                foreach (PreflightPropertyResponseModel result in testResult)
-                {
-                    if (result.Failed)
-                    {
-                        failed = true;
-                    }
-                    _hubContext.Clients.All.PreflightTest(result);
-                }
+                failed = TestAndBroadcast(prop.Name, propValue, prop.Editor) || failed;
             }
 
             return failed;
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="fromSave"></param>
+        /// <returns></returns>
+        public bool CheckContent(int id, bool fromSave) => CheckContent(_contentService.GetById(id), fromSave);
 
 
         /// <summary>
@@ -82,40 +82,22 @@ namespace Preflight.Services
         public bool CheckContent(IContent content, bool fromSave)
         {
             // make this available to pass into any plugins
-            _id = content.Id;
             _fromSave = fromSave;
             _settings = _settingsService.Get().Settings;
 
             var failed = false;
 
             IEnumerable<Property> props = content.GetPreflightProperties();
+
             foreach (Property prop in props)
             {
-                List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
+                string propValue = prop.GetValue()?.ToString();
 
-                // since the first two can return multiple, treat all three the same
-                switch (prop.PropertyType.PropertyEditorAlias)
-                {
-                    case KnownPropertyAlias.Grid:
-                        testResult = ExtractValuesFromUmbracoProperty(prop, KnownStrings.RteJsonPath);
-                        break;
-                    case KnownPropertyAlias.Rte:
-                    case KnownPropertyAlias.Textarea:
-                    case KnownPropertyAlias.Textbox:
-                        testResult = RunPluginsAgainstValue(prop.PropertyType.Name, prop.GetValue()?
-                            .ToString()).AsEnumerableOfOne().ToList();
-                        break;
-                }
+                // only continue if the prop has a value
+                if (!propValue.HasValue())
+                    continue;
 
-                // return the results via signalr for perceived perf
-                foreach (PreflightPropertyResponseModel result in testResult)
-                {
-                    if (result.Failed)
-                    {
-                        failed = true;
-                    }
-                    _hubContext.Clients.All.PreflightTest(result);
-                }
+                failed = TestAndBroadcast(prop.PropertyType.Name, propValue, prop.PropertyType.PropertyEditorAlias) || failed;
             }
 
             return failed;
@@ -123,44 +105,58 @@ namespace Preflight.Services
 
 
         /// <summary>
-        /// Extracts the testable values from a <see cref="SimpleProperty"/> and passes each to <see cref="ProcessJTokenValues" />
+        /// 
         /// </summary>
-        /// <param name="prop"></param>
-        /// <param name="editorPath"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="alias"></param>
         /// <returns></returns>
-        private List<PreflightPropertyResponseModel> ExtractValuesFromSimpleProperty(SimpleProperty prop, string editorPath)
+        private bool TestAndBroadcast(string name, string value, string alias)
         {
-            if (prop.Value == null)
+            List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
+
+            bool failed = false;
+
+            switch (alias)
             {
-                return new List<PreflightPropertyResponseModel>();
+                case KnownPropertyAlias.Grid:
+                    testResult = ExtractValuesFromGridProperty(name, value);
+                    break;
+                case KnownPropertyAlias.Rte:
+                case KnownPropertyAlias.Textarea:
+                case KnownPropertyAlias.Textbox:
+                    testResult = RunPluginsAgainstValue(name, value).AsEnumerableOfOne().ToList();
+                    break;
             }
 
-            JObject asJson = JObject.Parse(prop.Value);
-            IEnumerable<JToken> rtes = asJson.SelectTokens(editorPath);
+            // return the results via signalr for perceived perf
+            foreach (PreflightPropertyResponseModel result in testResult)
+            {
+                if (result.Failed)
+                {
+                    failed = true;
+                }
 
-            return ProcessJTokenValues(rtes, prop.Name);
+                // announce the result
+                _hubContext.Clients.All.PreflightTest(result);
+            }
+
+            return failed;
         }
 
 
         /// <summary>
-        /// Extracts the testable values from a single Property, and passes each to <see cref="ProcessJTokenValues" />
+        /// Extracts the testable values from a single Grid editor, and passes each to <see cref="ProcessJTokenValues" />
         /// </summary>
         /// <param name="prop"></param>
         /// <param name="editorPath"></param>
         /// <returns></returns>
-        private List<PreflightPropertyResponseModel> ExtractValuesFromUmbracoProperty(Property prop, string editorPath)
+        private List<PreflightPropertyResponseModel> ExtractValuesFromGridProperty(string propName, string propValue)
         {
-            object propValue = prop.GetValue();
+            JObject asJson = JObject.Parse(propValue);
+            IEnumerable<JToken> jtokens = asJson.SelectTokens(KnownStrings.GridRteJsonPath);
 
-            if (propValue == null)
-            {
-                return new List<PreflightPropertyResponseModel>();
-            }
-
-            JObject asJson = JObject.Parse(propValue.ToString());
-            IEnumerable<JToken> rtes = asJson.SelectTokens(editorPath);
-
-            return ProcessJTokenValues(rtes, prop.PropertyType.Name);
+            return ProcessJTokenValues(jtokens, propName);
         }
 
 
@@ -177,7 +173,7 @@ namespace Preflight.Services
 
             foreach (JToken rte in rtes)
             {
-                JToken value = rte.SelectToken(KnownStrings.RteValueJsonPath);
+                JToken value = rte.SelectToken(KnownStrings.GridValueJsonPath);
                 if (value == null) continue;
 
                 PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString());
@@ -220,7 +216,7 @@ namespace Preflight.Services
 
                 // ignore disabled plugins
                 if (plugin.IsDisabled()) continue;
-                if(!_fromSave && plugin.IsOnSaveOnly()) continue;
+                if (!_fromSave && plugin.IsOnSaveOnly()) continue;
 
                 try
                 {

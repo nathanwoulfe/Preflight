@@ -21,15 +21,22 @@
             );
 
         const service = {
-            check: id => request('GET', `${urlBase}check/${id}`),
+            check: id => {
+                request('GET', `${urlBase}check/${id}`);
+            },
 
-            checkDirty: data => request('POST', `${urlBase}checkdirty/`, data),
+            checkDirty: data => {
+                request('POST', `${urlBase}checkdirty/`, data);
+            },
 
             getSettings: () => request('GET', `${urlBase}getSettings`),
 
             getSettingValue: alias => request('GET', `${urlBase}getSettingValue/${alias}`),
 
-            saveSettings: settings => request('POST', `${urlBase}saveSettings`, settings),
+            saveSettings: (settings, tabs) => request('POST', `${urlBase}saveSettings`, {
+                settings: settings, 
+                tabs: tabs
+            }),
 
             getHelpText: () => helpText
         };

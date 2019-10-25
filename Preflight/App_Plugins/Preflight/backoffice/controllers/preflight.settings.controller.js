@@ -60,11 +60,15 @@
                     }
                 });
 
-                preflightService.saveSettings({ settings: settingsToSave, tabs: this.tabs })
+                preflightService.saveSettings(settingsToSave, this.tabs)
                     .then(resp => {
                         resp.data ?
                             notificationsService.success('SUCCESS', 'Settings updated') :
                             notificationsService.error('ERROR', 'Unable to save settings');
+
+                        // reset dashboard form state
+                        var formScope = angular.element(document.querySelector('[name="dashboardForm"]')).scope();
+                        formScope.dashboardForm.$setPristine();
                     });
             }
             else {

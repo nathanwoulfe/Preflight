@@ -24,7 +24,10 @@ namespace Preflight.Services
         {
             var fromCache = Current.AppCaches.RuntimeCache.GetCacheItem<PreflightSettings>(KnownStrings.SettingsCacheKey);
             if (fromCache != null)
-                return fromCache;
+            {
+                var x = 1;
+            }
+                //return fromCache;
 
             // only get here when nothing is cached 
             List<SettingsModel> settings;
@@ -39,7 +42,6 @@ namespace Preflight.Services
 
             // add tabs for core items
             List<SettingsTab> tabs = new List<SettingsTab>();
-
 
             // get any plugins and add their settings
             // once settings have been saved from the backoffice, need to check that plugins aren't added twice
@@ -59,7 +61,12 @@ namespace Preflight.Services
 
                 // generate a tab from the plugin if not added already
                 // send back the summary and description for the plugin as part of the tab object for display in the settings view
-                tabs.Add(new SettingsTab(plugin));                
+                tabs.Add(new SettingsTab
+                {
+                    Name = plugin.Name,
+                    Description = plugin.Description,
+                    Summary = plugin.Summary
+                });                
             }
 
             foreach (SettingsModel s in settings)
@@ -71,7 +78,10 @@ namespace Preflight.Services
 
                 if (!tabs.Any(x => x.Name == s.Tab))
                 {
-                    tabs.Add(new SettingsTab(s.Tab));
+                    tabs.Add(new SettingsTab
+                    {
+                        Name = s.Tab
+                    });
                 }
             }
 
@@ -79,7 +89,7 @@ namespace Preflight.Services
             var response = new PreflightSettings
             {
                 Settings = settings.DistinctBy(s => new { s.Tab, s.Label }).ToList(),
-                Tabs = tabs.GroupBy(x => x.Alias)
+                Tabs = tabs.GroupBy(x => x.Name)
                     .Select(y => y.First())
                     .OrderBy(i => i.Name != SettingsTabNames.General)
                     .ThenBy(i => i.Name).ToList()

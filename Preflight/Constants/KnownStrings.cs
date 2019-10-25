@@ -8,10 +8,10 @@ namespace Preflight.Constants
         public const string AppSettingKey = "PreflightInstalled";
 
         public const string ContentFailedChecks = "Content failed Preflight checks";
+        public const string GridRteJsonPath = "$..controls[?(@.editor.view == 'rte' || @.editor.view == 'textstring' || @.editor.view == 'textarea' || @.editor.alias == 'rte' || @.editor.alias == 'headline' || @.editor.alias == 'quote')]";
+        public const string GridValueJsonPath = "$..value";
 
-        public const string RteJsonPath = "$..controls[?(@.editor.alias == 'rte')]";
-        public const string RteValueJsonPath = "$..value";
-        public const string ArchetypeRteJsonPath = "$..[?(@.propertyEditorAlias == 'Umbraco.TinyMCE')]";
+        public const string GridTextstringJsonPath = "$..controls[?(@.editor.alias == 'textstring')]";
 
         public const string ClosingHtmlTags = @"(<\/li>|<\/h[1-6]{1}>)";
         public const string CharsToRemove = @"(<.*?>|\(|\)|\[|\]|,|\w'|'\w|\w""|""\w)";

@@ -5,6 +5,7 @@ namespace Preflight.Services.Interfaces
 {
     public interface IContentChecker
     {
+        bool CheckContent(int id, bool fromSave = false);
         bool CheckContent(IContent content, bool fromSave = false);
 
         /// <summary>

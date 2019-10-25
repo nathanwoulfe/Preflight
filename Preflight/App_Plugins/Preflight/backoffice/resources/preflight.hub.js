@@ -10,14 +10,12 @@
         function initHub(callback) {
             if ($.connection === undefined) {
                 const promises = [];
-                scripts.forEach(script => {
-                    promises.push(assetsService.loadJs(script));
-                });
+                scripts.forEach(script =>
+                    promises.push(assetsService.loadJs(script)));
 
                 $q.all(promises)
-                    .then(() => {
-                        hubSetup(callback);
-                    });
+                    .then(() => hubSetup(callback));
+                    
             } else {
                 hubSetup(callback);
             }
@@ -28,8 +26,11 @@
             const proxy = $.connection.preflightHub;
 
             const hub = {
-                start: () => {
+                start: callback => {
                     $.connection.hub.start();
+                    if (callback) {
+                        callback();
+                    }
                 },
                 on: (eventName, callback) => {
                     proxy.on(eventName, 
