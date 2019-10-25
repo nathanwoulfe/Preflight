@@ -88,7 +88,7 @@ namespace Preflight.Services
             // tabs are sorted alpha, with general first
             var response = new PreflightSettings
             {
-                Settings = settings.DistinctBy(s => new { s.Tab, s.Label }).ToList(),
+                Settings = settings.DistinctBy(s => (s.Tab, s.Label)).ToList(),
                 Tabs = tabs.GroupBy(x => x.Name)
                     .Select(y => y.First())
                     .OrderBy(i => i.Name != SettingsTabNames.General)

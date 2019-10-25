@@ -24,11 +24,5 @@ namespace Preflight.Extensions
 
             return value == null ? default(T) : (T) Convert.ChangeType(value, typeof(T));
         }
-
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
-        {
-            HashSet<TKey> known = new HashSet<TKey>();
-            return source.Where(element => known.Add(keySelector(element)));
-        }
     }
 }
