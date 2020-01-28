@@ -13,10 +13,10 @@ namespace Preflight.Plugins
 
         internal IEnumerable<IPreflightPlugin> Get()
         {
-            var catalog = new AggregateCatalog(
+            AggregateCatalog catalog = new AggregateCatalog(
                 new DirectoryCatalog(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin"), "*.dll"));
-         
-            var container = new CompositionContainer(catalog);
+
+            CompositionContainer container = new CompositionContainer(catalog);
 
             try
             {
@@ -25,6 +25,10 @@ namespace Preflight.Plugins
             catch (CompositionException e)
             {
                 Console.WriteLine(e.ToString());
+            }
+            finally
+            {
+                container.Dispose();
             }
 
             return _preflightPlugins;
