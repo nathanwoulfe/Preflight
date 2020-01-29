@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using Preflight.Constants;
+﻿using Preflight.Constants;
 using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services;
 using Preflight.Services.Interfaces;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 using Umbraco.Core;
 
 namespace Preflight.Plugins

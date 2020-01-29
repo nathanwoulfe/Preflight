@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
 using Preflight.Plugins;
+using System.Collections.Generic;
 
 namespace Preflight.Models
 {

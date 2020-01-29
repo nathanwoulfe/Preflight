@@ -255,6 +255,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ContentTypeBaseExtensions.cs" />
     <Compile Include="Extensions\PreflightPluginExtensions.cs" />
     <Compile Include="Models\SimpleProperty.cs" />
     <Compile Include="NotificationsHandler.cs" />

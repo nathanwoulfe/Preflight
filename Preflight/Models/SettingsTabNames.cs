@@ -1,6 +1,6 @@
 ﻿namespace Preflight.Models
 {
-    public  class SettingsTabNames
+    public class SettingsTabNames
     {
         public const string Readability = "Readability";
         public const string NaughtyAndNice = "Naught and nice";

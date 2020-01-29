@@ -7,9 +7,9 @@ namespace Preflight.Extensions
     {
         public static bool IsDisabled(this IPreflightPlugin plugin)
         {
-            return plugin.Settings.Any() && 
+            return plugin.Settings.Any() &&
                    plugin.Settings.Any(s => s.Alias == plugin.Name.DisabledAlias() && s.Value.ToString() == "1");
-            
+
         }
 
         public static bool IsOnSaveOnly(this IPreflightPlugin plugin)

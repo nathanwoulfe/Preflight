@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using Preflight.Constants;
+﻿using Preflight.Constants;
 using Preflight.Models;
 using Preflight.Services;
 using Preflight.Services.Interfaces;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Preflight.Plugins
 {
@@ -38,7 +38,7 @@ namespace Preflight.Plugins
         {
             _readabilityService = readabilityService;
 
-            Settings = PluginSettingsList.Populate(Name, 
+            Settings = PluginSettingsList.Populate(Name,
                 false,
                 false,
                 new GenericSettingModel("Readability target - minimum")

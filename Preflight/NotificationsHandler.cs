@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Preflight.Constants;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Preflight.Constants;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.UI;
 
 namespace Preflight
 {
@@ -45,7 +43,7 @@ namespace Preflight
                                     Message = $"PreflightCancelSaveOnFail_{context.Items["PreflightCancelSaveOnFail"]}",
                                     NotificationType = NotificationStyle.Error
                                 });
-                                
+
                             }
                         }
                         catch (Exception ex)

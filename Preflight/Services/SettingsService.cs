@@ -27,7 +27,7 @@ namespace Preflight.Services
             {
                 var x = 1;
             }
-                //return fromCache;
+            //return fromCache;
 
             // only get here when nothing is cached 
             List<SettingsModel> settings;
@@ -66,7 +66,7 @@ namespace Preflight.Services
                     Name = plugin.Name,
                     Description = plugin.Description,
                     Summary = plugin.Summary
-                });                
+                });
             }
 
             foreach (SettingsModel s in settings)

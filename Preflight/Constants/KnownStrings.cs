@@ -11,6 +11,8 @@ namespace Preflight.Constants
         public const string GridRteJsonPath = "$..controls[?(@.editor.view == 'rte' || @.editor.view == 'textstring' || @.editor.view == 'textarea' || @.editor.alias == 'rte' || @.editor.alias == 'headline' || @.editor.alias == 'quote')]";
         public const string GridValueJsonPath = "$..value";
 
+        public const string NcAlias = "ncContentTypeAlias";
+
         public const string GridTextstringJsonPath = "$..controls[?(@.editor.alias == 'textstring')]";
 
         public const string ClosingHtmlTags = @"(<\/li>|<\/h[1-6]{1}>)";

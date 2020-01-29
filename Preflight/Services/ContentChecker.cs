@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
@@ -20,17 +21,21 @@ namespace Preflight.Services
     internal class ContentChecker : IContentChecker
     {
         private readonly IContentService _contentService;
+        private readonly IContentTypeService _contentTypeService;
         private readonly ISettingsService _settingsService;
-        private IHubContext _hubContext;
+        private readonly ILogger _logger;
+        private readonly IHubContext _hubContext;
 
         private int _id;
         private bool _fromSave;
         private List<SettingsModel> _settings;
 
-        public ContentChecker(ISettingsService settingsService, IContentService contentService)
+        public ContentChecker(ISettingsService settingsService, IContentService contentService, IContentTypeService contentTypeService, ILogger logger)
         {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub>();
         }
@@ -49,9 +54,7 @@ namespace Preflight.Services
 
             foreach (SimpleProperty prop in dirtyProperties.Properties)
             {
-                string propName = prop.Name;
                 string propValue = prop.Value?.ToString();
-                string propAlias = prop.Editor;
 
                 // only continue if the prop has a value
                 if (!propValue.HasValue())
@@ -113,12 +116,16 @@ namespace Preflight.Services
         /// <returns></returns>
         private bool TestAndBroadcast(string name, string value, string alias)
         {
+
             List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
 
             bool failed = false;
 
             switch (alias)
             {
+                case KnownPropertyAlias.NestedContent:
+                    testResult = ExtractValuesFromNestedContentProperty(name, value);
+                    break;
                 case KnownPropertyAlias.Grid:
                     testResult = ExtractValuesFromGridProperty(name, value);
                     break;
@@ -146,10 +153,54 @@ namespace Preflight.Services
 
 
         /// <summary>
+        /// Extracts the testable values from a Nested Content instance, and passes each to <see cref="ProcessJTokenValues" />
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <param name="propValue"></param>
+        /// <returns></returns>
+        private List<PreflightPropertyResponseModel> ExtractValuesFromNestedContentProperty(string propName, string propValue)
+        {
+            Dictionary<string, IContentType> cache = new Dictionary<string, IContentType>();
+            List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
+
+            JArray asJson = JArray.Parse(propValue);
+            var index = 1;
+
+            foreach (JObject o in asJson)
+            {
+                var typeAlias = o.Value<string>(KnownStrings.NcAlias);
+                var type = cache.ContainsKey(typeAlias) ? cache[typeAlias] : _contentTypeService.Get(typeAlias);
+
+                if (!cache.ContainsKey(typeAlias))
+                {
+                    cache.Add(typeAlias, type);
+                }
+
+                var propsFromType = type.GetPreflightProperties();
+
+                foreach (var property in propsFromType)
+                {
+                    var value = o.Value<string>(property.Alias);
+
+                    PreflightPropertyResponseModel model = RunPluginsAgainstValue(propName, value);
+
+                    model.Label = $"{model.Name} (Item {index} - {property.Name})";
+
+                    response.Add(model);
+                }
+
+                index += 1;
+            }
+
+            return response;
+        }
+
+
+        /// <summary>
         /// Extracts the testable values from a single Grid editor, and passes each to <see cref="ProcessJTokenValues" />
         /// </summary>
-        /// <param name="prop"></param>
-        /// <param name="editorPath"></param>
+        /// <param name="propName"></param>
+        /// <param name="propValue"></param>
         /// <returns></returns>
         private List<PreflightPropertyResponseModel> ExtractValuesFromGridProperty(string propName, string propValue)
         {
@@ -163,22 +214,21 @@ namespace Preflight.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="rtes"></param>
+        /// <param name="editors"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        private List<PreflightPropertyResponseModel> ProcessJTokenValues(IEnumerable<JToken> rtes, string name)
+        private List<PreflightPropertyResponseModel> ProcessJTokenValues(IEnumerable<JToken> editors, string name)
         {
             List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
             var index = 1;
 
-            foreach (JToken rte in rtes)
+            foreach (JToken eidtor in editors)
             {
-                JToken value = rte.SelectToken(KnownStrings.GridValueJsonPath);
+                JToken value = eidtor.SelectToken(KnownStrings.GridValueJsonPath);
                 if (value == null) continue;
 
                 PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString());
 
-                // todo => extract the grid section, area, editor names for building the alias. Won't work for archetype though
                 model.Label = $"{model.Name} (Editor {index})";
                 index += 1;
 
@@ -237,8 +287,7 @@ namespace Preflight.Services
                 }
                 catch (Exception e)
                 {
-                    // todo => log
-                    string m = e.Message;
+                    _logger.Error<ContentChecker>(e, "Preflight couldn't take off...");
                 }
             }
 

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Preflight.Constants;
+using System.Collections.Generic;
 using System.Linq;
-using Preflight.Constants;
 using Umbraco.Core.Models;
 
 namespace Preflight.Extensions
@@ -11,6 +11,7 @@ namespace Preflight.Extensions
         {
             return content.Properties
                 .Where(p => p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Grid ||
+                            p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.NestedContent ||
                             p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Textbox ||
                             p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Textarea ||
                             p.PropertyType.PropertyEditorAlias == KnownPropertyAlias.Rte);

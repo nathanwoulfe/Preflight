@@ -1,10 +1,10 @@
 ﻿using Preflight.Models;
+using Preflight.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using Preflight.Services.Interfaces;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -12,8 +12,8 @@ namespace Preflight.Api
 {
     [RoutePrefix("umbraco/backoffice/preflight/api")]
     [PluginController("preflight")]
-    public class ApiController : UmbracoAuthorizedApiController 
-    { 
+    public class ApiController : UmbracoAuthorizedApiController
+    {
         private readonly ISettingsService _settingsService;
         private readonly IContentChecker _contentChecker;
 
@@ -100,7 +100,7 @@ namespace Preflight.Api
         [HttpGet]
         [Route("check/{id}")]
         public IHttpActionResult Check(int id)
-        {            
+        {
             try
             {
                 return Ok(new
@@ -109,7 +109,7 @@ namespace Preflight.Api
                     failed = _contentChecker.CheckContent(id)
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Error(ex.Message);
             }

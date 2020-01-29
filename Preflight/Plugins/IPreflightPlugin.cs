@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Web;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Preflight.Models;
+using System.Collections.Generic;
 
 namespace Preflight.Plugins
 {
@@ -20,7 +19,7 @@ namespace Preflight.Plugins
         /// </summary>
         [JsonProperty("failedCount")]
         int FailedCount { get; set; }
-        
+
         /// <summary>
         /// Sets the sort for the plugin - determins order of display in the app
         /// </summary>

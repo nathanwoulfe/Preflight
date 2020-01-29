@@ -15,5 +15,5 @@ namespace Preflight.Models
 
         [JsonProperty("unsafe")]
         public bool Unsafe { get; set; }
-    }   
+    }
 }

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Preflight.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Preflight.Models;
 
 namespace Preflight.Extensions
 {
@@ -22,7 +22,7 @@ namespace Preflight.Extensions
                 value = Convert.ToInt32(value);
             }
 
-            return value == null ? default(T) : (T) Convert.ChangeType(value, typeof(T));
+            return value == null ? default(T) : (T)Convert.ChangeType(value, typeof(T));
         }
     }
 }

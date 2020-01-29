@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Preflight.Constants;
+using Preflight.Extensions;
+using Preflight.Models;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Preflight.Constants;
-using Preflight.Extensions;
-using Preflight.Models;
 
 namespace Preflight.Plugins
 {

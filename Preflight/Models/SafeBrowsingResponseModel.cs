@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Preflight.Models
 {
@@ -56,5 +56,5 @@ namespace Preflight.Models
         public List<Entry> Entries { get; set; }
     }
 
-    
+
 }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Preflight.Models;
+﻿using Preflight.Models;
+using System.Collections.Generic;
 
 namespace Preflight.Services.Interfaces
 {

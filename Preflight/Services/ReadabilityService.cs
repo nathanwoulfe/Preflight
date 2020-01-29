@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Preflight.Constants;
+﻿using Preflight.Constants;
 using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Preflight.Services
 {

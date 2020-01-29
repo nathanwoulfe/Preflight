@@ -10,27 +10,27 @@ namespace Preflight.Extensions
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static bool HasValue(this string str) => !string.IsNullOrEmpty(str);        
+        public static bool HasValue(this string str) => !string.IsNullOrEmpty(str);
 
         /// <summary>
         /// camelCaseTheString
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string Camel(this string str) => str.ToCleanString(CleanStringType.CamelCase);        
+        public static string Camel(this string str) => str.ToCleanString(CleanStringType.CamelCase);
 
         /// <summary>
         /// Appends 'Disabled' and camelCases the given string
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string OnSaveOnlyAlias(this string str) => $"{str} on save only".Camel();        
+        public static string OnSaveOnlyAlias(this string str) => $"{str} on save only".Camel();
 
         /// <summary>
         /// Appends 'Disabled' and camelCases the given string
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string DisabledAlias(this string str) => $"{str} disabled".Camel();        
+        public static string DisabledAlias(this string str) => $"{str} disabled".Camel();
     }
 }
