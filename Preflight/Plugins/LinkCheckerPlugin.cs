@@ -41,21 +41,23 @@ namespace Preflight.Plugins
             Settings = PluginSettingsList.Populate(Name,
                 false,
                 true,
-                new GenericSettingModel("Ensure safe links")
-                {
-                    Description = "Set to true and Preflight will check links for potential malware and bad actors.",
-                    View = SettingType.Boolean,
-                    Value = "0",
-                    Order = 1,
-                    Core = true
-                },
-                new GenericSettingModel("Google SafeBrowsing API key")
-                {
-                    Description = "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites.",
-                    View = SettingType.String,
-                    Value = "Get your key from the Google API Console",
-                    Order = 2,
-                    Core = true
+                settings: new SettingsModel[] {
+                    new GenericSettingModel("Ensure safe links")
+                    {
+                        Description = "Set to true and Preflight will check links for potential malware and bad actors.",
+                        View = SettingType.Boolean,
+                        Value = "0",
+                        Order = 1,
+                        Core = true
+                    },
+                    new GenericSettingModel("Google SafeBrowsing API key")
+                    {
+                        Description = "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites.",
+                        View = SettingType.String,
+                        Value = "Get your key from the Google API Console",
+                        Order = 2,
+                        Core = true
+                    }
                 }
             );
         }

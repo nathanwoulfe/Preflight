@@ -9,9 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Preflight.Services
 {
@@ -30,6 +32,8 @@ namespace Preflight.Services
         private bool _fromSave;
         private List<SettingsModel> _settings;
 
+        private IEnumerable<IGridEditorConfig> _gridEditorConfig;
+
         public ContentChecker(ISettingsService settingsService, IContentService contentService, IContentTypeService contentTypeService, ILogger logger)
         {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
@@ -40,6 +44,14 @@ namespace Preflight.Services
             _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void Initialise()
+        {
+            _settings = _settingsService.Get().Settings;
+            _gridEditorConfig = Current.Configs.Grids().EditorsConfig.Editors;
+        }
 
         /// <summary>
         /// 
@@ -47,9 +59,9 @@ namespace Preflight.Services
         /// <param name="dirtyProperties"></param>
         public bool CheckDirty(DirtyProperties dirtyProperties)
         {
-            _id = dirtyProperties.Id;
-            _settings = _settingsService.Get().Settings;
+            Initialise();
 
+            _id = dirtyProperties.Id;
             var failed = false;
 
             foreach (SimpleProperty prop in dirtyProperties.Properties)
@@ -62,6 +74,8 @@ namespace Preflight.Services
 
                 failed = TestAndBroadcast(prop.Name, propValue, prop.Editor) || failed;
             }
+
+            _hubContext.Clients.All.PreflightComplete();
 
             return failed;
         }
@@ -84,10 +98,9 @@ namespace Preflight.Services
         /// <returns></returns>
         public bool CheckContent(IContent content, bool fromSave)
         {
-            // make this available to pass into any plugins
-            _fromSave = fromSave;
-            _settings = _settingsService.Get().Settings;
+            Initialise();
 
+            _fromSave = fromSave;
             var failed = false;
 
             IEnumerable<Property> props = content.GetPreflightProperties();
@@ -103,6 +116,8 @@ namespace Preflight.Services
                 failed = TestAndBroadcast(prop.PropertyType.Name, propValue, prop.PropertyType.PropertyEditorAlias) || failed;
             }
 
+            _hubContext.Clients.All.PreflightComplete();
+
             return failed;
         }
 
@@ -116,7 +131,6 @@ namespace Preflight.Services
         /// <returns></returns>
         private bool TestAndBroadcast(string name, string value, string alias)
         {
-
             List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
 
             bool failed = false;
@@ -132,20 +146,24 @@ namespace Preflight.Services
                 case KnownPropertyAlias.Rte:
                 case KnownPropertyAlias.Textarea:
                 case KnownPropertyAlias.Textbox:
-                    testResult = RunPluginsAgainstValue(name, value).AsEnumerableOfOne().ToList();
+                    testResult = RunPluginsAgainstValue(name, value, alias).AsEnumerableOfOne().ToList();
                     break;
             }
 
             // return the results via signalr for perceived perf
             foreach (PreflightPropertyResponseModel result in testResult)
             {
-                if (result.Failed)
+                // ignore results where no plugins ran
+                if (result.Plugins.Count > 0)
                 {
-                    failed = true;
-                }
+                    if (result.Failed)
+                    {
+                        failed = true;
+                    }
 
-                // announce the result
-                _hubContext.Clients.All.PreflightTest(result);
+                    // announce the result
+                    _hubContext.Clients.All.PreflightTest(result);
+                }
             }
 
             return failed;
@@ -182,7 +200,10 @@ namespace Preflight.Services
                 {
                     var value = o.Value<string>(property.Alias);
 
-                    PreflightPropertyResponseModel model = RunPluginsAgainstValue(propName, value);
+                    if (!value.HasValue())
+                        continue;
+
+                    PreflightPropertyResponseModel model = RunPluginsAgainstValue(propName, value, property.PropertyEditorAlias, KnownPropertyAlias.NestedContent);
 
                     model.Label = $"{model.Name} (Item {index} - {property.Name})";
 
@@ -202,102 +223,116 @@ namespace Preflight.Services
         /// <param name="propName"></param>
         /// <param name="propValue"></param>
         /// <returns></returns>
-        private List<PreflightPropertyResponseModel> ExtractValuesFromGridProperty(string propName, string propValue)
+        private List<PreflightPropertyResponseModel> ExtractValuesFromGridProperty(string name, string propValue)
         {
             JObject asJson = JObject.Parse(propValue);
-            IEnumerable<JToken> jtokens = asJson.SelectTokens(KnownStrings.GridRteJsonPath);
-
-            return ProcessJTokenValues(jtokens, propName);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="editors"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private List<PreflightPropertyResponseModel> ProcessJTokenValues(IEnumerable<JToken> editors, string name)
-        {
             List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
-            var index = 1;
 
-            foreach (JToken eidtor in editors)
+            IEnumerable<JToken> rows = asJson.SelectTokens("..rows");
+            foreach (JToken row in rows)
             {
-                JToken value = eidtor.SelectToken(KnownStrings.GridValueJsonPath);
-                if (value == null) continue;
+                string rowName = row[0].Value<string>("name");
+                IEnumerable<JToken> editors = row.SelectTokens(KnownStrings.GridRteJsonPath);
 
-                PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString());
+                foreach (JToken editor in editors)
+                {
+                    JToken value = editor.SelectToken(KnownStrings.GridValueJsonPath);
+                    if (value == null || !value.ToString().HasValue()) continue;
 
-                model.Label = $"{model.Name} (Editor {index})";
-                index += 1;
+                    // this is a bit messy - maps the grid editor view to the knownpropertyalias value
+                    var editorViewAlias = "";
+                    var editorAlias = editor.SelectToken("$..editor.alias")?.ToString();
 
-                response.Add(model);
+                    var gridEditorConfig = _gridEditorConfig.FirstOrDefault(x => x.Alias == editorAlias);
+                    var gridEditorName = gridEditorConfig.Name;
+                    var gridEditorView = gridEditorConfig.View;
+
+                    if (gridEditorView.HasValue())
+                    {
+                        switch (gridEditorView)
+                        {
+                            case "rte": editorViewAlias = KnownPropertyAlias.Rte; break;
+                            case "textstring": editorViewAlias = KnownPropertyAlias.Textbox; break;
+                            case "textarea": editorViewAlias = KnownPropertyAlias.Textarea; break;
+                        }
+                    }
+
+                    PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString(), editorViewAlias, KnownPropertyAlias.Grid);
+
+                    model.Label = $"{model.Name} ({rowName} - {gridEditorName})";
+
+                    response.Add(model);
+                }
             }
+        }
 
             return response;
         }
 
 
-        /// <summary>
-        /// Runs the set of plugins against the given string
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        private PreflightPropertyResponseModel RunPluginsAgainstValue(string name, string val)
+    /// <summary>
+    /// Runs the set of plugins against the given string
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="val"></param>
+    /// <returns></returns>
+    private PreflightPropertyResponseModel RunPluginsAgainstValue(string name, string val, string alias, string parentAlias = "")
+    {
+        var model = new PreflightPropertyResponseModel
         {
-            var model = new PreflightPropertyResponseModel
+            Label = name,
+            Name = name
+        };
+
+        if (val == null)
+            return model;
+
+        var plugins = new PluginProvider().Get();
+
+        foreach (IPreflightPlugin plugin in plugins)
+        {
+            // settings on the plugin are the defaults - set to correct values from _settings
+            plugin.Settings = _settings.Where(s => s.Tab == plugin.Name)?.ToList();
+
+            // ignore disabled plugins
+            if (plugin.IsDisabled()) continue;
+            if (!_fromSave && plugin.IsOnSaveOnly()) continue;
+
+            string propsToTest = plugin.Settings.FirstOrDefault(x => x.Alias.Contains("PropertiesToTest"))?.Value ?? KnownPropertyAlias.All;
+
+            // only continue if the field alias is include for testing, or the parent alias has been set, and is included for testing
+            if (!propsToTest.Contains(alias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias))) continue;
+
+            try
             {
-                Label = name,
-                Name = name
-            };
+                Type pluginType = plugin.GetType();
+                if (pluginType.GetMethod("Check") == null) continue;
 
-            if (val == null)
-                return model;
+                plugin.Check(_id, val, _settings);
 
-            var pluginProvider = new PluginProvider();
-
-            foreach (IPreflightPlugin plugin in pluginProvider.Get())
-            {
-                // settings on the plugin are the defaults - set to correct values from _settings
-                IEnumerable<SettingsModel> pluginSettings = _settings.Where(s => s.Tab == plugin.Name).ToList();
-                plugin.Settings = pluginSettings;
-
-                // ignore disabled plugins
-                if (plugin.IsDisabled()) continue;
-                if (!_fromSave && plugin.IsOnSaveOnly()) continue;
-
-                try
+                if (plugin.Result != null)
                 {
-                    Type pluginType = plugin.GetType();
-                    if (pluginType.GetMethod("Check") == null) continue;
-
-                    plugin.Check(_id, val, _settings);
-
-                    if (plugin.Result != null)
+                    if (plugin.FailedCount == 0)
                     {
-                        if (plugin.FailedCount == 0)
-                        {
-                            plugin.FailedCount = plugin.Failed ? 1 : 0;
-                        }
-
-                        model.Plugins.Add(plugin);
+                        plugin.FailedCount = plugin.Failed ? 1 : 0;
                     }
-                }
-                catch (Exception e)
-                {
-                    _logger.Error<ContentChecker>(e, "Preflight couldn't take off...");
+
+                    model.Plugins.Add(plugin);
                 }
             }
-
-            // mark as failed if any sub-tests have failed
-            model.FailedCount = model.Plugins.Sum(x => x.FailedCount);
-            model.Failed = model.FailedCount > 0;
-
-            model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
-
-            return model;
+            catch (Exception e)
+            {
+                _logger.Error<ContentChecker>(e, "Preflight couldn't take off...");
+            }
         }
+
+        // mark as failed if any sub-tests have failed
+        model.FailedCount = model.Plugins.Sum(x => x.FailedCount);
+        model.Failed = model.FailedCount > 0;
+
+        model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
+
+        return model;
     }
+}
 }

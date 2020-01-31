@@ -8,7 +8,7 @@ $umbGreen: #00aea2;
 $umbBlue: #1b264f;
 
 [data-element="sub-view-preflight"] .badge {
-    transition:background-color ease-in-out .5s;
+    transition: background-color ease-in-out .5s;
 
     &.-type-success {
         background-color: $green;
@@ -49,6 +49,10 @@ $umbBlue: #1b264f;
         &:first-child {
             margin-top: 0;
         }
+    }
+
+    .mb-20 {
+        margin-bottom:20px;
     }
 
     h5 {
@@ -227,6 +231,14 @@ $umbBlue: #1b264f;
         }
     }
 
+    .umb-expansion-panel {
+        &.disabled {
+            background: #fff;
+            opacity: .5;
+            pointer-events: none;
+        }
+    }
+
     .umb-expansion-panel__header {
         position: relative;
 
@@ -254,3 +266,4 @@ $umbBlue: #1b264f;
         }
     }
 }
+

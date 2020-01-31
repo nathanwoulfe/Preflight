@@ -3,12 +3,20 @@
     function ctrl($scope, $rootScope, $element, $timeout, editorState, preflightService, preflightHub) {
 
         const dirtyHashes = {};
-        const propsBeingChecked = [];
         const validPropTypes = Umbraco.Sys.ServerVariables.Preflight.PropertyTypesToCheck;
+        let propsBeingChecked = [];
+        let dirtyProps = [];
 
-        // cache these for the trivial perf benefit
-        const formSelector = '.umb-property ng-form[name="propertyForm"]';
-        const appSelector = 'preflight-app';
+        this.results = {
+            properties: []
+        };
+
+        this.noTests = false;
+
+        $scope.model.badge = {
+            type: 'info'
+        };
+
 
         const joinList = arr => {
             let outStr = '';
@@ -22,13 +30,6 @@
             return outStr;
         };
 
-        this.results = {
-            properties: []
-        };
-
-        $scope.model.badge = {
-            type: 'info'
-        };
 
         /**
          * Convert a string to a hash for storage and comparison.
@@ -36,9 +37,49 @@
          * @returns {int} the generated hash
          */
         const getHash = s => s.split('').reduce((a, b) => {
-            a = ((a << 5) - a) + b.charCodeAt(0);
+            a = (a << 5) - a + b.charCodeAt(0);
             return a & a;
         }, 0);
+
+
+        /**
+         * Get property by alias from the current variant
+         * @param {any} alias
+         */
+        const getProperty = alias => {
+            for (let tab of editorState.current.variants.find(x => x.active).tabs) {
+                for (let prop of tab.properties) {
+                    if (prop.alias === alias) {
+                        return prop;
+                    }
+                }
+            }
+        };
+
+
+        /**
+         * 
+         * @param {any} editor
+         */
+        const onComplete = () => {
+            // it's possible no tests ran, in which case results won't exist
+            this.noTests = this.results.properties.every(x => !x.plugins.length);
+            if (this.noTests) {
+                $scope.model.badge = undefined;
+            }
+
+            for (let p of this.results.properties) {
+                if (p.failedCount === -1) {
+                    p.disabled = true;
+                }
+            }
+        };
+
+        /**
+         * Is the editor param Umbraco.Grid or Umbraco.NestedContent?
+         * @param {any} editor
+         */
+        const isJsonProperty = editor => editor === 'Umbraco.Grid' || editor === 'Umbraco.NestedContent';
 
 
         /**
@@ -102,34 +143,31 @@
          * Also generates and stores a hash of the property value for comparison on subsequent calls, to prevent re-fetching unchanged data
          */
         const checkDirty = () => {
-            const propForms = document.querySelectorAll(formSelector);
-            const dirtyProps = [];
 
-            this.propsBeingCheckedStr = '';
-
+            dirtyProps = [];
             let hasDirty = false;
 
-            propForms.forEach(f => {
-                const elmScope = angular.element(f).scope();
-                if (elmScope.propertyForm.$dirty && validPropTypes.indexOf(elmScope.property.editor) !== -1) {
+            for (let prop of propertiesToTrack) {
+                let currentValue = getProperty(prop.alias).value;
+                currentValue = isJsonProperty(prop.editor) ? JSON.stringify(currentValue) : currentValue;
 
-                    const valAsString = JSON.stringify(elmScope.property.value); // treat json editors as strings
-                    const hash = getHash(valAsString);
-                    const propSlug = elmScope.property.label;
+                const hash = getHash(currentValue);
 
-                    if (dirtyHashes[propSlug] !== hash) {
+                if (dirtyHashes[prop.label] && dirtyHashes[prop.label] !== hash) {
 
-                        dirtyProps.push({
-                            name: elmScope.property.label,
-                            value: elmScope.property.editor === 'Umbraco.Grid' ? valAsString : elmScope.property.value,
-                            editor: elmScope.property.editor
-                        });
+                    dirtyProps.push({
+                        name: prop.label,
+                        value: currentValue,
+                        editor: prop.editor
+                    });
 
-                        dirtyHashes[propSlug] = hash;
-                        hasDirty = true;
-                    }
+                    dirtyHashes[prop.label] = hash;
+                    hasDirty = true;
+                } else if (!dirtyHashes[prop.label]) {
+                    dirtyHashes[prop.label] = hash;
                 }
-            });
+
+            }
 
             // if dirty properties exist, create a simple model for each and send the lot off for checking
             // response comes via the signalr hub so is not handled here
@@ -137,19 +175,21 @@
                 $timeout(() => {
 
                     dirtyProps.forEach(prop => {
-                        const existing = this.results.properties.filter(p => p.name === prop.name)[0];
-                        if (existing) {
-                            existing.open = false;
-                            existing.failedCount = -1;
-                        } else {
-                            // generate new placeholder for pending results - this is removed when the response is returned
-                            this.results.properties.push({
-                                label: prop.name,
-                                open: false,
-                                failed: false,
-                                failedCount: -1,
-                                name: `${prop.name}_temp`
-                            });
+                        for (let existing of this.results.properties.filter(p => p.name === prop.name)) {
+
+                            if (existing) {
+                                existing.open = false;
+                                existing.failedCount = -1;
+                            } else {
+                                // generate new placeholder for pending results - this is removed when the response is returned
+                                this.results.properties.push({
+                                    label: prop.name,
+                                    open: false,
+                                    failed: false,
+                                    failedCount: -1,
+                                    name: `${prop.name}_temp`
+                                });
+                            }
                         }
 
                         propsBeingChecked.push(prop.name);
@@ -168,18 +208,24 @@
             }
         };
 
-        /**
-         * Watch the visibility of the app, then update any dirty props
+
+        /*
+         * 
          */
-        $scope.$watch(
-            () => angular.element(document.getElementById(appSelector)).is(':visible'),
-            (newVal, oldVal) => {
-                if (newVal && newVal !== oldVal) {
+        $rootScope.$on('app.tabChange', (e, data) => {
+            if (data.alias === 'preflight') {
+                // collapse open nc controls, timeouts prevent $apply errors
+                for (let openNc of document.querySelectorAll('.umb-nested-content__item--active .umb-nested-content__header-bar')) {
+                    $timeout(() => openNc.click());
+                }
+
+                $timeout(() => {
                     checkDirty();
                     setBadgeCount();
-                }
+                });
             }
-        );
+        });
+
 
         /*
          * 
@@ -207,6 +253,10 @@
                         setBadgeCount();
                     });
 
+                hub.on('preflightComplete',
+                    () => onComplete()
+                );
+
                 hub.start(e => {
                     /**
                      * Check all properties when the controller loads. Won't re-run when changing between apps
@@ -218,21 +268,29 @@
                     }, 3000);
                 });
             });
-        }
+        };
 
         /**
          * Check the current editor has properties managed by preflight - hide the app if not
+         * Stores a reference collection of tracked properties
          */
         const activeVariant = editorState.current.variants.find(x => x.active);
+        let propertiesToTrack = [];
+
         if (activeVariant) {
-
-            let properties = [];
-
             activeVariant.tabs.forEach(x => {
-                properties = properties.concat(x.properties.map(y => y.editor));
+                propertiesToTrack = propertiesToTrack.concat(x.properties.map(x => {
+                    if (validPropTypes.indexOf(x.editor)) {
+                        return {
+                            editor: x.editor,
+                            alias: x.alias,
+                            label: x.label
+                        };
+                    }
+                }));
             });
 
-            if (properties.some(x => validPropTypes.indexOf(x) !== -1)) {
+            if (propertiesToTrack.length) {
                 init();
             } else {
                 const appLink = $element.closest('form').find('[data-element="sub-view-preflight"]');

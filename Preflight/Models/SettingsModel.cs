@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Preflight.Constants;
 using Preflight.Extensions;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,6 +77,12 @@ namespace Preflight.Models
         /// </summary>
         [JsonProperty("alias")]
         internal string Alias { get; set; }
+
+        /// <summary>
+        /// Prevalues for the setting
+        /// </summary>
+        [JsonProperty("prevalues")]
+        public string Prevalues { get; set; }
     }
 
 
@@ -102,7 +109,7 @@ namespace Preflight.Models
             Label = "Disabled";
             Alias = tab.DisabledAlias();
             Description = $"Disable the {tab} plugin";
-            View = "views/propertyeditors/boolean/boolean.html";
+            View = SettingType.Boolean;
             Order = -10;
             Core = true;
             Tab = tab;
@@ -120,8 +127,27 @@ namespace Preflight.Models
             Label = "Run on save only";
             Alias = tab.OnSaveOnlyAlias();
             Description = "Restrict this plugin to run only in a save event";
-            View = "views/propertyeditors/boolean/boolean.html";
+            View = SettingType.Boolean;
             Order = -5;
+            Core = true;
+            Tab = tab;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    internal class PropertiesToTestSettingModel : SettingsModel
+    {
+        public PropertiesToTestSettingModel(string tab, string propsToTest)
+        {
+            Value = propsToTest;
+            Label = "Properties to test";
+            Alias = tab.PropertiesToTestAlias();
+            Description = "Restrict this plugin to run against a subset of testable properties";
+            View = SettingType.CheckboxList;
+            Prevalues = KnownPropertyAlias.All;
+            Order = -15;
             Core = true;
             Tab = tab;
         }
@@ -133,15 +159,21 @@ namespace Preflight.Models
     /// </summary>
     public static class PluginSettingsList
     {
-        public static IEnumerable<SettingsModel> Populate(string name, bool disabled, bool runOnSaveOnly, params SettingsModel[] settings)
+        public static IEnumerable<SettingsModel> Populate(string name, bool disabled, bool runOnSaveOnly, string propsToTest = "", params SettingsModel[] settings)
         {
             if (!settings.Any())
                 return new List<SettingsModel>();
 
+            if (!propsToTest.HasValue())
+            {
+                propsToTest = KnownPropertyAlias.All;
+            }
+
             List<SettingsModel> response = new List<SettingsModel>
             {
                 new DisabledSettingModel(name, disabled),
-                new OnSaveOnlySettingModel(name, runOnSaveOnly)
+                new OnSaveOnlySettingModel(name, runOnSaveOnly),
+                new PropertiesToTestSettingModel(name, propsToTest)
             };
 
             foreach (SettingsModel s in settings)

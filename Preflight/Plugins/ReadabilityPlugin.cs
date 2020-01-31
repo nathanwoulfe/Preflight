@@ -41,30 +41,32 @@ namespace Preflight.Plugins
             Settings = PluginSettingsList.Populate(Name,
                 false,
                 false,
-                new GenericSettingModel("Readability target - minimum")
-                {
-                    Value = "60",
-                    Description = "Readability result must be great than this value",
-                    View = SettingType.Slider,
-                    Order = 1,
-                    Core = true,
-                },
-                new GenericSettingModel("Readability target - maximum")
-                {
-                    Value = "100",
-                    Description = "Readability result must be less than this value",
-                    View = SettingType.Slider,
-                    Order = 2,
-                    Core = true,
-                },
-                new GenericSettingModel("Long word syllable count")
-                {
-                    Value = "5",
-                    Description =
-                        "Words in text will be flagged as long, if their syllable count is equal to or greater than this value",
-                    View = SettingType.Slider,
-                    Order = 3,
-                    Core = true,
+                settings: new SettingsModel[] {
+                    new GenericSettingModel("Readability target - minimum")
+                    {
+                        Value = "60",
+                        Description = "Readability result must be great than this value",
+                        View = SettingType.Slider,
+                        Order = 1,
+                        Core = true,
+                    },
+                    new GenericSettingModel("Readability target - maximum")
+                    {
+                        Value = "100",
+                        Description = "Readability result must be less than this value",
+                        View = SettingType.Slider,
+                        Order = 2,
+                        Core = true,
+                    },
+                    new GenericSettingModel("Long word syllable count")
+                    {
+                        Value = "5",
+                        Description =
+                            "Words in text will be flagged as long, if their syllable count is equal to or greater than this value",
+                        View = SettingType.Slider,
+                        Order = 3,
+                        Core = true,
+                    }
                 }
             );
 

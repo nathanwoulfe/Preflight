@@ -2,14 +2,25 @@
 
     function ctrl(notificationsService, preflightService) {
 
+        const getCheckboxListModel = o =>
+            o.split(',')
+                .map((val, i) => {
+                    return {
+                        value: val,
+                        key: val,
+                        sortOrder: i
+                    };
+                })
+                .sort((a, b) => a < b);
+
         preflightService.getSettings()
             .then(resp => {
                 this.settings = resp.data.settings;
-                this.tabs = resp.data.tabs; 
+                this.tabs = resp.data.tabs;
 
                 this.settings.forEach(v => {
                     if (v.view.indexOf('slider') !== -1) {
-                        v.config = { 
+                        v.config = {
                             handle: 'round',
                             initVal1: v.alias === 'longWordSyllables' ? 5 : 65,
                             maxVal: v.alias === 'longWordSyllables' ? 10 : 100,
@@ -31,6 +42,13 @@
                         };
 
                         v.validation = {};
+                    } else if (v.view.indexOf('checkboxlist') !== -1) {
+
+                        v.value = v.value.split(',');
+
+                        v.config = {
+                            items: getCheckboxListModel(v.prevalues)
+                        };
                     }
                 });
             });
@@ -38,9 +56,9 @@
 
         /**
          * 
-         */ 
-        this.saveSettings = () => {  
-             
+         */
+        this.saveSettings = () => {
+
             const min = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMinimum')[0].value);
             const max = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMaximum')[0].value);
 
@@ -57,6 +75,8 @@
                 settingsToSave.forEach(v => {
                     if (v.view.indexOf('multipletextbox') !== -1) {
                         v.value = v.value.map(o => o.value).join(',');
+                    } else if (v.view.indexOf('checkboxlist') !== -1) {
+                        v.value = v.value.join(',');
                     }
                 });
 

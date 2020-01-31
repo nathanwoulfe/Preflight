@@ -26,6 +26,9 @@
   .preflight .mt-30:first-child {
     margin-top: 0; }
 
+.preflight .mb-20 {
+  margin-bottom: 20px; }
+
 .preflight h5 {
   margin-top: 0; }
 
@@ -153,6 +156,11 @@
   background: #35c786; }
   .preflight .pass-color {
     color: #35c786; }
+
+.preflight .umb-expansion-panel.disabled {
+  background: #fff;
+  opacity: .5;
+  pointer-events: none; }
 
 .preflight .umb-expansion-panel__header {
   position: relative; }

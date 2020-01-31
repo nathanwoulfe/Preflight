@@ -20,7 +20,7 @@ namespace Preflight.Extensions
         public static string Camel(this string str) => str.ToCleanString(CleanStringType.CamelCase);
 
         /// <summary>
-        /// Appends 'Disabled' and camelCases the given string
+        /// Appends 'on save only' and camelCases the given string
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
@@ -32,5 +32,12 @@ namespace Preflight.Extensions
         /// <param name="str"></param>
         /// <returns></returns>
         public static string DisabledAlias(this string str) => $"{str} disabled".Camel();
+
+        /// <summary>
+        /// Appends 'properties to test' and camelCases the given string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string PropertiesToTestAlias(this string str) => $"{str} properties to test".Camel();
     }
 }

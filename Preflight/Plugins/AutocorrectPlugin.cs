@@ -33,13 +33,15 @@ namespace Preflight.Plugins
             Settings = PluginSettingsList.Populate(Name,
                 false,
                 true,
-                new GenericSettingModel("Autocorrect terms")
-                {
-                    Description = "Pipe-separated list of terms to autocorrect in Preflight checks - eg 'replace me|new text'.",
-                    View = SettingType.MultipleTextbox,
-                    Value = "replacethis|new term",
-                    Order = 1,
-                    Core = true
+                settings: new SettingsModel[] {
+                    new GenericSettingModel("Autocorrect terms")
+                    {
+                        Description = "Pipe-separated list of terms to autocorrect in Preflight checks - eg 'replace me|new text'.",
+                        View = SettingType.MultipleTextbox,
+                        Value = "replacethis|new term",
+                        Order = 1,
+                        Core = true
+                    }
                 }
             );
         }
