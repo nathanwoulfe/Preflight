@@ -263,8 +263,7 @@ namespace Preflight.Services
 
                     response.Add(model);
                 }
-            }
-        }
+            }        
 
             return response;
         }
