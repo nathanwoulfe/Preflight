@@ -2,6 +2,8 @@
 
     function preflightService($http, umbRequestHelper) {
 
+        let settings;
+
         const urlBase = Umbraco.Sys.ServerVariables.Preflight.ApiPath;
 
         const helpText = `
@@ -21,15 +23,11 @@
             );
 
         const service = {
-            check: id => {
-                request('GET', `${urlBase}check/${id}`);
-            },
+            check: id => request('GET', `${urlBase}check/${id}`),            
 
-            checkDirty: data => {
-                request('POST', `${urlBase}checkdirty/`, data);
-            },
+            checkDirty: data => request('POST', `${urlBase}checkdirty/`, data),            
 
-            getSettings: () => request('GET', `${urlBase}getSettings`),
+            getSettings: () => settings = settings || request('GET', `${urlBase}getSettings`),            
 
             getSettingValue: alias => request('GET', `${urlBase}getSettingValue/${alias}`),
 

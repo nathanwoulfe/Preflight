@@ -3,6 +3,7 @@ using Preflight.Constants;
 using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -44,7 +45,7 @@ namespace Preflight.Startup
         }
 
         /// <summary>
-        /// Add workflow-specific values to the servervariables dictionary
+        /// Add preflight-specific values to the servervariables dictionary
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="dictionary"></param>
@@ -76,6 +77,21 @@ namespace Preflight.Startup
         private void ContentService_Saving(IContentService sender, SaveEventArgs<IContent> e)
         {
             List<SettingsModel> settings = _settingsService.Get().Settings;
+
+            // only check if current user group is opted in to testing on save
+            var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
+            if (groupSetting != null && groupSetting.Value.HasValue())
+            {
+                var currentUserGroups = Umbraco.Web.Composing.Current.UmbracoContext.Security.CurrentUser?.Groups?.Select(x => x.Name) ?? default;
+                if (currentUserGroups.Any())
+                {
+                    bool testOnSave = groupSetting.Value.Split(',').Intersect(currentUserGroups).Any();
+
+                    if (!testOnSave)
+                        return;
+                }
+            }
+
             if (!settings.GetValue<bool>(KnownSettings.BindSaveHandler)) return;
 
             var cancelSaveOnFail = settings.GetValue<bool>(KnownSettings.CancelSaveOnFail);

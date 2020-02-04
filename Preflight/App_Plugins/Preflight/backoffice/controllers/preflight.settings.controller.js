@@ -2,17 +2,6 @@
 
     function ctrl(notificationsService, preflightService) {
 
-        const getCheckboxListModel = o =>
-            o.split(',')
-                .map((val, i) => {
-                    return {
-                        value: val,
-                        key: val,
-                        sortOrder: i
-                    };
-                })
-                .sort((a, b) => a < b);
-
         preflightService.getSettings()
             .then(resp => {
                 this.settings = resp.data.settings;
@@ -47,7 +36,7 @@
                         v.value = v.value.split(',');
 
                         v.config = {
-                            items: getCheckboxListModel(v.prevalues)
+                            items: v.prevalues
                         };
                     }
                 });
@@ -60,7 +49,7 @@
         this.saveSettings = () => {
 
             const min = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMinimum')[0].value);
-            const max = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMaximum')[0].value);
+            const max = parseInt(this.settings.filter(x => x.alias === 'readabilityTargetMaximum')[0].value); 
 
             if (min < max) {
 

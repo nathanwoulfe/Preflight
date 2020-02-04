@@ -34,5 +34,14 @@
     "view": "views/propertyeditors/boolean/boolean.html",
     "value": 1,
     "core": true
+  },
+  {
+    "label": "User group opt in/out",
+    "description": "Select user groups to opt in to on-save testing and event cancellation",
+    "tab": "General",
+    "order": 2,
+    "view": "views/propertyeditors/checkboxlist/checkboxlist.html",
+    "value": "Editors",
+    "core": true
   }
 ]

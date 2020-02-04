@@ -147,7 +147,8 @@
             dev: {
                 expand: true,
                 cwd: '<%= backoffice %>/',
-                src: ['**/*', '!settings.json'], // don't overwrite settings
+                src: ['**/*'],
+//                src: ['**/*', '!settings.json'], // don't overwrite settings
                 dest: '../Preflight.site.v8/<%= backoffice %>/',
             },
 

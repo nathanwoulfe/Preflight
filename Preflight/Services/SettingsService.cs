@@ -10,25 +10,81 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 
 namespace Preflight.Services
 {
     public class SettingsService : ISettingsService
     {
+        private readonly ILogger _logger;
+        private readonly IUserService _userService;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        public SettingsService(ILogger logger, IUserService userService)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        }
 
         /// <summary>
         /// Load the Preflight settings from the JSON file in app_plugins
         /// </summary>
         public PreflightSettings Get()
         {
-            var fromCache = Current.AppCaches.RuntimeCache.GetCacheItem<PreflightSettings>(KnownStrings.SettingsCacheKey);
+            if (IsDebug())
+                return GetSettings();
+
+            PreflightSettings fromCache = Current.AppCaches.RuntimeCache.GetCacheItem(KnownStrings.SettingsCacheKey, () => GetSettings(), new TimeSpan(24, 0, 0), false);
+
             if (fromCache != null)
             {
-                var x = 1;
+                return fromCache;
             }
-            //return fromCache;
 
+            _logger.Error<SettingsService>(new NullReferenceException("Could not get Preflight settings"));
+
+            return null;
+        }
+
+        /// <summary>
+        /// Save the Preflight settings to the JSON file in app_plugins and update cache
+        /// </summary>
+        public bool Save(PreflightSettings settings)
+        {
+            try
+            {
+                Current.AppCaches.RuntimeCache.InsertCacheItem(KnownStrings.SettingsCacheKey, () => settings, new TimeSpan(24, 0, 0), false);
+
+                // only persist the settings, tabs can be regenerated on startup
+                using (var file = new StreamWriter(KnownStrings.SettingsFilePath, false))
+                {
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(file, settings.Settings);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error<SettingsService>(ex, "Could not save Preflight settings");
+                return false;
+            }
+        }
+
+        private bool IsDebug()
+        {
+            #if DEBUG
+                return true;
+            #endif
+                return false;
+        }
+
+        private PreflightSettings GetSettings()
+        {
             // only get here when nothing is cached 
             List<SettingsModel> settings;
 
@@ -38,6 +94,24 @@ namespace Preflight.Services
             {
                 string json = file.ReadToEnd();
                 settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json);
+            }
+
+            // populate prevalues for the groups setting
+            // intersect ensures any removed groups aren't kept as settings values
+            // since group name and alias can differ, needs to store both in the prevalue, and manage rebuilding this on the client side
+            var allGroups = _userService.GetAllUserGroups();
+            var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
+
+            if (groupSetting != null)
+            {
+                var groupNames = allGroups.Select(x => new { value = x.Name, key = x.Alias });
+                groupSetting.Prevalues = groupNames;
+
+                if (groupSetting.Value.HasValue())
+                {
+                    var groupSettingValue = groupSetting.Value.Split(',').Intersect(groupNames.Select(x => x.value));
+                    groupSetting.Value = string.Join(",", groupSettingValue);
+                }
             }
 
             // add tabs for core items
@@ -86,7 +160,7 @@ namespace Preflight.Services
             }
 
             // tabs are sorted alpha, with general first
-            var response = new PreflightSettings
+            return new PreflightSettings
             {
                 Settings = settings.DistinctBy(s => (s.Tab, s.Label)).ToList(),
                 Tabs = tabs.GroupBy(x => x.Name)
@@ -94,34 +168,6 @@ namespace Preflight.Services
                     .OrderBy(i => i.Name != SettingsTabNames.General)
                     .ThenBy(i => i.Name).ToList()
             };
-
-            // if we are here, cache should be set
-            Current.AppCaches.RuntimeCache.InsertCacheItem(KnownStrings.SettingsCacheKey, () => response, new TimeSpan(24, 0, 0), false);
-
-            return response;
-        }
-
-        /// <summary>
-        /// Save the Preflight settings to the JSON file in app_plugins and update cache
-        /// </summary>
-        public bool Save(PreflightSettings settings)
-        {
-            try
-            {
-                Current.AppCaches.RuntimeCache.InsertCacheItem(KnownStrings.SettingsCacheKey, () => settings, new TimeSpan(24, 0, 0), false);
-
-                // only persist the settings, tabs can be regenerated on startup
-                using (var file = new StreamWriter(KnownStrings.SettingsFilePath, false))
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(file, settings.Settings);
-                }
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }

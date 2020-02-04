@@ -3,17 +3,35 @@
     const postSaveUrl = '/umbracoapi/content/postsave';
 
     function interceptor(notificationsService, $q, $injector) {
+
+        const checkGroup = userGroupOptInOut => {
+            // use the stored value to get the corresponding key from the setting's prevalues (which is value,key paring of all groups)
+            var enabledGroups = userGroupOptInOut.prevalues.filter(x => userGroupOptInOut.value.includes(x.value)).map(x => x.key);
+
+            $injector.invoke(['authResource', authResource => {
+                authResource.getCurrentUser()
+                    .then(currentUser => {
+                        if (enabledGroups.some(x => currentUser.userGroups.includes(x))) {
+                            notificationsService.add({
+                                key: 'preflight_notice',
+                                view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/views/warning.notification.html`
+                            });
+                        }
+                    });
+            }]);
+        };
+
         return {
             request: request => {
                 if (request.url.toLowerCase().indexOf(postSaveUrl) !== -1) {
                     $injector.invoke(['preflightService', s => {
-                        s.getSettingValue('runPreflightOnSave')
-                            .then(resp => {
-                                if (resp.value === '1') {
-                                    notificationsService.add({
-                                        key: 'preflight_notice',
-                                        view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/views/warning.notification.html`
-                                    });
+                        s.getSettings()
+                            .then(resp => {                   
+                                const settings = resp.data.settings;
+                                const runOnSave = settings.find(x => x.alias === 'runPreflightOnSave'); 
+                                if (runOnSave && runOnSave.value === '1') {
+                                    const userGroupOptInOut = settings.find(x => x.alias === 'userGroupOptInOut');
+                                    checkGroup(userGroupOptInOut);
                                 }
                             });
                     }]);
@@ -56,11 +74,8 @@
         };
     }
 
-    angular.module('preflight').factory('preflight.save.interceptor', ['notificationsService', '$q', '$injector', interceptor]);
-
     angular.module('preflight')
-        .config(function ($httpProvider) {
-            $httpProvider.interceptors.push('preflight.save.interceptor');
-        });
+        .factory('preflight.save.interceptor', ['notificationsService', '$q', '$injector', interceptor])
+        .config($httpProvider => $httpProvider.interceptors.push('preflight.save.interceptor'));
 
 })();

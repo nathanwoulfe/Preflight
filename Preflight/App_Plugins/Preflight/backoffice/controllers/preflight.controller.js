@@ -144,7 +144,7 @@
          */
         const checkDirty = () => {
 
-            dirtyProps = [];
+            dirtyProps = []; 
             let hasDirty = false;
 
             for (let prop of propertiesToTrack) {
@@ -245,6 +245,15 @@
          * Initiates the signalr hub for returning test results
          */
         const init = () => {
+
+            //preflightService.getSettings()
+            //    .then(resp => {
+            //        const groups = resp.data.settings.find(x => x.label === 'User group opt in/out');
+            //        if (groups) {
+            //            userService
+            //        }
+            //    });
+
             preflightHub.initHub(hub => {
 
                 hub.on('preflightTest',

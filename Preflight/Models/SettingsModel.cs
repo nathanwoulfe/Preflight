@@ -82,7 +82,7 @@ namespace Preflight.Models
         /// Prevalues for the setting
         /// </summary>
         [JsonProperty("prevalues")]
-        public string Prevalues { get; set; }
+        public object Prevalues { get; set; }
     }
 
 
@@ -146,7 +146,7 @@ namespace Preflight.Models
             Alias = tab.PropertiesToTestAlias();
             Description = "Restrict this plugin to run against a subset of testable properties";
             View = SettingType.CheckboxList;
-            Prevalues = KnownPropertyAlias.All;
+            Prevalues = KnownPropertyAlias.All.Select(x => new { value = x, key = x });
             Order = -15;
             Core = true;
             Tab = tab;
@@ -166,7 +166,7 @@ namespace Preflight.Models
 
             if (!propsToTest.HasValue())
             {
-                propsToTest = KnownPropertyAlias.All;
+                propsToTest = string.Join(",", KnownPropertyAlias.All);
             }
 
             List<SettingsModel> response = new List<SettingsModel>

@@ -12,5 +12,6 @@
         public const string NaughtyList = "Naughty words";
         public const string AutocorrectTerms = "Autocorrect terms";
         public const string GoogleApiKey = "Google SafeBrowsing API key";
+        public const string UserGroupOptIn = "User group opt in/out";
     }
 }

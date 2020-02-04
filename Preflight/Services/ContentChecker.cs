@@ -297,7 +297,7 @@ namespace Preflight.Services
             if (plugin.IsDisabled()) continue;
             if (!_fromSave && plugin.IsOnSaveOnly()) continue;
 
-            string propsToTest = plugin.Settings.FirstOrDefault(x => x.Alias.Contains("PropertiesToTest"))?.Value ?? KnownPropertyAlias.All;
+            string propsToTest = plugin.Settings.FirstOrDefault(x => x.Alias.Contains("PropertiesToTest"))?.Value ?? string.Join(",", KnownPropertyAlias.All);
 
             // only continue if the field alias is include for testing, or the parent alias has been set, and is included for testing
             if (!propsToTest.Contains(alias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias))) continue;

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Preflight.Constants
 {
@@ -10,7 +11,7 @@ namespace Preflight.Constants
         public const string Textbox = Umbraco.Core.Constants.PropertyEditors.Aliases.TextBox;
         public const string NestedContent = Umbraco.Core.Constants.PropertyEditors.Aliases.NestedContent;
 
-        public static string All = string.Join(",", typeof(KnownPropertyAlias).GetFields()
-                .Where(x => x.IsLiteral).Select(x => x.GetRawConstantValue().ToString()));
+        public static IEnumerable<string> All = typeof(KnownPropertyAlias).GetFields()
+                .Where(x => x.IsLiteral).Select(x => x.GetRawConstantValue().ToString());
     }
 }
