@@ -36,10 +36,18 @@
     "core": true
   },
   {
+    "label": "Properties to test",
+    "description": "Restrict Preflight to a subset of testable properties",
+    "tab": "General",
+    "order": 2,
+    "view": "views/propertyeditors/checkboxlist/checkboxlist.html",
+    "core": true
+  },
+  {
     "label": "User group opt in/out",
     "description": "Select user groups to opt in to on-save testing and event cancellation",
     "tab": "General",
-    "order": 2,
+    "order": 3,
     "view": "views/propertyeditors/checkboxlist/checkboxlist.html",
     "value": "Editors",
     "core": true

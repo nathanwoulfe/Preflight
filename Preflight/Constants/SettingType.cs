@@ -7,6 +7,5 @@
         public const string String = "views/propertyeditors/textbox/textbox.html";
         public const string MultipleTextbox = "views/propertyeditors/multipletextbox/multipletextbox.html";
         public const string CheckboxList = "views/propertyeditors/checkboxlist/checkboxlist.html";
-
     }
 }

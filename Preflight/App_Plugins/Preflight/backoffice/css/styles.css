@@ -6,6 +6,11 @@
       transform: translateY(-2px);
       content: '\e165'; }
 
+.pf-disabled {
+  cursor: not-allowed !important;
+  opacity: 0.5;
+  pointer-events: none; }
+
 .preflight > div {
   position: relative; }
 

@@ -1,6 +1,20 @@
 ﻿(() => {
 
-    function ctrl(notificationsService, preflightService) {
+    function ctrl($scope, notificationsService, preflightService) {
+
+        const watchTestableProperties = () => {
+            let propertiesToModify = this.settings.filter(x => x.alias.indexOf('PropertiesToTest') !== -1 && x.alias !== 'propertiesToTest');
+            $scope.$watch(() => this.settings.find(x => x.alias === 'propertiesToTest').value, newVal => {
+                if (newVal) {
+                    for (let prop of propertiesToModify) {
+                        // use the prop alias to find the checkbox set
+                        for (let checkbox of document.querySelectorAll(`umb-checkbox[name*="${prop.alias}"]`)) {
+                            checkbox.querySelector('.umb-form-check').classList[newVal.indexOf(checkbox.getAttribute('value')) === -1 ? 'add' : 'remove']('pf-disabled'); 
+                        }
+                    }
+                }
+            }, true);
+        };
 
         preflightService.getSettings()
             .then(resp => {
@@ -40,6 +54,9 @@
                         };
                     }
                 });
+
+                watchTestableProperties();
+
             });
 
 
@@ -85,9 +102,8 @@
                     'Unable to save settings - readability minimum cannot be greater than readability maximum');
             }
         };
-
     }
 
-    angular.module('preflight').controller('preflight.settings.controller', ['notificationsService', 'preflightService', ctrl]);
+    angular.module('preflight').controller('preflight.settings.controller', ['$scope', 'notificationsService', 'preflightService', ctrl]);
 
 })();

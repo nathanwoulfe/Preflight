@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Filters;
 using System.Web.Routing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -16,7 +17,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
+using Umbraco.Web.Editors;
 using Umbraco.Web.JavaScript;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Preflight.Startup
 {
@@ -37,11 +40,46 @@ namespace Preflight.Startup
 
             ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
             ContentService.Saving += ContentService_Saving;
+            EditorModelEventManager.SendingContentModel += EditorModelEventManager_SendingContentModel;
         }
 
         public void Terminate()
         {
 
+        }
+
+        private void EditorModelEventManager_SendingContentModel(HttpActionExecutedContext sender, EditorModelEventArgs<ContentItemDisplay> e)
+        {
+            List<SettingsModel> settings = _settingsService.Get().Settings;
+
+            var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
+            var testablePropsSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.PropertiesToTest, StringComparison.InvariantCultureIgnoreCase));
+
+            if (groupSetting != null && groupSetting.Value.HasValue())
+            {
+                var currentUserGroups = e.UmbracoContext.Security.CurrentUser?.Groups?.Select(x => x.Name) ?? default;
+                if (currentUserGroups.Any())
+                {
+                    bool include = groupSetting.Value.Split(',').Intersect(currentUserGroups).Any();
+
+                    if (!include)
+                        e.Model.ContentApps = e.Model.ContentApps.Where(x => x.Name != KnownStrings.Name);
+                }
+            }
+
+            // remove preflight app if content type doesn't include testable properties
+            if (testablePropsSetting != null)
+            {
+                var defaultVariant = e.Model.Variants.FirstOrDefault();
+                var properties = defaultVariant.Tabs.SelectMany(x => x.Properties.Select(y => y.Editor)).Distinct();
+
+                var isTestable = properties.Intersect(testablePropsSetting.Value.Split(',')).Any();
+
+                if (!isTestable)
+                {
+                    e.Model.ContentApps = e.Model.ContentApps.Where(x => x.Name != KnownStrings.Name);
+                }
+            }
         }
 
         /// <summary>
@@ -54,17 +92,11 @@ namespace Preflight.Startup
             var urlHelper = new System.Web.Mvc.UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
             IDictionary<string, object> settings = dictionary["umbracoSettings"].ToDictionary();
 
-            List<string> typesToCheck = new List<string>();
-            foreach (FieldInfo field in typeof(KnownPropertyAlias).GetFields())
-            {
-                typesToCheck.Add(field.GetValue(null).ToString());
-            }
-
             dictionary.Add("Preflight", new Dictionary<string, object>
             {
                 { "ContentFailedChecks", KnownStrings.ContentFailedChecks },
                 { "PluginPath", $"{settings["appPluginsPath"]}/preflight/backoffice" },
-                { "PropertyTypesToCheck", typesToCheck },
+                { "PropertyTypesToCheck", KnownPropertyAlias.All },
                 { "ApiPath", urlHelper.GetUmbracoApiServiceBaseUrl<Api.ApiController>(controller => controller.GetSettings()) }
             });
         }

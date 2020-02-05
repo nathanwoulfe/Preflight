@@ -244,15 +244,7 @@
         /**
          * Initiates the signalr hub for returning test results
          */
-        const init = () => {
-
-            //preflightService.getSettings()
-            //    .then(resp => {
-            //        const groups = resp.data.settings.find(x => x.label === 'User group opt in/out');
-            //        if (groups) {
-            //            userService
-            //        }
-            //    });
+        const initSignarlR = () => {
 
             preflightHub.initHub(hub => {
 
@@ -274,13 +266,12 @@
                     $timeout(() => {
                         setBadgeCount(true);
                         preflightService.check(editorState.current.id);
-                    }, 3000);
+                    });
                 });
             });
         };
 
         /**
-         * Check the current editor has properties managed by preflight - hide the app if not
          * Stores a reference collection of tracked properties
          */
         const activeVariant = editorState.current.variants.find(x => x.active);
@@ -289,7 +280,7 @@
         if (activeVariant) {
             activeVariant.tabs.forEach(x => {
                 propertiesToTrack = propertiesToTrack.concat(x.properties.map(x => {
-                    if (validPropTypes.indexOf(x.editor)) {
+                    if (validPropTypes.includes(x.editor)) {
                         return {
                             editor: x.editor,
                             alias: x.alias,
@@ -299,17 +290,9 @@
                 }));
             });
 
+            // array will have length, as app is only sent on types with testable properties
             if (propertiesToTrack.length) {
-                init();
-            } else {
-                const appLink = $element.closest('form').find('[data-element="sub-view-preflight"]');
-
-                if (appLink) {
-                    const appLinkListItem = appLink.closest('li')[0];
-                    if (appLinkListItem) {
-                        appLinkListItem.classList.add('ng-hide');
-                    }
-                }
+                initSignarlR();
             }
         }
     }

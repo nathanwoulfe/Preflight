@@ -13,5 +13,6 @@
         public const string AutocorrectTerms = "Autocorrect terms";
         public const string GoogleApiKey = "Google SafeBrowsing API key";
         public const string UserGroupOptIn = "User group opt in/out";
+        public const string PropertiesToTest = "Properties to test";
     }
 }

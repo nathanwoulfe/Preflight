@@ -36,8 +36,8 @@ namespace Preflight.Services
         /// </summary>
         public PreflightSettings Get()
         {
-            if (IsDebug())
-                return GetSettings();
+            //if (IsDebug())
+                //return GetSettings();
 
             PreflightSettings fromCache = Current.AppCaches.RuntimeCache.GetCacheItem(KnownStrings.SettingsCacheKey, () => GetSettings(), new TimeSpan(24, 0, 0), false);
 
@@ -111,6 +111,19 @@ namespace Preflight.Services
                 {
                     var groupSettingValue = groupSetting.Value.Split(',').Intersect(groupNames.Select(x => x.value));
                     groupSetting.Value = string.Join(",", groupSettingValue);
+                }
+            }
+
+            // populate prevlaues for subsetting testable properties, default value to all if nothing exists
+            var testablePropertiesProp = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.PropertiesToTest, StringComparison.InvariantCultureIgnoreCase));
+
+            if (testablePropertiesProp != null)
+            {
+                testablePropertiesProp.Prevalues = KnownPropertyAlias.All.Select(x => new { value = x, key = x });
+
+                if (!testablePropertiesProp.Value.HasValue())
+                {
+                    testablePropertiesProp.Value = string.Join(",", KnownPropertyAlias.All);
                 }
             }
 

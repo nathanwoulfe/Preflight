@@ -31,6 +31,7 @@ namespace Preflight.Services
         private int _id;
         private bool _fromSave;
         private List<SettingsModel> _settings;
+        private string _testableProperties;
 
         private IEnumerable<IGridEditorConfig> _gridEditorConfig;
 
@@ -45,11 +46,13 @@ namespace Preflight.Services
         }
 
         /// <summary>
-        /// 
+        /// Intialise variables for this testing run
         /// </summary>
         private void Initialise()
         {
             _settings = _settingsService.Get().Settings;
+            _testableProperties = _settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.PropertiesToTest, StringComparison.InvariantCultureIgnoreCase))?.Value ?? "";
+
             _gridEditorConfig = Current.Configs.Grids().EditorsConfig.Editors;
         }
 
@@ -263,75 +266,75 @@ namespace Preflight.Services
 
                     response.Add(model);
                 }
-            }        
+            }
 
             return response;
         }
 
 
-    /// <summary>
-    /// Runs the set of plugins against the given string
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="val"></param>
-    /// <returns></returns>
-    private PreflightPropertyResponseModel RunPluginsAgainstValue(string name, string val, string alias, string parentAlias = "")
-    {
-        var model = new PreflightPropertyResponseModel
+        /// <summary>
+        /// Runs the set of plugins against the given string
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        private PreflightPropertyResponseModel RunPluginsAgainstValue(string name, string val, string alias, string parentAlias = "")
         {
-            Label = name,
-            Name = name
-        };
-
-        if (val == null)
-            return model;
-
-        var plugins = new PluginProvider().Get();
-
-        foreach (IPreflightPlugin plugin in plugins)
-        {
-            // settings on the plugin are the defaults - set to correct values from _settings
-            plugin.Settings = _settings.Where(s => s.Tab == plugin.Name)?.ToList();
-
-            // ignore disabled plugins
-            if (plugin.IsDisabled()) continue;
-            if (!_fromSave && plugin.IsOnSaveOnly()) continue;
-
-            string propsToTest = plugin.Settings.FirstOrDefault(x => x.Alias.Contains("PropertiesToTest"))?.Value ?? string.Join(",", KnownPropertyAlias.All);
-
-            // only continue if the field alias is include for testing, or the parent alias has been set, and is included for testing
-            if (!propsToTest.Contains(alias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias))) continue;
-
-            try
+            var model = new PreflightPropertyResponseModel
             {
-                Type pluginType = plugin.GetType();
-                if (pluginType.GetMethod("Check") == null) continue;
+                Label = name,
+                Name = name
+            };
 
-                plugin.Check(_id, val, _settings);
+            if (val == null || !_testableProperties.Contains(alias) || (parentAlias.HasValue() && !_testableProperties.Contains(parentAlias)))
+                return model;                
 
-                if (plugin.Result != null)
+            var plugins = new PluginProvider().Get();
+
+            foreach (IPreflightPlugin plugin in plugins)
+            {
+                // settings on the plugin are the defaults - set to correct values from _settings
+                plugin.Settings = _settings.Where(s => s.Tab == plugin.Name)?.ToList();
+
+                // ignore disabled plugins
+                if (plugin.IsDisabled()) continue;
+                if (!_fromSave && plugin.IsOnSaveOnly()) continue;
+
+                string propsToTest = plugin.Settings.FirstOrDefault(x => x.Alias.Contains("PropertiesToTest"))?.Value ?? string.Join(",", KnownPropertyAlias.All);
+
+                // only continue if the field alias is include for testing, or the parent alias has been set, and is included for testing
+                if (!propsToTest.Contains(alias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias))) continue;
+
+                try
                 {
-                    if (plugin.FailedCount == 0)
-                    {
-                        plugin.FailedCount = plugin.Failed ? 1 : 0;
-                    }
+                    Type pluginType = plugin.GetType();
+                    if (pluginType.GetMethod("Check") == null) continue;
 
-                    model.Plugins.Add(plugin);
+                    plugin.Check(_id, val, _settings);
+
+                    if (plugin.Result != null)
+                    {
+                        if (plugin.FailedCount == 0)
+                        {
+                            plugin.FailedCount = plugin.Failed ? 1 : 0;
+                        }
+
+                        model.Plugins.Add(plugin);
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.Error<ContentChecker>(e, "Preflight couldn't take off...");
                 }
             }
-            catch (Exception e)
-            {
-                _logger.Error<ContentChecker>(e, "Preflight couldn't take off...");
-            }
+
+            // mark as failed if any sub-tests have failed
+            model.FailedCount = model.Plugins.Sum(x => x.FailedCount);
+            model.Failed = model.FailedCount > 0;
+
+            model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
+
+            return model;
         }
-
-        // mark as failed if any sub-tests have failed
-        model.FailedCount = model.Plugins.Sum(x => x.FailedCount);
-        model.Failed = model.FailedCount > 0;
-
-        model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
-
-        return model;
     }
-}
 }

@@ -20,6 +20,12 @@ $umbBlue: #1b264f;
     }
 }
 
+.pf-disabled {
+    cursor:not-allowed!important;
+    opacity:0.5;
+    pointer-events:none;
+}
+
 .preflight {
 
     > div {
