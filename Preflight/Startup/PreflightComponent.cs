@@ -57,7 +57,7 @@ namespace Preflight.Startup
 
             if (groupSetting != null && groupSetting.Value.HasValue())
             {
-                var currentUserGroups = e.UmbracoContext.Security.CurrentUser?.Groups?.Select(x => x.Name) ?? default;
+                var currentUserGroups = e.UmbracoContext.Security.CurrentUser?.Groups?.Select(x => x.Name) ?? new List<string>();
                 if (currentUserGroups.Any())
                 {
                     bool include = groupSetting.Value.Split(',').Intersect(currentUserGroups).Any();
