@@ -2,8 +2,6 @@
 
     function preflightService($http, umbRequestHelper) {
 
-        let settings;
-
         const urlBase = Umbraco.Sys.ServerVariables.Preflight.ApiPath;
 
         const helpText = `
@@ -18,7 +16,7 @@
 
         const request = (method, url, data) =>
             umbRequestHelper.resourcePromise(
-                method === 'GET' ? $http.get(url) : $http.post(url, data),
+                method === 'GET' ? $http.get(url) : $http.post(url, data), 
                 'Something broke'
             );
 
@@ -27,7 +25,7 @@
 
             checkDirty: data => request('POST', `${urlBase}checkdirty/`, data),            
 
-            getSettings: () => settings = settings || request('GET', `${urlBase}getSettings`),            
+            getSettings: () => request('GET', `${urlBase}getSettings`),            
 
             getSettingValue: alias => request('GET', `${urlBase}getSettingValue/${alias}`),
 

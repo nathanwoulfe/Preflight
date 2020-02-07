@@ -73,7 +73,14 @@ namespace Preflight.Services
 
                 // only continue if the prop has a value
                 if (!propValue.HasValue())
+                {
+                    _hubContext.Clients.All.PreflightTest(new PreflightPropertyResponseModel
+                    {
+                        Name = prop.Name,
+                        Remove = true
+                    });
                     continue;
+                }
 
                 failed = TestAndBroadcast(prop.Name, propValue, prop.Editor) || failed;
             }
@@ -114,7 +121,15 @@ namespace Preflight.Services
 
                 // only continue if the prop has a value
                 if (!propValue.HasValue())
+                {
+                    _hubContext.Clients.All.PreflightTest(new PreflightPropertyResponseModel
+                    {
+                        Name = prop.PropertyType.Name,
+                        Remove = true
+                    });
+
                     continue;
+                }
 
                 failed = TestAndBroadcast(prop.PropertyType.Name, propValue, prop.PropertyType.PropertyEditorAlias) || failed;
             }
@@ -287,7 +302,7 @@ namespace Preflight.Services
             };
 
             if (val == null || !_testableProperties.Contains(alias) || (parentAlias.HasValue() && !_testableProperties.Contains(parentAlias)))
-                return model;                
+                return model;
 
             var plugins = new PluginProvider().Get();
 

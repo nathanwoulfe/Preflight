@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <div ng-show="vm.propsBeingCheckedStr.length && !vm.noTests" class="alert preflight-alert">
+    <div ng-show="vm.propsBeingCheckedStr.length && !vm.noTests" ng-hide="vm.done" class="alert preflight-alert">
         <h4 class="intro-text"><localize key="preflight_runningChecks"></localize> {{ vm.propsBeingCheckedStr }}</h4>
     </div>
 

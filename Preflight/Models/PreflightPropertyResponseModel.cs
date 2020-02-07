@@ -24,11 +24,15 @@ namespace Preflight.Models
         [JsonProperty("failedCount")]
         public int FailedCount { get; set; }
 
+        [JsonProperty("remove")]
+        public bool Remove { get; set; }
+
         public PreflightPropertyResponseModel()
         {
             Open = false;
-            Failed = false;
+            Failed = false;            
             FailedCount = -1;
+            Remove = false;
 
             Plugins = new List<IPreflightPlugin>();
         }

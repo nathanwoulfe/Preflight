@@ -36,10 +36,10 @@
          * @param {string} s - the string to hashify
          * @returns {int} the generated hash
          */
-        const getHash = s => s.split('').reduce((a, b) => {
+        const getHash = s => s ? s.split('').reduce((a, b) => {
             a = (a << 5) - a + b.charCodeAt(0);
             return a & a;
-        }, 0);
+        }, 0) : 1;
 
 
         /**
@@ -68,11 +68,14 @@
                 $scope.model.badge = undefined;
             }
 
+
             for (let p of this.results.properties) {
-                if (p.failedCount === -1) {
-                    p.disabled = true;
-                }
+                p.disabled = p.failedCount === -1;
             }
+
+            console.log(this.results);
+
+            this.done = true;
         };
 
         /**
@@ -111,7 +114,9 @@
          * @param {object} data - a response model item returned via the signalr hub
          */
         const rebindResult = data => {
+
             let newProp = true;
+
             this.results.properties.forEach(prop => {
                 if (prop.label === data.label) {
                     angular.extend(prop, data);
@@ -122,13 +127,15 @@
 
             // a new property will have a temporary placeholder - remove it
             // _temp ensures grid with multiple editors only removes the correct temp entry
-            if (newProp) {
+            if (newProp && !data.remove) {
                 const tempIndex = this.results.properties.map(p => p.name === `${data.name}_temp`).indexOf(true);
                 if (tempIndex !== -1) {
                     this.results.properties.splice(tempIndex, 1);
                 }
                 this.results.properties.push(data);
             }
+
+            this.results.properties = this.results.properties.filter(x => x.remove === false);
 
             this.results.failedCount = this.results.properties.reduce((prev, cur) => prev + cur.failedCount, 0);
             this.results.failed = this.results.failedCount > 0;
@@ -144,7 +151,7 @@
          */
         const checkDirty = () => {
 
-            dirtyProps = []; 
+            dirtyProps = [];
             let hasDirty = false;
 
             for (let prop of propertiesToTrack) {
@@ -166,7 +173,6 @@
                 } else if (!dirtyHashes[prop.label]) {
                     dirtyHashes[prop.label] = hash;
                 }
-
             }
 
             // if dirty properties exist, create a simple model for each and send the lot off for checking
@@ -203,6 +209,7 @@
                     };
 
                     setBadgeCount(true);
+                    this.done = false;
                     preflightService.checkDirty(payload);
                 });
             }
@@ -265,6 +272,7 @@
                      */
                     $timeout(() => {
                         setBadgeCount(true);
+                        checkDirty(); // builds initial hash array, but won't run anything
                         preflightService.check(editorState.current.id);
                     });
                 });
