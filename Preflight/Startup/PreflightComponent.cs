@@ -114,7 +114,7 @@ namespace Preflight.Startup
             var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
             if (groupSetting != null && groupSetting.Value.HasValue())
             {
-                var currentUserGroups = Umbraco.Web.Composing.Current.UmbracoContext.Security.CurrentUser?.Groups?.Select(x => x.Name) ?? default;
+                var currentUserGroups = Umbraco.Web.Composing.Current.UmbracoContext.Security.CurrentUser?.Groups?.Select(x => x.Name) ?? new List<string>();
                 if (currentUserGroups.Any())
                 {
                     bool testOnSave = groupSetting.Value.Split(',').Intersect(currentUserGroups).Any();
