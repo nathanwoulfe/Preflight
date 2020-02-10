@@ -306,6 +306,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Plugins\Preflight\backoffice\app.js" />
+    <Content Include="App_Plugins\Preflight\backoffice\components\progress.directive.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.settings.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\controllers\preflight.notification.controller.js" />
     <Content Include="App_Plugins\Preflight\backoffice\components\card.component.js" />

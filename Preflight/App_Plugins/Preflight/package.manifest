@@ -25,7 +25,8 @@
 
     "~/App_Plugins/preflight/backoffice/components/card.component.js",
     "~/App_Plugins/preflight/backoffice/components/resultintro.component.js",
-    "~/App_Plugins/preflight/backoffice/components/stateicon.component.js"
+    "~/App_Plugins/preflight/backoffice/components/stateicon.component.js",
+    "~/App_Plugins/preflight/backoffice/components/progress.directive.js"
   ],
   "css": [
     "~/App_Plugins/preflight/backoffice/css/styles.css"

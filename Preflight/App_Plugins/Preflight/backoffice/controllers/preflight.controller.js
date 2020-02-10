@@ -12,14 +12,20 @@
         };
 
         this.noTests = false;
+        this.percentageDone = 20;
+        this.progressStep = 0;
 
         $scope.model.badge = {
             type: 'info'
         };
 
 
+        /**
+         * 
+         * @param {any} arr
+         */
         const joinList = arr => {
-            let outStr = '';
+            let outStr;
             if (arr.length === 1) {
                 outStr = arr[0];
             } else if (arr.length === 2) {
@@ -27,6 +33,7 @@
             } else if (arr.length > 2) {
                 outStr = arr.slice(0, -1).join(', ') + ', and ' + arr.slice(-1);
             }
+
             return outStr;
         };
 
@@ -68,13 +75,11 @@
                 $scope.model.badge = undefined;
             }
 
-
             for (let p of this.results.properties) {
                 p.disabled = p.failedCount === -1;
             }
 
-            console.log(this.results);
-
+            this.showSuccessMessage = !this.results.failed && !this.noTests;
             this.done = true;
         };
 
@@ -116,19 +121,19 @@
         const rebindResult = data => {
 
             let newProp = true;
+            let totalTestsRun = 0;
+            let existingProp = this.results.properties.find(x => x.label === data.label);
 
-            this.results.properties.forEach(prop => {
-                if (prop.label === data.label) {
-                    angular.extend(prop, data);
-                    prop.loading = false;
-                    newProp = false;
-                }
-            });
+            if (existingProp) {
+                existingProp = Object.assign(existingProp, data);
+                existingProp.loading = false;
+                newProp = false;
+            }            
 
             // a new property will have a temporary placeholder - remove it
             // _temp ensures grid with multiple editors only removes the correct temp entry
-            if (newProp && !data.remove) {
-                const tempIndex = this.results.properties.map(p => p.name === `${data.name}_temp`).indexOf(true);
+            if (newProp && !data.remove && data.failedCount !== -1) {
+                const tempIndex = this.results.properties.findIndex(p => p.name === `${data.name}_temp`);
                 if (tempIndex !== -1) {
                     this.results.properties.splice(tempIndex, 1);
                 }
@@ -136,12 +141,16 @@
             }
 
             this.results.properties = this.results.properties.filter(x => x.remove === false);
+            this.results.properties = this.results.properties.filter(x => x.failedCount > -1);
 
-            this.results.failedCount = this.results.properties.reduce((prev, cur) => prev + cur.failedCount, 0);
-            this.results.failed = this.results.failedCount > 0;
+            this.results.failedCount = this.results.properties.reduce((prev, cur) => {
+                totalTestsRun += cur.totalTests;
+                return prev + cur.failedCount;
+            }, 0);
 
-            propsBeingChecked.splice(propsBeingChecked.indexOf(data.name), 1);
-            this.propsBeingCheckedStr = joinList(propsBeingChecked);
+            this.results.failed = this.results.failedCount > 0;            
+            this.propsBeingCheckedStr = joinList(propsBeingChecked.splice(propsBeingChecked.indexOf(data.name), 1));
+            this.percentageFailed = (totalTestsRun - this.results.failedCount) / totalTestsRun * 100;
         };
 
 
@@ -182,7 +191,6 @@
 
                     dirtyProps.forEach(prop => {
                         for (let existing of this.results.properties.filter(p => p.name === prop.name)) {
-
                             if (existing) {
                                 existing.open = false;
                                 existing.failedCount = -1;
@@ -210,6 +218,7 @@
 
                     setBadgeCount(true);
                     this.done = false;
+
                     preflightService.checkDirty(payload);
                 });
             }

@@ -23,7 +23,7 @@
     "tab": "General",
     "order": 0,
     "view": "views/propertyeditors/boolean/boolean.html",
-    "value": 1,
+    "value": 0,
     "core": true
   },
   {
@@ -32,7 +32,7 @@
     "tab": "General",
     "order": 1,
     "view": "views/propertyeditors/boolean/boolean.html",
-    "value": 1,
+    "value": 0,
     "core": true
   },
   {

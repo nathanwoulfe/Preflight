@@ -24,6 +24,9 @@ namespace Preflight.Models
         [JsonProperty("failedCount")]
         public int FailedCount { get; set; }
 
+        [JsonProperty("totalTests")]
+        public int TotalTests { get; set; }
+
         [JsonProperty("remove")]
         public bool Remove { get; set; }
 

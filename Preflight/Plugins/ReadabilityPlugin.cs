@@ -24,6 +24,8 @@ namespace Preflight.Plugins
         public int SortOrder => -2;
         public int FailedCount { get; set; }
 
+        public int TotalTests => 3;
+
         public string Name => "Readability";
         public string Summary => "Ensure content meets minimum readability measures, using the Flesch reading ease algorithm.";
         public string ViewPath => "/app_plugins/preflight/backoffice/plugins/readability.html";

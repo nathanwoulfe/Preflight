@@ -21,6 +21,13 @@ namespace Preflight.Plugins
         int FailedCount { get; set; }
 
         /// <summary>
+        /// If a plugin contains multiple sub-tests, set this value to indicate the total number of tests
+        /// Will return 1 if not set
+        /// </summary>
+        [JsonProperty("totalTests")]
+        int TotalTests { get; }
+
+        /// <summary>
         /// Sets the sort for the plugin - determins order of display in the app
         /// </summary>
         [JsonIgnore]

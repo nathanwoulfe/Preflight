@@ -24,6 +24,7 @@ namespace Preflight.Plugins
         public string ViewPath => "";
         public string Summary => "Automatically replace naughty words with less naughty words, or fix common spelling mistakes.";
         public string Description { get; set; }
+        public int TotalTests => 1;
 
         /// <summary>
         /// 

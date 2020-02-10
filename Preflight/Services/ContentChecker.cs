@@ -217,15 +217,26 @@ namespace Preflight.Services
                 foreach (var property in propsFromType)
                 {
                     var value = o.Value<string>(property.Alias);
+                    string label = $"{propName} (Item {index} - {property.Name})";
 
                     if (!value.HasValue())
-                        continue;
+                    {
+                        _hubContext.Clients.All.PreflightTest(new PreflightPropertyResponseModel
+                        {
+                            Name = property.Name,
+                            Label = label,
+                            Remove = true
+                        });
+                    }
+                    else
+                    {
+                        PreflightPropertyResponseModel model = RunPluginsAgainstValue(propName, value, property.PropertyEditorAlias, KnownPropertyAlias.NestedContent);
 
-                    PreflightPropertyResponseModel model = RunPluginsAgainstValue(propName, value, property.PropertyEditorAlias, KnownPropertyAlias.NestedContent);
+                        model.Label = label;
+                        model.TotalTests = model.Plugins.Aggregate(0, (acc, x) => acc + x.TotalTests);
 
-                    model.Label = $"{model.Name} (Item {index} - {property.Name})";
-
-                    response.Add(model);
+                        response.Add(model);
+                    }
                 }
 
                 index += 1;
@@ -254,9 +265,6 @@ namespace Preflight.Services
 
                 foreach (JToken editor in editors)
                 {
-                    JToken value = editor.SelectToken(KnownStrings.GridValueJsonPath);
-                    if (value == null || !value.ToString().HasValue()) continue;
-
                     // this is a bit messy - maps the grid editor view to the knownpropertyalias value
                     var editorViewAlias = "";
                     var editorAlias = editor.SelectToken("$..editor.alias")?.ToString();
@@ -265,21 +273,37 @@ namespace Preflight.Services
                     var gridEditorName = gridEditorConfig.Name;
                     var gridEditorView = gridEditorConfig.View;
 
-                    if (gridEditorView.HasValue())
+                    string label = $"{name} ({rowName} - {gridEditorName})";
+
+                    JToken value = editor.SelectToken(KnownStrings.GridValueJsonPath);
+                    if (value == null || !value.ToString().HasValue())
                     {
-                        switch (gridEditorView)
+                        _hubContext.Clients.All.PreflightTest(new PreflightPropertyResponseModel
                         {
-                            case "rte": editorViewAlias = KnownPropertyAlias.Rte; break;
-                            case "textstring": editorViewAlias = KnownPropertyAlias.Textbox; break;
-                            case "textarea": editorViewAlias = KnownPropertyAlias.Textarea; break;
-                        }
+                            Name = gridEditorName,
+                            Label = label,
+                            Remove = true
+                        }); ;
                     }
+                    else
+                    {
+                        if (gridEditorView.HasValue())
+                        {
+                            switch (gridEditorView)
+                            {
+                                case "rte": editorViewAlias = KnownPropertyAlias.Rte; break;
+                                case "textstring": editorViewAlias = KnownPropertyAlias.Textbox; break;
+                                case "textarea": editorViewAlias = KnownPropertyAlias.Textarea; break;
+                            }
+                        }
 
-                    PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString(), editorViewAlias, KnownPropertyAlias.Grid);
+                        PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString(), editorViewAlias, KnownPropertyAlias.Grid);
 
-                    model.Label = $"{model.Name} ({rowName} - {gridEditorName})";
+                        model.Label = label;
+                        model.TotalTests = model.Plugins.Aggregate(0, (acc, x) => acc + x.TotalTests);
 
-                    response.Add(model);
+                        response.Add(model);
+                    }
                 }
             }
 
@@ -348,6 +372,7 @@ namespace Preflight.Services
             model.Failed = model.FailedCount > 0;
 
             model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
+            model.TotalTests = model.Plugins.Aggregate(0, (acc, x) => acc + x.TotalTests);
 
             return model;
         }

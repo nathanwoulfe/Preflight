@@ -25,6 +25,8 @@ namespace Preflight.Plugins
         public int SortOrder => -1;
         public int FailedCount { get; set; }
 
+        public int TotalTests => 2;
+
         public string Name => "Link health";
         public string ViewPath => "/app_plugins/preflight/backoffice/plugins/linkhealth.html";
 

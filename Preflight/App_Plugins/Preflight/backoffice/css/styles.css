@@ -6,6 +6,24 @@
       transform: translateY(-2px);
       content: '\e165'; }
 
+.preflight-progress {
+  margin: 15px auto 30px; }
+  .preflight-progress .umb-progress-circle__highlight {
+    transition: stroke-dasharray ease-in-out 500ms; }
+  .preflight-progress .umb-progress-circle__percentage {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 10%; }
+    .preflight-progress .umb-progress-circle__percentage small {
+      font-size: 12px; }
+
 .pf-disabled {
   cursor: not-allowed !important;
   opacity: 0.5;
