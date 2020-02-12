@@ -304,7 +304,7 @@
                             label: x.label
                         };
                     }
-                }));
+                })).filter(x => x);
             });
 
             // array will have length, as app is only sent on types with testable properties

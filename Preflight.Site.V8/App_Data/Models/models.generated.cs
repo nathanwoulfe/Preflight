@@ -19,7 +19,7 @@ using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "37d1d6cd9f5f6bd4")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "dc6ebcfbd3151954")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.2")]
 
 namespace Umbraco.Web.PublishedModels
@@ -48,6 +48,13 @@ namespace Umbraco.Web.PublishedModels
 		{ }
 
 		// properties
+
+		///<summary>
+		/// date time
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.1.0")]
+		[ImplementPropertyType("dateTime")]
+		public DateTime DateTime => this.Value<DateTime>("dateTime");
 
 		///<summary>
 		/// Grid
@@ -83,6 +90,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.1.0")]
 		[ImplementPropertyType("rTETheSecond")]
 		public IHtmlString RTetheSecond => this.Value<IHtmlString>("rTETheSecond");
+
+		///<summary>
+		/// tags
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.1.0")]
+		[ImplementPropertyType("tags")]
+		public IEnumerable<string> Tags => this.Value<IEnumerable<string>>("tags");
 
 		///<summary>
 		/// Textbox
