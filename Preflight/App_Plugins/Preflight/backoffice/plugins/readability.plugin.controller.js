@@ -18,10 +18,9 @@
                 view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/plugins/readability.overlay.html`,
                 title: 'Readability',
                 description: 'Why should I care?',
+                size: 'small',
                 text: $scope.model.description,
-                close: () => {
-                    editorService.close();
-                }
+                close: () => editorService.close()                
             };
 
             editorService.open(helpOverlay);

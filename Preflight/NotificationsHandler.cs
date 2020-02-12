@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Preflight
@@ -48,9 +49,9 @@ namespace Preflight
                         }
                         catch (Exception ex)
                         {
-                            //todo => v8 logging
-                            //LogHelper.Error<WebApiHandler>("Error changing custom publishing cancelled message.", ex);
+                            Current.Logger.Error(typeof(NotificationsHandler), "Error changing custom publishing cancelled message.", ex);
                         }
+
                         return response;
 
                     }, cancellationToken);
