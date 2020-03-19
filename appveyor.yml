@@ -1,5 +1,5 @@
 # version format
-version: 1.3.1.{build}
+version: 1.3.2.{build}
 
 image: Visual Studio 2019
 
@@ -38,9 +38,9 @@ deploy:
         appveyor_repo_tag: true      
     
   - provider: GitHub
-    tag: v1.3.1
-    release: Release 1.3.1
-    description: "Missed a bit - everything broke when a non-testable property existed on the content type. Testable properties are now filtered properly"
+    tag: v1.3.2
+    release: Release 1.3.2
+    description: "Don't show the Preflight app in the media section because that would be silly"
     force_update: true
     auth_token:
         secure: Otbl8p8qCwciDqJgSWCyN0Arfs5XS1CwiHcK+r0F6uz9Rxt4gzBFvlc3cjPV3NxR
