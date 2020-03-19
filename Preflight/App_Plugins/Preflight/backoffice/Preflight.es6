@@ -1,4 +1,4 @@
-/*! preflight - v0.1.0-build100 - 2020-02-12
+/*! preflight - v1.0.0-build1 - 2020-02-18
  * Copyright (c) 2020 Nathan Woulfe;
  * Licensed MIT
  */
@@ -340,7 +340,7 @@
                             label: x.label
                         };
                     }
-                }));
+                })).filter(x => x);
             });
 
             // array will have length, as app is only sent on types with testable properties

@@ -6,7 +6,7 @@
     angular.module('preflight', [
         'preflight.components',
         'preflight.services'
-    ]);
+    ]); 
 
     //        .config(['$provide', $provide => {
     //    $provide.decorator("$rootScope", function ($delegate) {
