@@ -11,6 +11,7 @@ install:
   - set PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe;C:\Ruby25\bin;%PATH%
   - cmd: npm install -g grunt-cli
   - cmd: set UMBRACO_PACKAGE_MIN_VERSION=8.1.0
+  - cmd: nuget restore
   - cmd: cd BuildPackage
   - cmd: Build.bat
   
