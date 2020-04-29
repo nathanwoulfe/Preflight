@@ -5,7 +5,7 @@
 
     angular.module('preflight', [
         'preflight.components',
-        'preflight.services'
+        'preflight.services' 
     ]); 
 
     //        .config(['$provide', $provide => {

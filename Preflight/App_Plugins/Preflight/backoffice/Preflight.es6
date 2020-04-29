@@ -1,4 +1,4 @@
-/*! preflight - v1.0.0-build1 - 2020-02-18
+/*! preflight - v1.3.3-build100 - 2020-04-25
  * Copyright (c) 2020 Nathan Woulfe;
  * Licensed MIT
  */
@@ -10,8 +10,8 @@
 
     angular.module('preflight', [
         'preflight.components',
-        'preflight.services'
-    ]);
+        'preflight.services' 
+    ]); 
 
     //        .config(['$provide', $provide => {
     //    $provide.decorator("$rootScope", function ($delegate) {
