@@ -10,7 +10,6 @@ using Umbraco.Web.WebApi;
 
 namespace Preflight.Api
 {
-    [RoutePrefix("umbraco/backoffice/preflight/api")]
     [PluginController("preflight")]
     public class ApiController : UmbracoAuthorizedApiController
     {
@@ -28,7 +27,6 @@ namespace Preflight.Api
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getSettings")]
         public IHttpActionResult GetSettings()
         {
             try
@@ -50,7 +48,6 @@ namespace Preflight.Api
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getSettingValue/{id}")]
         public IHttpActionResult GetSettingValue(string id)
         {
             try
@@ -75,7 +72,6 @@ namespace Preflight.Api
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("saveSettings")]
         public IHttpActionResult SaveSettings(PreflightSettings settings)
         {
             try
@@ -98,7 +94,6 @@ namespace Preflight.Api
         /// <param name="id">Node id</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("check/{id}")]
         public IHttpActionResult Check(int id)
         {
             try
@@ -120,7 +115,6 @@ namespace Preflight.Api
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("checkdirty")]
         public IHttpActionResult CheckDirty(DirtyProperties data)
         {
             try

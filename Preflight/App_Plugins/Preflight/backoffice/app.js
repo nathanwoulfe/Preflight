@@ -11,7 +11,7 @@
     //        .config(['$provide', $provide => {
     //    $provide.decorator("$rootScope", function ($delegate) {
     //        var Scope = $delegate.constructor;
-    //        var origBroadcast = Scope.prototype.$broadcast;
+    //        var origBroadcast = Scope.prototype.$broadcast; 
     //        var origEmit = Scope.prototype.$emit;
 
     //        Scope.prototype.$broadcast = function () {
