@@ -1,4 +1,4 @@
-/*! preflight - v1.3.3-build52 - 2020-04-29
+/*! preflight - v1.3.5-build23 - 2020-07-30
  * Copyright (c) 2020 Nathan Woulfe;
  * Licensed MIT
  */
@@ -16,7 +16,7 @@
     //        .config(['$provide', $provide => {
     //    $provide.decorator("$rootScope", function ($delegate) {
     //        var Scope = $delegate.constructor;
-    //        var origBroadcast = Scope.prototype.$broadcast;
+    //        var origBroadcast = Scope.prototype.$broadcast; 
     //        var origEmit = Scope.prototype.$emit;
 
     //        Scope.prototype.$broadcast = function () {
