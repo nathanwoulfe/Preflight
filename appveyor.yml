@@ -1,5 +1,5 @@
 # version format
-version: 1.3.4.{build}
+version: 1.3.5.{build}
 
 image: Visual Studio 2019
 
@@ -39,9 +39,9 @@ deploy:
         appveyor_repo_tag: true      
     
   - provider: GitHub
-    tag: v1.3.4
-    release: Release 1.3.4
-    description: "Enabling attribute routing breaks Preflight API. Not any more."
+    tag: v1.3.5
+    release: Release 1.3.5
+    description: ""
     force_update: true
     auth_token:
         secure: Otbl8p8qCwciDqJgSWCyN0Arfs5XS1CwiHcK+r0F6uz9Rxt4gzBFvlc3cjPV3NxR
