@@ -1,21 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2015
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Preflight", "Preflight\Preflight.csproj", "{D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{42C19924-0B8A-47D6-A2B6-EDEC68AB73DB}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Preflight.Site.V8", "Preflight.Site.V8\Preflight.Site.V8.csproj", "{DF7A4793-44A0-4C53-A328-5A7F95F11891}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Preflight.Site", "Preflight.Site.V8\Preflight.Site.csproj", "{DF7A4793-44A0-4C53-A328-5A7F95F11891}"
 	ProjectSection(ProjectDependencies) = postProject
-		{D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F} = {D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F}
+		{A7D0A724-C91F-48C2-86CF-B99BCF251F90} = {A7D0A724-C91F-48C2-86CF-B99BCF251F90}
+		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77} = {FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preflight.Site.NetCore", "Preflight.Site.NetCore\Preflight.Site.NetCore.csproj", "{1A49A23C-A4AD-43EF-90DE-CC58B72EDF3A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A7D0A724-C91F-48C2-86CF-B99BCF251F90} = {A7D0A724-C91F-48C2-86CF-B99BCF251F90}
+		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77} = {FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preflight.Backoffice", "src\Preflight.Backoffice\Preflight.Backoffice.csproj", "{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preflight", "src\Preflight\Preflight.csproj", "{A7D0A724-C91F-48C2-86CF-B99BCF251F90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +33,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5DCB5FF-AD56-4A2E-8350-1B9EC0B1D13F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A49A23C-A4AD-43EF-90DE-CC58B72EDF3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A49A23C-A4AD-43EF-90DE-CC58B72EDF3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A49A23C-A4AD-43EF-90DE-CC58B72EDF3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A49A23C-A4AD-43EF-90DE-CC58B72EDF3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

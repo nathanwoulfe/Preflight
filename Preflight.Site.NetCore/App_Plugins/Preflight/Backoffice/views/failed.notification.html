@@ -1,0 +1,13 @@
+<div ng-controller="preflight.notification.controller as vm">
+    <h4><localize key="preflight_failedNoticeTitle"></localize></h4>
+    <p>
+        <span ng-if="vm.saveCancelled"><localize key="preflight_saveCancelled"></localize>. </span>
+        <localize key="preflight_reviewAndSave"></localize>
+    </p>
+    <button class="btn btn-default" ng-click="vm.discard(notification)">
+        <localize key="general_close"></localize>
+    </button>
+    <button class="btn btn-success" ng-click="vm.switch(notification)">
+        <localize key="preflight_review"></localize>
+    </button>
+</div>

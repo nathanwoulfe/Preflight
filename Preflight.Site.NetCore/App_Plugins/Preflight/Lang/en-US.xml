@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="en" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
+  <area alias="dashboardTabs">
+    <key alias="preflight">Preflight</key>
+  </area>
+  <area alias="preflight">
+
+    <key alias="passIntro">Content on this page passes all preflight checks</key>
+    <key alias="passText">Good job! Check back after updating the content for fresh test results</key>
+    <key alias="failIntro">That's not great...</key>
+    <key alias="failTextSingular">Content on this page fails one preflight check</key>
+    <key alias="failTextPlural">Content on this page fails multiple preflight checks</key>
+    <key alias="noTestsIntro">No content on this page underwent preflight checks</key>
+    <key alias="noTestsText">Ensure the Preflight settings are including the appropriate property types</key>
+
+    <key alias="runningChecks">Preflight found modified content - testing</key>
+
+    <key alias="failedNoticeTitle">Content on this page has failed the preflight checks</key>
+    <key alias="saveCancelled">The save request has been cancelled</key>
+    <key alias="reviewAndSave">Please review the test results, update the content and re-save</key>
+
+    <key alias="review">Review</key>
+    <key alias="saveSettings">Save settings</key>
+    <key alias="plusMore">plus %0% more...</key>
+
+    <key alias="presaveIntro">This page is being run through preflight tests to ensure content quality</key>
+    <key alias="presaveText">This may take a few seconds to process</key>
+  </area>
+
+  <area alias="preflightLinkHealth">
+    <key alias="brokenLinksHeading">Broken links</key>
+    <key alias="brokenLinksPassText">No broken links found for this property</key>
+
+    <key alias="safeBrowsingHeading">Safe Browsing key value</key>
+    <key alias="safeBrowsingPassText">No unsafe links found for this property</key>
+  </area>
+
+  <area alias="preflightReadability">
+    <key alias="readingEaseScore">Reading ease score</key>
+    <key alias="readingEaseRange">Target %0%-%1%</key>
+    <key alias="averageSyllables">Average syllables</key>
+    <key alias="perWord">per word</key>
+    <key alias="averageSentence">Average sentence</key>
+    <key alias="length">length</key>
+    <key alias="longWordsPassText">No long words found for this property</key>
+    <key alias="blacklistPassText">No naughty words/phrases for this property</key>
+    <key alias="longWordsHeading">Long words</key>
+    <key alias="blacklistHeading">Naughty words</key>
+  </area>
+</language>

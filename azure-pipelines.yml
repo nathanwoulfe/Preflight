@@ -1,0 +1,110 @@
+trigger:
+  - v2/dev
+  - v2/release
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  - name: DEV_BRANCH
+    value: 'refs/heads/v2/dev'
+  - name: OUT_DIR
+    value: '../nupkgs'
+  - name: NPM_CONFIG_CACHE
+    value: $(Pipeline.Workspace)/.npm  
+  - name: PROJECTS
+    value: >-
+      src/Preflight/Preflight.csproj
+  
+      src/Preflight.Backoffice/Preflight.Backoffice.csproj
+  - name: NUGET_PACKAGES
+    value: $(Pipeline.Workspace)/.nuget/packages
+
+steps:
+
+- task: PowerShell@2
+  displayName: 'Get configuration'
+  inputs: 
+    targetType: 'inline'
+    script: |
+      $configuration = If ($Env:BUILD_SOURCEBRANCH -eq '$(DEV_BRANCH)') { 'DEBUG' } Else { 'RELEASE' }
+      echo "source branch = $Env:BUILD_SOURCEBRANCH"
+      echo "configuration = $configuration"
+      echo "##vso[task.setvariable variable=CONFIGURATION]$configuration"
+
+- task: PowerShell@2
+  displayName: 'Get version from csproj'
+  inputs:
+    targetType: 'inline'      
+    script: |
+      $xml = [Xml] (Get-Content .\Directory.Build.props)
+      $prefix = $xml.Project.PropertyGroup.VersionPrefix
+      $suffix = $xml.Project.PropertyGroup.VersionSuffix
+   
+      echo "version = $prefix-$suffix.$Env:BUILD_BUILDID"
+      
+      If ($Env:BUILD_SOURCEBRANCH -eq '$(DEV_BRANCH)') {
+        echo "##vso[task.setvariable variable=VERSION]$prefix-$suffix.$Env:BUILD_BUILDID" } 
+      Else { 
+        echo "##vso[task.setvariable variable=VERSION]$prefix-$suffix" }
+
+- task: Cache@2
+  inputs:
+    key: 'nuget | "$(Agent.OS)" | ./src/Preflight/packages.lock.json'
+    restoreKeys: |
+       nuget | "$(Agent.OS)"
+    path: $(NUGET_PACKAGES)
+  displayName: 'NuGet cache'
+
+- task: Cache@2
+  displayName: 'NPM cache'
+  inputs:
+    key: 'npm | "$(Agent.OS)" | ./src/Preflight.Backoffice/package-lock.json'
+    restoreKeys: |
+       npm | "$(Agent.OS)"
+    path: $(NPM_CONFIG_CACHE)
+
+- task: Npm@1
+  displayName: 'Restore NPM dependencies, build Backoffice'
+  inputs:
+    customCommand: 'npm install && npm run prod'
+    workingDir: './src/Preflight.Backoffice'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore dotnet dependencies'
+  inputs:
+    command: restore
+    projects: $(PROJECTS)
+    selectOrConfig: config
+    nugetConfigPath: NuGet.config
+    verbosityRestore: Minimal
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack the Core, Web and Backoffice projects'
+  inputs:
+    command: 'pack'
+    packagesToPack: 'src/Preflight.Backoffice/Preflight.Backoffice.csproj;src/Preflight/Preflight.csproj'
+    configuration: '$(CONFIGURATION)'
+    packDirectory: '$(OUT_DIR)'
+    includesymbols: true
+    verbosityPack: Minimal
+    versioningScheme: byEnvVar
+    versionEnvVar: VERSION
+
+- task: CopyFiles@2
+  displayName: 'Copy package files from OutDir to staging directory'
+  inputs:     
+    SourceFolder: '$(OUT_DIR)'
+    Contents: |
+      *.nupkg
+      *.snupkg
+      !*.symbols.nupkg
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
+    OverWrite: true
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish zip and nuget from staging directory'
+  inputs:
+    artifactName: 'Preflight.Umbraco'
+    targetPath: '$(Build.ArtifactStagingDirectory)'
