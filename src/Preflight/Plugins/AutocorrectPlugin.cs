@@ -4,6 +4,11 @@ using Preflight.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+#if NET472
+using CharArrays = Umbraco.Core.Constants.CharArrays;
+#else
+using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
+#endif
 
 namespace Preflight.Plugins
 {
@@ -52,12 +57,12 @@ namespace Preflight.Plugins
         /// <param name="id"></param>
         /// <param name="val"></param>
         /// <param name="settings"></param>
-        public void Check(int id, string val, List<SettingsModel> settings)
+        public void Check(int id, string culture, string val, List<SettingsModel> settings)
         {
-            Dictionary<string, string> autocorrect = settings.GetValue<string>(KnownSettings.AutocorrectTerms)?.Split(',')
+            Dictionary<string, string> autocorrect = settings.GetValue<string>(KnownSettings.AutocorrectTerms, culture)?.Split(CharArrays.Comma)
                 .ToDictionary(
-                    s => s.Split('|')[0],
-                    s => s.Split('|')[1]
+                    s => s.Split(CharArrays.VerticalTab)[0],
+                    s => s.Split(CharArrays.VerticalTab)[1]
                 );
 
             if (autocorrect == null || !autocorrect.Any())

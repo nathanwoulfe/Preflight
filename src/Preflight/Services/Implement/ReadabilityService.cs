@@ -5,6 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+#if NET472
+using CharArrays = Umbraco.Core.Constants.CharArrays;
+#else
+using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
+#endif
 
 namespace Preflight.Services.Implement
 {
@@ -30,21 +35,21 @@ namespace Preflight.Services.Implement
         ///  <param name="text">The string to parse</param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public ReadabilityResponseModel Check(string text, List<SettingsModel> settings)
+        public ReadabilityResponseModel Check(string text, string culture, List<SettingsModel> settings)
         {
-            var longWordLength = settings.GetValue<int>(KnownSettings.LongWordSyllables);
-            var readabilityMin = settings.GetValue<int>(KnownSettings.ReadabilityMin);
-            var readabilityMax = settings.GetValue<int>(KnownSettings.ReadabilityMax);
+            var longWordLength = settings.GetValue<int>(KnownSettings.LongWordSyllables, culture);
+            var readabilityMin = settings.GetValue<int>(KnownSettings.ReadabilityMin, culture);
+            var readabilityMax = settings.GetValue<int>(KnownSettings.ReadabilityMax, culture);
 
-            string[] whitelist = settings.GetValue<string>(KnownSettings.NiceList).Split(',');
-            string[] blacklist = settings.GetValue<string>(KnownSettings.NaughtyList).Split(',');
+            string[] whitelist = settings.GetValue<string>(KnownSettings.NiceList, culture).Split(CharArrays.Comma);
+            string[] blacklist = settings.GetValue<string>(KnownSettings.NaughtyList, culture).Split(CharArrays.Comma);
 
             List<string> longWords = new List<string>();
             List<string> blacklisted = new List<string>();
 
             text = Regex.Replace(text, KnownStrings.ClosingHtmlTags, ".");
             text = text.Replace(KnownStrings.NewLine, " ");
-            text = Regex.Replace(text, KnownStrings.CharsToRemove, "").Replace("&amp;", "&");
+            text = Regex.Replace(text, KnownStrings.CharsToRemove, string.Empty).Replace("&amp;", "&");
             text = Regex.Replace(text, KnownStrings.DuplicateSpaces, " ");
 
             List<string> sentences = text.Split(KnownStrings.WordDelimiters).Where(s => s.HasValue() && s.Length > 3).ToList();
@@ -55,7 +60,12 @@ namespace Preflight.Services.Implement
 
             foreach (string sentence in sentences)
             {
-                List<string> words = sentence.Trim().Split(' ').Where(s => s.HasValue() && !whitelist.Contains(s, StringComparer.OrdinalIgnoreCase)).ToList();
+                List<string> words = sentence
+                    .Trim()
+                    .Split(CharArrays.Space)
+                    .Where(s => s.HasValue() && !whitelist.Contains(s, StringComparer.OrdinalIgnoreCase))
+                    .ToList();
+
                 totalWords += words.Count;
 
                 foreach (string word in words)

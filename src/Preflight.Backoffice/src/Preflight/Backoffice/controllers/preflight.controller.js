@@ -23,6 +23,7 @@
     noTests = false;
     percentageDone = 20;
     progressStep = 0;
+    activeVariant;
 
     constructor($scope, $rootScope, $element, $timeout, editorState, preflightService, preflightHub) {
         this.$scope = $scope;
@@ -161,6 +162,12 @@
 
 
     /**
+     * if node is invariant, send no culture, otherwise get from language.name on the active variant
+     * */
+    getCurrentCulture = () => this.activeVariant.language ? this.activeVariant.language.culture : '';
+
+
+    /**
      * Updates the property set with the new value, and removes any temporary property from that set
      * @param {object} data - a response model item returned via the signalr hub
      */
@@ -259,6 +266,7 @@
 
                 const payload = {
                     properties: this.dirtyProps,
+                    culture: this.getCurrentCulture(),
                     nodeId: this.editorState.current.id
                 };
 
@@ -287,24 +295,24 @@
                 () => this.onComplete()
             );
 
-            hub.start(e => {
+            hub.start(() => {
                 /**
                  * Check all properties when the controller loads. Won't re-run when changing between apps
                  * but needs to happen after the hub loads
                  */
                 this.$timeout(() => {
                     this.setBadgeCount(true);
-                    this.checkDirty(); // builds initial hash array, but won't run anything
-                    this.preflightService.check(this.editorState.current.id);
+                    this.checkDirty(); // builds initial hash array, but won't run anything                    
+                    this.preflightService.check(this.editorState.current.id, this.getCurrentCulture());
                 });
             });
         });
     }
 
     $onInit() {
-        const activeVariant = this.editorState.current.variants.find(x => x.active);
-        if (activeVariant) {
-            activeVariant.tabs.forEach(x => {
+        this.activeVariant = this.editorState.current.variants.find(x => x.active);
+        if (this.activeVariant) {
+            this.activeVariant.tabs.forEach(x => {
                 this.propertiesToTrack = this.propertiesToTrack.concat(x.properties.map(x => {
                     if (this.validPropTypes.includes(x.editor)) {
                         return {

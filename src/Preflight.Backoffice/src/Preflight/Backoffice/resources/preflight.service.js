@@ -29,13 +29,11 @@
             'Something broke'
         );
 
-    check = id => this.request('GET', `Check/${id} `);
+    check = (id, culture) => this.request('GET', `Check/${id}/${culture} `);
 
     checkDirty = data => this.request('POST', `CheckDirty`, data);
 
     getSettings = () => this.request('GET', `GetSettings`);
-
-    getSettingValue = alias => this.request('GET', `GetSettingValue/${alias} `);
 
     saveSettings = (settings, tabs) => this.request('POST', `SaveSettings`, {
         settings,

@@ -1,16 +1,17 @@
-﻿using Preflight.Models;
+﻿using Preflight.Extensions;
+using Preflight.Models;
 using Preflight.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 #if NET472
 using System.Web.Http;
+using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using IActionResult = System.Web.Http.IHttpActionResult;
 #else
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
 #endif
@@ -22,11 +23,13 @@ namespace Preflight.Controllers
     {
         private readonly ISettingsService _settingsService;
         private readonly IContentChecker _contentChecker;
+        private readonly ILocalizationService _localizationService;
 
-        public ApiController(ISettingsService settingsService, IContentChecker contentChecker)
+        public ApiController(ISettingsService settingsService, IContentChecker contentChecker, ILocalizationService localizationService)
         {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _contentChecker = contentChecker ?? throw new ArgumentNullException(nameof(contentChecker));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
         /// <summary>
@@ -52,32 +55,7 @@ namespace Preflight.Controllers
         }
 
         /// <summary>
-        /// Get Preflight settings object value
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("GetSettingValue")]
-        public IActionResult GetSettingValue(string id)
-        {
-            try
-            {
-                List<SettingsModel> settings = _settingsService.Get().Settings;
-                SettingsModel model = settings.First(s => s.Alias == id);
-
-                return Ok(new
-                {
-                    status = HttpStatusCode.OK,
-                    value = model?.Value
-                });
-            }
-            catch (Exception ex)
-            {
-                return Error(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Sabve Preflight settings object
+        /// Save Preflight settings object
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -105,14 +83,14 @@ namespace Preflight.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("Check")]
-        public IActionResult Check(int id)
+        public IActionResult Check(int id, string culture = "")
         {
             try
             {
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,
-                    failed = _contentChecker.CheckContent(id)
+                    failed = _contentChecker.CheckContent(id, culture.HasValue() ? culture : _localizationService.GetDefaultLanguageIsoCode())
                 });
             }
             catch (Exception ex)

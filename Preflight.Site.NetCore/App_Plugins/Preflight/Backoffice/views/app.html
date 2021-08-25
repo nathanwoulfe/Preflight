@@ -24,22 +24,26 @@
     <progress-circle size="100" percentage="vm.percentageFailed" foreground="success" background="danger"></progress-circle>
 
     <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties | orderBy: prop.label track by $index" ng-if="vm.results && !vm.noTests" ng-class="{'loading': prop.loading, 'disabled' : prop.disabled }">
-        <div class="umb-expansion-panel__header" ng-click="prop.open = !prop.open">
-            <div>
+
+        <button type="button"
+                aria-expanded="{{tab.open}}"
+                class="btn-reset umb-expansion-panel__header"
+                ng-click="prop.open = !prop.open">
+            <span>
                 <span class="count-badge" ng-bind="prop.failedCount" ng-if="prop.failedCount"></span>
                 <span class="count-badge pass" ng-if="prop.failedCount <= 0" ng-class="{'pass' : prop.failedCount === 0, 'pending' : prop.failedCount === -1}">
-                    <ins class="icon-"></ins>
+                    <umb-icon icon="icon-check" ng-if="prop.failedCount === 0"></umb-icon>
                 </span>
                 {{ prop.label }}
-            </div>
-            <ins class="umb-expansion-panel__expand" ng-class="{ 'icon-navigation-right': !prop.open, 'icon-navigation-down': prop.open }">&nbsp;</ins>
-        </div>
+            </span>
+            <umb-icon icon="{{tab.open ? 'icon-navigation-up' : 'icon-navigation-down'}}"
+                      class="umb-expansion-panel__expand"></umb-icon>
+        </button>
 
         <div class="umb-expansion-panel__content" ng-show="prop.open">
-            <div class="flex mt-30" ng-repeat="plugin in prop.plugins">
-                <div ng-include="plugin.viewPath" ng-repeat="model in [plugin]" class="preflight-plugin-wrapper"></div>
+            <div class="flex relative mt4" ng-repeat="plugin in prop.plugins">
+                <div ng-include="plugin.viewPath" ng-repeat="model in [plugin]" class="w-100"></div>
             </div>
         </div>
     </div>
-
 </div>

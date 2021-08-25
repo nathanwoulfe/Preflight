@@ -7,17 +7,20 @@ namespace Preflight.Extensions
 {
     public static class SettingsModelListExtensions
     {
-        public static T GetValue<T>(this IEnumerable<SettingsModel> settings, string name) where T : IConvertible
+        public static T GetValue<T>(this IEnumerable<SettingsModel> settings, string label, string culture) where T: IConvertible
         {
-            object value = settings.First(s => s.Alias == name.Camel())?.Value;
+            var stringValue = settings.FirstOrDefault(x => string.Equals(x.Label, label, StringComparison.InvariantCultureIgnoreCase)).Value.ForVariant(culture);
+            return ConvertObject<T>(stringValue);            
+        }
 
-            // why? because settings are stored as strings, and a string won't convert to bool
+        private static T ConvertObject<T>(object obj) where T : IConvertible
+        {
             if (typeof(T) == typeof(bool))
             {
-                value = Convert.ToInt32(value);
+                obj = Convert.ToInt32(obj);
             }
 
-            return value == null ? default(T) : (T)Convert.ChangeType(value, typeof(T));
+            return obj == null ? default : (T)Convert.ChangeType(obj, typeof(T));
         }
     }
 }

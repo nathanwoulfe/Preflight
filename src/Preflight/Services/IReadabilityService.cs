@@ -5,6 +5,6 @@ namespace Preflight.Services
 {
     public interface IReadabilityService
     {
-        ReadabilityResponseModel Check(string text, List<SettingsModel> settings);
+        ReadabilityResponseModel Check(string text, string culture, List<SettingsModel> settings);
     }
 }

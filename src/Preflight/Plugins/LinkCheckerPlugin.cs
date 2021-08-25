@@ -24,7 +24,7 @@ namespace Preflight.Plugins
         public int TotalTests => 2;
 
         public string Name => "Link health";
-        public string ViewPath => "/app_plugins/preflight/backoffice/plugins/linkhealth.html";
+        public string ViewPath => "/App_Plugins/Preflight/Backoffice/plugins/linkhealth/linkhealth.html";
 
         public string Summary => "Check links resolve correctly. Optionally check URLs against Google's SafeBrowsing API";
         public string Description { get; set; }
@@ -58,10 +58,10 @@ namespace Preflight.Plugins
             );
         }
 
-        public void Check(int id, string val, List<SettingsModel> settings)
+        public void Check(int id, string culture, string val, List<SettingsModel> settings)
         {
-            var apiKey = settings.GetValue<string>(KnownSettings.GoogleApiKey);
-            var checkSafeBrowsing = settings.GetValue<bool>(KnownSettings.EnsureSafeLinks);
+            var apiKey = settings.GetValue<string>(KnownSettings.GoogleApiKey, culture);
+            var checkSafeBrowsing = settings.GetValue<bool>(KnownSettings.EnsureSafeLinks, culture);
 
             // check safebrowsing first to avoid double processing of links
             List<BrokenLinkModel> safeBrowsingResult = checkSafeBrowsing && apiKey.HasValue() ? _safeBrowsingService.Check(val, apiKey) : new List<BrokenLinkModel>();

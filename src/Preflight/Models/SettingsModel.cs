@@ -45,7 +45,7 @@ namespace Preflight.Models
         /// Set the default value for the setting
         /// </summary>
         [JsonProperty("value")]
-        public string Value { get; set; }
+        public object Value { get; set; }
 
         /// <summary>
         /// Describe the setting
@@ -54,7 +54,7 @@ namespace Preflight.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// Path to an Umbraco property editor view eg "views/propertyeditors/boolean/boolean.html"
+        /// Name of an Umbraco property editor - full path is built later
         /// </summary>
         [JsonProperty("view")]
         public string View { get; set; }

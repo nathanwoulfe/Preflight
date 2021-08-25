@@ -25,7 +25,7 @@ namespace Preflight.Plugins
 
         public string Name => "Readability";
         public string Summary => "Ensure content meets minimum readability measures, using the Flesch reading ease algorithm.";
-        public string ViewPath => "/app_plugins/preflight/backoffice/plugins/readability.html";
+        public string ViewPath => "/App_Plugins/Preflight/Backoffice/plugins/readability/readability.html";
 
         /// <summary>
         /// 
@@ -77,10 +77,10 @@ namespace Preflight.Plugins
                 <p>As well as the Flesch score, the readability test returns sentence length; average syllables per word; and long or complex words.</p>";
         }
 
-        public void Check(int id, string val, List<SettingsModel> settings)
+        public void Check(int id, string culture, string val, List<SettingsModel> settings)
         {
             // must get a result of any type
-            ReadabilityResponseModel result = _readabilityService.Check(val, settings);
+            ReadabilityResponseModel result = _readabilityService.Check(val, culture, settings);
             // then set Failed
             Failed = result.Failed;
             // and set Result

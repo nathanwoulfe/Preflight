@@ -5,7 +5,7 @@
      */
 
     static template = `
-        <h5 ng-bind="::$ctrl.heading"></h5>
+        <h5 ng-bind="::$ctrl.heading" class="mt0"></h5>
         <span ng-if="$ctrl.pass" ng-bind="::$ctrl.passText"></span>`;
 
     localizationService;
@@ -29,7 +29,7 @@
 
 export const ResultIntroComponent = {
     transclude: true,
-    name: 'resultIntro',
+    name: 'preflightResultIntro',
     bindings: {
         tokens: '<',
         passText: '@?',

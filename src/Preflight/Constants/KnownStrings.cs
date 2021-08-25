@@ -6,6 +6,7 @@
         public const string Alias = "preflight";
         public const string Icon = "icon-paper-plane";
         public const string AppSettingKey = "PreflightInstalled";
+        public const string SettingsTable = "PreflightSettings";
 
         public const string ContentFailedChecks = "Content failed Preflight checks";
         public const string GridRteJsonPath = "$..controls[?(@.editor.view == 'rte' || @.editor.view == 'textstring' || @.editor.view == 'textarea' || @.editor.alias == 'rte' || @.editor.alias == 'headline' || @.editor.alias == 'quote')]";

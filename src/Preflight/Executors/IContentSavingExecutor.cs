@@ -45,26 +45,27 @@ namespace Preflight.Executors
             message = null;
 
             List<SettingsModel> settings = _settingsService.Get().Settings;
+            string culture = content.AvailableCultures.First();
 
             // only check if current user group is opted in to testing on save
-            var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
-            if (groupSetting != null && groupSetting.Value.HasValue())
+            var groupSetting = settings.GetValue<string>(KnownSettings.UserGroupOptIn, culture);
+            if (groupSetting != null && groupSetting.Any())
             {
                 var currentUserGroups = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser?.Groups?.Select(x => x.Name) ?? new List<string>();
                 if (currentUserGroups.Any())
                 {
-                    bool testOnSave = groupSetting.Value.Split(CharArrays.Comma).Intersect(currentUserGroups).Any();
+                    bool testOnSave = groupSetting.Split(CharArrays.Comma).Intersect(currentUserGroups).Any();
 
                     if (!testOnSave)
                         return false;
                 }
             }
 
-            if (!settings.GetValue<bool>(KnownSettings.BindSaveHandler)) return false;
+            if (!settings.GetValue<bool>(KnownSettings.BindSaveHandler, culture)) return false;
 
-            var cancelSaveOnFail = settings.GetValue<bool>(KnownSettings.CancelSaveOnFail);
+            var cancelSaveOnFail = settings.GetValue<bool>(KnownSettings.CancelSaveOnFail, culture);
 
-            bool failed = _contentChecker.CheckContent(content, true);
+            bool failed = _contentChecker.CheckContent(content, culture, true);
 
             // at least one property on the current document fails the preflight check
             if (!failed) return false;

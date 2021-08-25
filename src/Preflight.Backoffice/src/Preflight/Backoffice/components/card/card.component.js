@@ -1,6 +1,6 @@
 ﻿class Card {
 
-    template = `
+    static template = `
         <div class="card {{ ::$ctrl.cardClass }}">
             <span class="card-score {{ ::$ctrl.cardScoreClass }}" ng-bind="::$ctrl.score"></span>
             <span class="card-title">
@@ -19,15 +19,14 @@
     }
 
     $onInit() {
-
         if (this.failed) {
             this.cardClass = 'fail';
             this.cardScoreClass = 'fail-color';
         }
 
         if (this.title[0] === '@') {
-            localizationService.localize(this.title, this.tokens)
-                .then(localizedTitle => this.title = localizedTitle);
+            this.localizationService.localize(this.title, this.tokens)
+                .then(localizedTitle => this.title = localizedTitle); 
         }
 
         if (this.subtitle[0] === '@') {
@@ -38,8 +37,8 @@
 }
 
 export const CardComponent = {
-    transclude: true,
-    name: 'card',
+    transclude: true, 
+    name: 'preflightCard',
     bindings: {
         title: '@?',
         subtitle: '@?',

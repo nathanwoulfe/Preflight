@@ -76,7 +76,8 @@ namespace Preflight
 
             builder.AddNotificationHandler<ServerVariablesParsingNotification, ServerVariablesParsingHandler>()
                 .AddNotificationHandler<ContentSavingNotification, ContentSavingHandler>()
-                .AddNotificationHandler<SendingContentNotification, SendingContentHandler>();
+                .AddNotificationHandler<SendingContentNotification, SendingContentHandler>()
+                .AddNotificationHandler<UmbracoApplicationStartingNotification, AppStartingHandler>();
 
             builder.WithCollectionBuilder<PreflightPluginCollectionBuilder>()
                 .Add(() => builder.TypeLoader.GetTypes<IPreflightPlugin>());

@@ -1,0 +1,23 @@
+﻿@import '../../css/_variables';
+
+.preflight {
+    .linkhealth-result-table {
+        th {
+            text-align: left;
+            padding: 5px 10px;
+            background: rgba($grey, 0.75);
+        }
+
+        td {
+            padding: 5px 10px;
+        }
+    }
+
+    .broken-link-type {
+        color: $orange;
+
+        &.unsafe {
+            color: $red;
+        }
+    }
+}

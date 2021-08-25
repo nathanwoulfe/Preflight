@@ -81,8 +81,9 @@ namespace Preflight.Plugins
         /// Params will be passed into this method when ContentChecker processes the plugin
         /// </summary>
         /// <param name="id">The current node id</param>
+        /// <param name="culture">The variant culture to check</param>
         /// <param name="val">The string value of the current property</param>
         /// <param name="settings">The complete Preflight settings collection</param>
-        void Check(int id, string val, List<SettingsModel> settings);
+        void Check(int id, string culture, string val, List<SettingsModel> settings);
     }
 }

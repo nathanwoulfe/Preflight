@@ -8,7 +8,7 @@
     <linkhealth-result results="model.result.brokenLinks" ng-if="model.result.brokenLinks.length"></linkhealth-result>
 </div>
 
-<div class="flex mt-30" ng-if="model.result.safeBrowsing.length > 0">
+<div class="flex relative mt40" ng-if="model.result.safeBrowsing.length > 0">
     <preflight-state-icon failed="model.result.safeBrowsing.length > 0"></preflight-state-icon>
     <div class="preflight-result">
         <preflight-result-intro localize="heading,passText"

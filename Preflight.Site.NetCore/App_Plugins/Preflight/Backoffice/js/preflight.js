@@ -13,7 +13,7 @@ var name = 'preflight';
 angular.module(name, [_servicesModule.ServicesModule, _componentsModule.ComponentsModule, _controllersModule.ControllersModule, _pluginsModule.PluginsModule]);
 angular.module('umbraco').requires.push(name);
 
-},{"./components/_componentsModule":2,"./controllers/_controllersModule":7,"./plugins/_pluginsModule":12,"./resources/_servicesModule":15}],2:[function(require,module,exports){
+},{"./components/_componentsModule":2,"./controllers/_controllersModule":8,"./plugins/_pluginsModule":13,"./resources/_servicesModule":16}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21,20 +21,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ComponentsModule = void 0;
 
-var _card = require("./card.component");
+var _card = require("./card/card.component");
 
-var _progress = require("./progress.directive");
+var _progresscircle = require("./progresscircle/progresscircle.component");
 
 var _resultintro = require("./resultintro.component");
 
-var _stateicon = require("./stateicon.component");
+var _stateicon = require("./stateicon/stateicon.component");
 
-var ComponentsModule = angular.module('preflight.components', []).component(_card.CardComponent.name, _card.CardComponent).component(_resultintro.ResultIntroComponent.name, _resultintro.ResultIntroComponent).component(_stateicon.StateIconComponent.name, _stateicon.StateIconComponent).directive(_progress.ProgressCircleDirective.directiveName, function () {
-  return new _progress.ProgressCircleDirective();
-}).name;
+var ComponentsModule = angular.module('preflight.components', []).component(_card.CardComponent.name, _card.CardComponent).component(_resultintro.ResultIntroComponent.name, _resultintro.ResultIntroComponent).component(_stateicon.StateIconComponent.name, _stateicon.StateIconComponent).component(_progresscircle.ProgressCircleComponent.name, _progresscircle.ProgressCircleComponent).name;
 exports.ComponentsModule = ComponentsModule;
 
-},{"./card.component":3,"./progress.directive":4,"./resultintro.component":5,"./stateicon.component":6}],3:[function(require,module,exports){
+},{"./card/card.component":3,"./progresscircle/progresscircle.component":4,"./resultintro.component":5,"./stateicon/stateicon.component":6}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -53,8 +51,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var Card = /*#__PURE__*/function () {
   function Card(localizationService) {
     _classCallCheck(this, Card);
-
-    _defineProperty(this, "template", "\n        <div class=\"card {{ ::$ctrl.cardClass }}\">\n            <span class=\"card-score {{ ::$ctrl.cardScoreClass }}\" ng-bind=\"::$ctrl.score\"></span>\n            <span class=\"card-title\">\n                {{ ::$ctrl.title }}<br />\n                {{ ::$ctrl.subtitle }}\n            </span>\n        </div>");
 
     _defineProperty(this, "cardClass", 'pass');
 
@@ -76,7 +72,7 @@ var Card = /*#__PURE__*/function () {
       }
 
       if (this.title[0] === '@') {
-        localizationService.localize(this.title, this.tokens).then(function (localizedTitle) {
+        this.localizationService.localize(this.title, this.tokens).then(function (localizedTitle) {
           return _this.title = localizedTitle;
         });
       }
@@ -92,9 +88,11 @@ var Card = /*#__PURE__*/function () {
   return Card;
 }();
 
+_defineProperty(Card, "template", "\n        <div class=\"card {{ ::$ctrl.cardClass }}\">\n            <span class=\"card-score {{ ::$ctrl.cardScoreClass }}\" ng-bind=\"::$ctrl.score\"></span>\n            <span class=\"card-title\">\n                {{ ::$ctrl.title }}<br />\n                {{ ::$ctrl.subtitle }}\n            </span>\n        </div>");
+
 var CardComponent = {
   transclude: true,
-  name: 'card',
+  name: 'preflightCard',
   bindings: {
     title: '@?',
     subtitle: '@?',
@@ -113,64 +111,57 @@ exports.CardComponent = CardComponent;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ProgressCircleDirective = void 0;
+exports.ProgressCircleComponent = void 0;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var ProgressCircleDirective = /*#__PURE__*/function () {
-  function ProgressCircleDirective() {
-    _classCallCheck(this, ProgressCircleDirective);
+var ProgressCircle = function ProgressCircle($element) {
+  var _this = this;
 
-    _defineProperty(this, "restrict", 'E');
+  _classCallCheck(this, ProgressCircle);
 
-    _defineProperty(this, "replace", true);
+  _defineProperty(this, "r", void 0);
 
-    _defineProperty(this, "scope", {
-      size: '@?',
-      percentage: '=',
-      done: '@',
-      foreground: '@',
-      background: '@'
-    });
+  _defineProperty(this, "$element", void 0);
 
-    _defineProperty(this, "template", "\n        <div class=\"umb-progress-circle preflight-progress\" ng-style=\"{'width': size, 'height': size }\"> {{ percent }}\n            <svg class=\"umb-progress-circle__view-box\" viewBox=\"0 0 33.83098862 33.83098862\"> \n                <circle class=\"umb-progress-circle__highlight--{{ background }}\" cx=\"16.91549431\" cy=\"16.91549431\" r=\"15.91549431\" fill=\"none\" stroke-width=\".5\"></circle>\n                <circle class=\"umb-progress-circle__highlight umb-progress-circle__highlight--{{ foreground }}\" \n                    cx=\"16.91549431\" cy=\"16.91549431\" r=\"15.91549431\" stroke-linecap=\"round\" fill=\"none\" stroke-width=\"2\" stroke-dasharray=\"{{ dashArray }}\"></circle> \n            </svg> \n            <div ng-style=\"{'font-size': percentageSize}\" class=\"umb-progress-circle__percentage\">\n                {{ label }}\n                <small>pass rate</small>                \n            </div>\n        </div>");
-  }
+  _defineProperty(this, "$onChanges", function () {
+    _this.draw();
+  });
 
-  _createClass(ProgressCircleDirective, [{
-    key: "link",
-    value: function link(scope, element) {
-      function onInit() {
-        // making sure we get the right numbers
-        var percent = Math.round(scope.percentage);
-        percent = percent > 100 ? 100 : percent || 0; // calculating the circle's highlight
+  _defineProperty(this, "draw", function () {
+    var percent = Math.round(_this.percentage);
+    percent = percent > 100 ? 100 : percent || 0; // calculating the circle's highlight
 
-        var r = element.find('.umb-progress-circle__highlight').attr('r');
-        var pathLength = r * Math.PI * 2 * percent / 100; // Full circle length
+    var pathLength = _this.r * Math.PI * 2 * percent / 100; // Full circle length
 
-        scope.dashArray = "".concat(pathLength, ",100"); // set font size
+    _this.dashArray = "".concat(pathLength, ",100"); // set font size
 
-        scope.percentageSize = scope.size * 0.3 + 'px'; // use rounded percentage
+    _this.percentageSize = _this.size * 0.3 + 'px'; // use rounded percentage
 
-        scope.label = "".concat(percent, "%");
-      }
+    _this.label = "".concat(percent, "%");
+  });
 
-      var watcher = scope.$watch('percentage', onInit);
-      scope.$on('$destroy', watcher());
-    }
-  }]);
+  this.r = $element.find('.umb-progress-circle__highlight').attr('r');
+};
 
-  return ProgressCircleDirective;
-}();
+_defineProperty(ProgressCircle, "template", "\n        <div class=\"umb-progress-circle preflight-progress-circle\" ng-style=\"{'width': $ctrl.size, 'height': $ctrl.size }\">\n            <svg class=\"umb-progress-circle__view-box\" viewBox=\"0 0 33.83098862 33.83098862\"> \n                <circle class=\"umb-progress-circle__highlight--{{ $ctrl.background }}\" cx=\"16.91549431\" cy=\"16.91549431\" r=\"15.91549431\" fill=\"none\" stroke-width=\".5\"></circle>\n                <circle class=\"umb-progress-circle__highlight umb-progress-circle__highlight--{{ $ctrl.foreground }}\"\n                    cx=\"16.91549431\" cy=\"16.91549431\" r=\"15.91549431\" stroke-linecap=\"round\" fill=\"none\" stroke-width=\"2\" stroke-dasharray=\"{{ $ctrl.dashArray }}\"></circle>\n            </svg> \n            <div ng-style=\"{'font-size': $ctrl.percentageSize}\" class=\"umb-progress-circle__percentage\">\n                {{ $ctrl.label }}\n                <small>pass rate</small>                \n            </div>\n        </div>");
 
-exports.ProgressCircleDirective = ProgressCircleDirective;
-
-_defineProperty(ProgressCircleDirective, "directiveName", "progressCircle");
+var ProgressCircleComponent = {
+  transclude: true,
+  name: 'progressCircle',
+  bindings: {
+    size: '@?',
+    percentage: '<',
+    done: '@',
+    foreground: '@',
+    background: '@'
+  },
+  template: ProgressCircle.template,
+  controller: ProgressCircle
+};
+exports.ProgressCircleComponent = ProgressCircleComponent;
 
 },{}],5:[function(require,module,exports){
 "use strict";
@@ -223,11 +214,11 @@ var ResultIntro = /*#__PURE__*/function () {
   return ResultIntro;
 }();
 
-_defineProperty(ResultIntro, "template", "\n        <h5 ng-bind=\"::$ctrl.heading\"></h5>\n        <span ng-if=\"$ctrl.pass\" ng-bind=\"::$ctrl.passText\"></span>");
+_defineProperty(ResultIntro, "template", "\n        <h5 ng-bind=\"::$ctrl.heading\" class=\"mt0\"></h5>\n        <span ng-if=\"$ctrl.pass\" ng-bind=\"::$ctrl.passText\"></span>");
 
 var ResultIntroComponent = {
   transclude: true,
-  name: 'resultIntro',
+  name: 'preflightResultIntro',
   bindings: {
     tokens: '<',
     passText: '@?',
@@ -277,11 +268,11 @@ var StateIcon = /*#__PURE__*/function () {
   return StateIcon;
 }();
 
-_defineProperty(StateIcon, "template", "\n        <div class=\"state-icon {{ ::$ctrl.className }}\">\n            <i class=\"icon icon-{{ ::$ctrl.icon }}\"></i>\n        </div>");
+_defineProperty(StateIcon, "template", "\n        <div class=\"state-icon {{ ::$ctrl.className }}\">\n            <umb-icon icon=\"icon-{{ ::$ctrl.icon }}\"></umb-icon>\n        </div>");
 
 var StateIconComponent = {
   transclude: true,
-  name: 'stateIcon',
+  name: 'preflightStateIcon',
   bindings: {
     failed: '<',
     disabled: '<'
@@ -292,6 +283,19 @@ var StateIconComponent = {
 exports.StateIconComponent = StateIconComponent;
 
 },{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.constants = void 0;
+var constants = {
+  checkboxlist: 'checkboxlist',
+  multipletextbox: 'multipletextbox'
+};
+exports.constants = constants;
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -308,7 +312,7 @@ var _settings = require("./settings.controller");
 var ControllersModule = angular.module('preflight.controllers', []).controller(_preflight.PreflightController.controllerName, _preflight.PreflightController).controller(_notification.NotificationController.controllerName, _notification.NotificationController).controller(_settings.SettingsController.controllerName, _settings.SettingsController).name;
 exports.ControllersModule = ControllersModule;
 
-},{"./notification.controller":8,"./preflight.controller":9,"./settings.controller":10}],8:[function(require,module,exports){
+},{"./notification.controller":9,"./preflight.controller":10,"./settings.controller":11}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -355,7 +359,7 @@ exports.NotificationController = NotificationController;
 
 _defineProperty(NotificationController, "controllerName", 'preflight.notification.controller');
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -418,6 +422,8 @@ var PreflightController = /*#__PURE__*/function () {
     _defineProperty(this, "percentageDone", 20);
 
     _defineProperty(this, "progressStep", 0);
+
+    _defineProperty(this, "activeVariant", void 0);
 
     _defineProperty(this, "joinList", function (arr) {
       var outStr;
@@ -524,6 +530,10 @@ var PreflightController = /*#__PURE__*/function () {
           type: 'success icon-'
         };
       }
+    });
+
+    _defineProperty(this, "getCurrentCulture", function () {
+      return _this.activeVariant.language ? _this.activeVariant.language.culture : '';
     });
 
     _defineProperty(this, "rebindResult", function (data) {
@@ -645,6 +655,7 @@ var PreflightController = /*#__PURE__*/function () {
           _this.propsBeingCheckedStr = _this.joinList(_this.propsBeingChecked);
           var payload = {
             properties: _this.dirtyProps,
+            culture: _this.getCurrentCulture(),
             nodeId: _this.editorState.current.id
           };
 
@@ -667,7 +678,7 @@ var PreflightController = /*#__PURE__*/function () {
         hub.on('preflightComplete', function () {
           return _this.onComplete();
         });
-        hub.start(function (e) {
+        hub.start(function () {
           /**
            * Check all properties when the controller loads. Won't re-run when changing between apps
            * but needs to happen after the hub loads
@@ -675,10 +686,10 @@ var PreflightController = /*#__PURE__*/function () {
           _this.$timeout(function () {
             _this.setBadgeCount(true);
 
-            _this.checkDirty(); // builds initial hash array, but won't run anything
+            _this.checkDirty(); // builds initial hash array, but won't run anything                    
 
 
-            _this.preflightService.check(_this.editorState.current.id);
+            _this.preflightService.check(_this.editorState.current.id, _this.getCurrentCulture());
           });
         });
       });
@@ -747,12 +758,12 @@ var PreflightController = /*#__PURE__*/function () {
     value: function $onInit() {
       var _this2 = this;
 
-      var activeVariant = this.editorState.current.variants.find(function (x) {
+      this.activeVariant = this.editorState.current.variants.find(function (x) {
         return x.active;
       });
 
-      if (activeVariant) {
-        activeVariant.tabs.forEach(function (x) {
+      if (this.activeVariant) {
+        this.activeVariant.tabs.forEach(function (x) {
           _this2.propertiesToTrack = _this2.propertiesToTrack.concat(x.properties.map(function (x) {
             if (_this2.validPropTypes.includes(x.editor)) {
               return {
@@ -780,7 +791,7 @@ exports.PreflightController = PreflightController;
 
 _defineProperty(PreflightController, "controllerName", 'preflight.controller');
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -788,7 +799,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.SettingsController = void 0;
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+var _constants = require("../constants");
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -803,28 +824,44 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var SettingsController = /*#__PURE__*/function () {
-  function SettingsController($scope, notificationsService, preflightService) {
+  function SettingsController($scope, $q, notificationsService, languageResource, preflightService) {
     var _this = this;
 
     _classCallCheck(this, SettingsController);
 
     _defineProperty(this, "$scope", void 0);
 
+    _defineProperty(this, "$q", void 0);
+
+    _defineProperty(this, "languageResource", void 0);
+
     _defineProperty(this, "notificationsService", void 0);
 
     _defineProperty(this, "preflightService", void 0);
 
-    _defineProperty(this, "watchTestableProperties", function () {
-      var propertiesToModify = _this.settings.filter(function (x) {
-        return x.alias.indexOf('PropertiesToTest') !== -1 && x.alias !== 'propertiesToTest';
-      });
+    _defineProperty(this, "languages", []);
 
-      _this.$scope.$watch(function () {
+    _defineProperty(this, "tabs", []);
+
+    _defineProperty(this, "settings", []);
+
+    _defineProperty(this, "currentLanguage", void 0);
+
+    _defineProperty(this, "languageChangeWatcher", void 0);
+
+    _defineProperty(this, "testablePropertiesWatcher", void 0);
+
+    _defineProperty(this, "watchTestableProperties", function () {
+      _this.testablePropertiesWatcher = _this.$scope.$watch(function () {
         return _this.settings.find(function (x) {
           return x.alias === 'propertiesToTest';
         }).value;
       }, function (newVal) {
         if (newVal) {
+          var propertiesToModify = _this.settings.filter(function (x) {
+            return x.alias.includes('PropertiesToTest') && x.alias !== 'propertiesToTest';
+          });
+
           var _iterator = _createForOfIteratorHelper(propertiesToModify),
               _step;
 
@@ -857,28 +894,63 @@ var SettingsController = /*#__PURE__*/function () {
     });
 
     _defineProperty(this, "saveSettings", function () {
-      var min = parseInt(_this.settings.filter(function (x) {
-        return x.alias === 'readabilityTargetMinimum';
-      })[0].value);
-      var max = parseInt(_this.settings.filter(function (x) {
-        return x.alias === 'readabilityTargetMaximum';
-      })[0].value);
+      // ensure the current language is correctly mapped to the sync model
+      _this.settings.forEach(function (s) {
+        var syncSetting = _this.settingsSyncModel.find(function (x) {
+          return x.alias === s.alias;
+        });
 
-      if (min < max) {
-        if (min + 10 > max) {
-          _this.notificationsService.warning('WARNING', 'Readability range is narrow');
-        } // need to transform multitextbox values without digest
+        if (!syncSetting.value) {
+          syncSetting.value = {};
+        }
+
+        syncSetting.value[_this.currentLanguage] = s.value ? s.value : s.view.includes(_constants.constants.checkboxlist) || s.view.includes(_constants.constants.multipletextbox) ? [] : null;
+      }); // ensure readability is valid
+
+
+      var validRange = true;
+
+      _this.languages.forEach(function (l) {
+        var culture = l.culture;
+        var min = parseInt(_this.settingsSyncModel.find(function (x) {
+          return x.alias === 'readabilityTargetMinimum';
+        }).value[culture]);
+        var max = parseInt(_this.settingsSyncModel.find(function (x) {
+          return x.alias === 'readabilityTargetMaximum';
+        }).value[culture]);
+
+        if (min > max) {
+          _this.notificationsService.error('ERROR', "Unable to save settings - readability minimum cannot be greater than readability maximum (".concat(l.name, ")"));
+
+          validRange = false;
+        } else if (min + 10 > max) {
+          _this.notificationsService.warning('WARNING', "Readability range is narrow (".concat(l.name, ")"));
+        }
+      });
+
+      if (validRange) {
+        // need to transform multitextbox values without digest
         // so must be a new object, not a reference
-
-
-        var settingsToSave = JSON.parse(JSON.stringify(_this.settings));
+        var settingsToSave = JSON.parse(JSON.stringify(_this.settingsSyncModel));
         settingsToSave.forEach(function (v) {
-          if (v.view.indexOf('multipletextbox') !== -1) {
-            v.value = v.value.map(function (o) {
-              return o.value;
-            }).join(',');
-          } else if (v.view.indexOf('checkboxlist') !== -1) {
-            v.value = v.value.join(',');
+          if (v.view.includes(_constants.constants.multipletextbox)) {
+            for (var _i = 0, _Object$entries = Object.entries(v.value); _i < _Object$entries.length; _i++) {
+              var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+                  key = _Object$entries$_i[0],
+                  value = _Object$entries$_i[1];
+
+              v.value[key] = value.map(function (o) {
+                return o.value;
+              }).join(',');
+            }
+          } else if (v.view.includes(_constants.constants.checkboxlist)) {
+            for (var _i2 = 0, _Object$entries2 = Object.entries(v.value); _i2 < _Object$entries2.length; _i2++) {
+              var _Object$entries2$_i = _slicedToArray(_Object$entries2[_i2], 2),
+                  _key = _Object$entries2$_i[0],
+                  _value = _Object$entries2$_i[1];
+
+              v.value[_key] = _value.join(',');
+            }
           }
         });
 
@@ -887,27 +959,102 @@ var SettingsController = /*#__PURE__*/function () {
 
           _this.$scope.preflightSettingsForm.$setPristine();
         });
-      } else {
-        _this.notificationsService.error('ERROR', 'Unable to save settings - readability minimum cannot be greater than readability maximum');
       }
     });
 
     this.$scope = $scope;
+    this.$q = $q;
     this.notificationsService = notificationsService;
     this.preflightService = preflightService;
+    this.languageResource = languageResource;
+    this.languageChangeWatcher = $scope.$watch(function () {
+      return _this.currentLanguage;
+    }, function (newLang, oldLang) {
+      // update settings to only include the current variant
+      if (newLang && newLang !== oldLang) {
+        _this.settings.forEach(function (s) {
+          var syncSetting = _this.settingsSyncModel.find(function (x) {
+            return x.alias === s.alias;
+          }); // manage old language by updating the sync settings model,
+          // ensuring the value is an object
+
+
+          if (oldLang) {
+            if (!syncSetting.value) {
+              syncSetting.value = {};
+            }
+
+            syncSetting.value[oldLang] = s.value;
+          } // get the value for the new language and update the settings model
+
+
+          if (syncSetting.value && syncSetting.value[newLang]) {
+            s.value = syncSetting.value[newLang];
+          } else {
+            // set the value to a sensible default - array if type is checkboxlist
+            s.value = s.view.includes(_constants.constants.checkboxlist) || s.view.includes(_constants.constants.multipletextbox) ? [] : null;
+          }
+        });
+      }
+    });
   }
 
   _createClass(SettingsController, [{
+    key: "$onDestroy",
+    value: function $onDestroy() {
+      this.languageChangeWatcher();
+      this.testablePropertiesWatcher();
+    }
+  }, {
     key: "$onInit",
     value: function $onInit() {
       var _this2 = this;
 
-      this.preflightService.getSettings().then(function (resp) {
-        _this2.settings = resp.data.settings;
-        _this2.tabs = resp.data.tabs;
+      var promises = [this.preflightService.getSettings(), this.languageResource.getAll()];
+      this.$q.all(promises).then(function (resp) {
+        _this2.settingsSyncModel = resp[0].data.settings;
+        _this2.settings = JSON.parse(JSON.stringify(_this2.settingsSyncModel));
+        _this2.tabs = resp[0].data.tabs;
+        _this2.languages = resp[1];
+
+        var currentLanguage = _this2.languages.find(function (x) {
+          return x.isDefault;
+        }).culture;
+
+        _this2.settingsSyncModel.forEach(function (v) {
+          if (v.view.includes(_constants.constants.multipletextbox) && v.value) {
+            for (var _i3 = 0, _Object$entries3 = Object.entries(v.value); _i3 < _Object$entries3.length; _i3++) {
+              var _Object$entries3$_i = _slicedToArray(_Object$entries3[_i3], 2),
+                  key = _Object$entries3$_i[0],
+                  value = _Object$entries3$_i[1];
+
+              v.value[key] = value.split(',').map(function (val) {
+                return {
+                  value: val
+                };
+              }).sort(function (a, b) {
+                return a < b;
+              });
+            }
+          } else if (v.view.includes(_constants.constants.checkboxlist) && v.value) {
+            for (var _i4 = 0, _Object$entries4 = Object.entries(v.value); _i4 < _Object$entries4.length; _i4++) {
+              var _Object$entries4$_i = _slicedToArray(_Object$entries4[_i4], 2),
+                  _key2 = _Object$entries4$_i[0],
+                  _value2 = _Object$entries4$_i[1];
+
+              v.value[_key2] = _value2.split(',');
+            }
+          }
+        });
 
         _this2.settings.forEach(function (v) {
-          if (v.view.indexOf('slider') !== -1) {
+          var syncSetting = _this2.settingsSyncModel.find(function (x) {
+            return x.alias === v.alias;
+          });
+
+          v.value = syncSetting.value ? syncSetting.value[currentLanguage] : null;
+
+          if (v.view.includes('slider')) {
             v.config = {
               handle: 'round',
               initVal1: v.alias === 'longWordSyllables' ? 5 : 65,
@@ -918,26 +1065,20 @@ var SettingsController = /*#__PURE__*/function () {
               tooltip: 'always',
               tooltipPosition: 'bottom'
             };
-          } else if (v.view.indexOf('multipletextbox') !== -1) {
-            v.value = v.value.split(',').map(function (val) {
-              return {
-                value: val
-              };
-            }).sort(function (a, b) {
-              return a < b;
-            });
+          } else if (v.view.includes(_constants.constants.multipletextbox)) {
             v.config = {
               min: 0,
               max: 0
             };
             v.validation = {};
-          } else if (v.view.indexOf('checkboxlist') !== -1) {
-            v.value = v.value.split(',');
+          } else if (v.view.includes(_constants.constants.checkboxlist)) {
             v.config = {
               items: v.prevalues
             };
           }
         });
+
+        _this2.currentLanguage = currentLanguage;
 
         _this2.watchTestableProperties();
       });
@@ -955,7 +1096,7 @@ exports.SettingsController = SettingsController;
 
 _defineProperty(SettingsController, "controllerName", 'preflight.settings.controller');
 
-},{}],11:[function(require,module,exports){
+},{"../constants":7}],12:[function(require,module,exports){
 "use strict";
 
 (function () {
@@ -1046,7 +1187,7 @@ _defineProperty(SettingsController, "controllerName", 'preflight.settings.contro
   }]);
 })();
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1054,14 +1195,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.PluginsModule = void 0;
 
-var _linkhealthResult = require("./linkhealth.result.component");
+var _linkhealthResult = require("./linkhealth/linkhealth.result.component");
 
-var _readabilityPlugin = require("./readability.plugin.controller");
+var _readabilityPlugin = require("./readability/readability.plugin.controller");
 
 var PluginsModule = angular.module('preflight.plugins', []).component(_linkhealthResult.LinkHealthResultComponent.name, _linkhealthResult.LinkHealthResultComponent).controller(_readabilityPlugin.ReadabilityPluginController.controllerName, _readabilityPlugin.ReadabilityPluginController).name;
 exports.PluginsModule = PluginsModule;
 
-},{"./linkhealth.result.component":13,"./readability.plugin.controller":14}],13:[function(require,module,exports){
+},{"./linkhealth/linkhealth.result.component":14,"./readability/readability.plugin.controller":15}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1078,7 +1219,7 @@ var LinkHealthResultComponent = {
 };
 exports.LinkHealthResultComponent = LinkHealthResultComponent;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1099,10 +1240,9 @@ var ReadabilityPluginController = function ReadabilityPluginController($scope, e
 
   _defineProperty(this, "editorService", void 0);
 
-  _defineProperty(this, "help", function (e) {
-    e.preventDefault();
+  _defineProperty(this, "help", function () {
     var helpOverlay = {
-      view: "".concat(Umbraco.Sys.ServerVariables.Preflight.PluginPath, "/plugins/readability.overlay.html"),
+      view: "".concat(Umbraco.Sys.ServerVariables.Preflight.PluginPath, "/plugins/readability/readability.overlay.html"),
       title: 'Readability',
       description: 'Why should I care?',
       size: 'small',
@@ -1121,9 +1261,9 @@ var ReadabilityPluginController = function ReadabilityPluginController($scope, e
 
 exports.ReadabilityPluginController = ReadabilityPluginController;
 
-_defineProperty(ReadabilityPluginController, "controllerName", 'readabilityPluginController');
+_defineProperty(ReadabilityPluginController, "controllerName", 'readability.plugin.controller');
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1138,7 +1278,7 @@ var _preflight2 = require("./preflight.hub");
 var ServicesModule = angular.module('preflight.services', []).service(_preflight.PreflightService.serviceName, _preflight.PreflightService).service(_preflight2.PreflightHub.serviceName, _preflight2.PreflightHub).name;
 exports.ServicesModule = ServicesModule;
 
-},{"./preflight.hub":16,"./preflight.service":17}],16:[function(require,module,exports){
+},{"./preflight.hub":17,"./preflight.service":18}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1172,28 +1312,28 @@ var PreflightHub = /*#__PURE__*/function () {
 
     _defineProperty(this, "starting", false);
 
-    _defineProperty(this, "platform", Umbraco.Sys.ServerVariables.Plumber.platform);
+    _defineProperty(this, "platform", Umbraco.Sys.ServerVariables.Preflight.platform);
 
     _defineProperty(this, "setupHub", function (callback) {
       var proxy;
       var hub = {};
 
       if (_this.platform === 'CORE') {
-        $.connection = new signalR.HubConnectionBuilder().withUrl(Umbraco.Sys.ServerVariables.Plumber.signalRHub).withAutomaticReconnect().configureLogging(signalR.LogLevel.Warning).build();
+        $.connection = new signalR.HubConnectionBuilder().withUrl(Umbraco.Sys.ServerVariables.Preflight.signalRHub).withAutomaticReconnect().configureLogging(signalR.LogLevel.Warning).build();
         proxy = $.connection;
       } else {
-        proxy = $.connection.plumberHub;
+        proxy = $.connection.preflightHub;
       }
 
       if (proxy !== undefined) {
         hub = {
           active: true,
-          start: function start() {
+          start: function start(callback) {
             if (_this.platform === 'CORE') {
               try {
-                proxy.start().then(function () {}
-                /*console.info('Hub started =>', $.connection.connectionId)*/
-                )["catch"](function () {
+                proxy.start().then(function () {
+                  return callback ? callback() : {};
+                })["catch"](function () {
                   return console.warn('Failed to start hub');
                 });
               } catch (e) {
@@ -1205,6 +1345,7 @@ var PreflightHub = /*#__PURE__*/function () {
               }
 
               $.connection.hub.start();
+              callback ? callback() : {};
             }
           },
           on: function on(eventName, callback) {
@@ -1215,27 +1356,11 @@ var PreflightHub = /*#__PURE__*/function () {
                 }
               });
             });
-          },
-
-          /**
-           * Function is common across 472 and 5.0
-           * @param methodName
-           * @param callback
-           */
-          invoke: function invoke(methodName, callback) {
-            proxy.invoke(methodName).done(function (result) {
-              return _this.$rootScope.$apply(function () {
-                if (callback) {
-                  callback(result);
-                }
-              });
-            });
           }
         };
       } else {
         hub = {
           on: function on() {},
-          invoke: function invoke() {},
           start: function start() {
             return console.warn('No hub to start');
           }
@@ -1307,7 +1432,7 @@ exports.PreflightHub = PreflightHub;
 
 _defineProperty(PreflightHub, "serviceName", 'preflightHub');
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1334,8 +1459,8 @@ var PreflightService = function PreflightService($http, umbRequestHelper) {
     return _this.umbRequestHelper.resourcePromise(method === 'GET' ? _this.$http.get(_this.urlBase + url) : _this.$http.post(_this.urlBase + url, data), 'Something broke');
   });
 
-  _defineProperty(this, "check", function (id) {
-    return _this.request('GET', "Check/".concat(id, " "));
+  _defineProperty(this, "check", function (id, culture) {
+    return _this.request('GET', "Check/".concat(id, "/").concat(culture, " "));
   });
 
   _defineProperty(this, "checkDirty", function (data) {
@@ -1344,10 +1469,6 @@ var PreflightService = function PreflightService($http, umbRequestHelper) {
 
   _defineProperty(this, "getSettings", function () {
     return _this.request('GET', "GetSettings");
-  });
-
-  _defineProperty(this, "getSettingValue", function (alias) {
-    return _this.request('GET', "GetSettingValue/".concat(alias, " "));
   });
 
   _defineProperty(this, "saveSettings", function (settings, tabs) {
@@ -1371,6 +1492,6 @@ _defineProperty(PreflightService, "serviceName", 'preflightService');
 
 _defineProperty(PreflightService, "helpText", "\n        <p>If your content is too difficult for your visitors to read, you're all going to have a bad time.</p>\n        <p>The readability test runs your content through the Flesch reading ease algorithm to determine text complexity.</p>\n        <h5>The algorithm</h5>\n        <p><code>RE = 206.835 - (1.015 x ASL) - (84.6 x ASW)</code></p>\n        <p>Where <code>RE</code> is Readability Ease, <code>ASL</code> is Average Sentence Length, and <code>ASW</code> is Average Syllables per Word</p>\n        <p>The result is a number between 0 and 100, where a higher score means better readability, with a score between 60 and 69 largely considered acceptable.</p>\n        <h5>Readability test results</h5>\n        <p>As well as the Flesch score, the readability test returns sentence length; average syllables per word; and long or complex words;</p>");
 
-},{}]},{},[1,3,4,5,6,2,8,9,10,7,11,13,14,12,16,17,15])
+},{}]},{},[1,7,5,2,9,10,11,8,12,13,17,18,16,3,4,6,14,15])
 
 //# sourceMappingURL=preflight.js.map

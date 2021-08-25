@@ -1,6 +1,6 @@
 ﻿export class ReadabilityPluginController {
 
-    static controllerName = 'readabilityPluginController';
+    static controllerName = 'readability.plugin.controller';
 
     $scope;
     editorService;
@@ -10,10 +10,9 @@
         this.editorService = editorService;
     }
 
-    help = e => {
-        e.preventDefault();
+    help = () => {
         const helpOverlay = {
-            view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/plugins/readability.overlay.html`,
+            view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/plugins/readability/readability.overlay.html`,
             title: 'Readability',
             description: 'Why should I care?',
             size: 'small',

@@ -10,7 +10,7 @@
     callbacks = [];
 
     starting = false
-    platform = Umbraco.Sys.ServerVariables.Plumber.platform;
+    platform = Umbraco.Sys.ServerVariables.Preflight.platform;
 
     constructor($rootScope, $q, assetsService) {
         this.$rootScope = $rootScope;
@@ -29,12 +29,13 @@
     }
 
     setupHub = callback => {
+        
         let proxy;
         let hub = {};
 
         if (this.platform === 'CORE') {
             $.connection = new signalR.HubConnectionBuilder()
-                .withUrl(Umbraco.Sys.ServerVariables.Plumber.signalRHub)
+                .withUrl(Umbraco.Sys.ServerVariables.Preflight.signalRHub)
                 .withAutomaticReconnect()
                 .configureLogging(signalR.LogLevel.Warning)
                 .build();
@@ -42,18 +43,17 @@
             proxy = $.connection;
         }
         else {
-            proxy = $.connection.plumberHub;
+            proxy = $.connection.preflightHub;
         }
 
         if (proxy !== undefined) {
-
             hub = {
                 active: true,
-                start: () => {
+                start: callback => {
                     if (this.platform === 'CORE') {
                         try {
                             proxy.start()
-                                .then(() => { } /*console.info('Hub started =>', $.connection.connectionId)*/)
+                                .then(() => callback ? callback() : {})
                                 .catch(() => console.warn('Failed to start hub'));
                         } catch (e) {
                             console.warn('Could not setup signalR connection', e);
@@ -64,6 +64,7 @@
                             $.connection.hub.stop(true, true);
                         }
                         $.connection.hub.start();
+                        callback ? callback() : {};
                     }
                 },
                 on: (eventName, callback) => {
@@ -74,32 +75,18 @@
                             }
                         });
                     });
-                },
-                /**
-                 * Function is common across 472 and 5.0
-                 * @param methodName
-                 * @param callback
-                 */
-                invoke: (methodName, callback) => {
-                    proxy.invoke(methodName)
-                        .done(result =>
-                            this.$rootScope.$apply(() => {
-                                if (callback) {
-                                    callback(result);
-                                }
-                            }));
                 }
             };
         } else {
             hub = {
                 on: () => { },
-                invoke: () => { },
                 start: () => console.warn('No hub to start'),
             };
         }
-
+        
         return callback(hub);
     }
+
 
     /**
      * Function is common across 472 and 5.0

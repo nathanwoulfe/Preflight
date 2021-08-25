@@ -4,7 +4,7 @@
     "description": "These words will be excluded from the readability check",
     "tab": "Naughty and nice",
     "order": 1,
-    "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
+    "view": "multipletextbox",
     "value": "Umbraco,preflight,hippopotamus",
     "core": true
   },
@@ -13,7 +13,7 @@
     "description": "These words should never be used",
     "tab": "Naughty and nice",
     "order": 2,
-    "view": "views/propertyeditors/multipletextbox/multipletextbox.html",
+    "view": "multipletextbox",
     "value": "bannedword,never_use_this",
     "core": true
   }, 
@@ -22,7 +22,7 @@
     "description": "Set to true and Preflight will run on all saves, and alert users to any errors.",
     "tab": "General",
     "order": 0,
-    "view": "views/propertyeditors/boolean/boolean.html",
+    "view": "boolean",
     "value": 0,
     "core": true
   },
@@ -31,7 +31,7 @@
     "description": "Set to true and Preflight will cancel the save event, if tests fail and Preflight is set to run on save.",
     "tab": "General",
     "order": 1,
-    "view": "views/propertyeditors/boolean/boolean.html",
+    "view": "boolean",
     "value": 0,
     "core": true
   },
@@ -40,7 +40,7 @@
     "description": "Restrict Preflight to a subset of testable properties",
     "tab": "General",
     "order": 2,
-    "view": "views/propertyeditors/checkboxlist/checkboxlist.html",
+    "view": "checkboxlist",
     "core": true
   },
   {
@@ -48,7 +48,7 @@
     "description": "Select user groups to opt in to testing",
     "tab": "General",
     "order": 3,
-    "view": "views/propertyeditors/checkboxlist/checkboxlist.html",
+    "view": "checkboxlist",
     "value": "Administrators,Editors",
     "core": true
   }

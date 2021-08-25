@@ -15,11 +15,16 @@
                     <umb-box-content>
                         <p>Preflight provides a pluggable framework for adding pre-publishing checks to your content.</p>
                         <p>Out of the box, Preflight provides plugins for general readability (reading level, sentence length, blacklisting words), link health and text autocorrect.</p>
+                        <select id="groupLanguage"
+                                ng-options="l.culture as l.name for l in vm.languages"
+                                ng-disabled="vm.languages.length === 1"
+                                ng-model="vm.currentLanguage">
+                        </select>
                     </umb-box-content>
                 </umb-box>
 
                 <div class="form-horizontal">
-                    <div class="umb-expansion-panel" ng-repeat="tab in vm.tabs">
+                    <div class="umb-expansion-panel" ng-repeat="tab in vm.tabs" ng-if="vm.tabs.length">
 
                         <button type="button" 
                                 aria-expanded="{{tab.open}}" 
@@ -31,7 +36,8 @@
                         </button>
 
                         <div class="umb-expansion-panel__content" ng-show="tab.open">
-                            <div class="umb-control-group mb-20" ng-if="tab.description" ng-bind-html="::tab.description"></div>
+                            <div class="umb-control-group mb3" ng-if="tab.description" ng-bind-html="::tab.description"></div>
+
                             <umb-property data-element="property-{{ ::tab.alias }}" ng-repeat="property in vm.settings | filter: { tab: tab.name } | orderBy: 'order'" property="property">
                                 <umb-property-editor model="property"></umb-property-editor>
                             </umb-property>

@@ -38,9 +38,9 @@ namespace Preflight.Services.Implement
         private readonly PreflightPluginCollection _plugins;
 
 #if NET472
-        private readonly IHubContext _hubContext;
+        private readonly IHubContext<IPreflightHub> _hubContext;
 #else
-        private readonly IHubContext<PreflightHub> _hubContext;
+        private readonly IHubContext<PreflightHub, IPreflightHub> _hubContext;
 #endif
 
         private int _id;
@@ -54,7 +54,7 @@ namespace Preflight.Services.Implement
         public ContentChecker(ISettingsService settingsService, IContentService contentService, IGridConfig gridConfig,
             IContentTypeService contentTypeService, ILogger<ContentChecker> logger, PreflightPluginCollection plugins)
 #else
-        public ContentChecker(IHubContext<PreflightHub> hubContext, ISettingsService settingsService, IOptions<IGridConfig> gridConfig,
+        public ContentChecker(IHubContext<PreflightHub, IPreflightHub> hubContext, ISettingsService settingsService, IOptions<IGridConfig> gridConfig,
             IContentService contentService, IContentTypeService contentTypeService, ILogger<ContentChecker> logger, PreflightPluginCollection plugins)
 #endif
         {
@@ -65,7 +65,7 @@ namespace Preflight.Services.Implement
             _plugins = plugins ?? throw new ArgumentNullException(nameof(plugins));
 
 #if NET472
-            _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub>();
+            _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub, IPreflightHub>();
             _gridEditorConfig = gridConfig.EditorsConfig.Editors;
 #else
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
@@ -76,10 +76,20 @@ namespace Preflight.Services.Implement
         /// <summary>
         /// Intialise variables for this testing run
         /// </summary>
-        private void Initialise()
+        private void Initialise(string culture)
         {
             _settings = _settingsService.Get().Settings;
-            _testableProperties = _settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.PropertiesToTest, StringComparison.InvariantCultureIgnoreCase))?.Value ?? "";
+            _testableProperties = _settings.GetValue<string>(KnownSettings.PropertiesToTest, culture);
+        }
+
+        private void SendTestResult(PreflightPropertyResponseModel model)
+        {
+            _hubContext.Clients.All.preflightTest(model);
+        }
+
+        private void PreflightComplete()
+        {
+            _hubContext.Clients.All.preflightComplete();
         }
 
         /// <summary>
@@ -88,7 +98,7 @@ namespace Preflight.Services.Implement
         /// <param name="dirtyProperties"></param>
         public bool CheckDirty(DirtyProperties dirtyProperties)
         {
-            Initialise();
+            Initialise(dirtyProperties.Culture);
 
             _id = dirtyProperties.Id;
             var failed = false;
@@ -100,7 +110,7 @@ namespace Preflight.Services.Implement
                 // only continue if the prop has a value
                 if (!propValue.HasValue())
                 {
-                    _hubContext.Clients.All.SendAsync("PreflightTest", new PreflightPropertyResponseModel
+                    SendTestResult(new PreflightPropertyResponseModel
                     {
                         Name = prop.Name,
                         Remove = true
@@ -109,10 +119,10 @@ namespace Preflight.Services.Implement
                     continue;
                 }
 
-                failed = TestAndBroadcast(prop.Name, propValue, prop.Editor) || failed;
+                failed = TestAndBroadcast(prop.Name, dirtyProperties.Culture, propValue, prop.Editor) || failed;
             }
 
-            _hubContext.Clients.All.SendAsync("PreflightComplete");
+            PreflightComplete();
 
             return failed;
         }
@@ -124,7 +134,7 @@ namespace Preflight.Services.Implement
         /// <param name="id"></param>
         /// <param name="fromSave"></param>
         /// <returns></returns>
-        public bool CheckContent(int id, bool fromSave) => CheckContent(_contentService.GetById(id), fromSave);
+        public bool CheckContent(int id, string culture, bool fromSave) => CheckContent(_contentService.GetById(id), culture, fromSave);
 
 
         /// <summary>
@@ -133,9 +143,9 @@ namespace Preflight.Services.Implement
         /// <param name="content"></param>
         /// <param name="fromSave"></param>
         /// <returns></returns>
-        public bool CheckContent(IContent content, bool fromSave)
+        public bool CheckContent(IContent content, string culture, bool fromSave)
         {
-            Initialise();
+            Initialise(culture);
 
             _fromSave = fromSave;
             var failed = false;
@@ -144,12 +154,12 @@ namespace Preflight.Services.Implement
 
             foreach (IProperty prop in props)
             {
-                string propValue = prop.GetValue()?.ToString();
+                string propValue = (prop.GetValue(culture) ?? prop.GetValue()).ToString();
 
                 // only continue if the prop has a value
                 if (!propValue.HasValue())
                 {
-                    _hubContext.Clients.All.SendAsync("PreflightTest", new PreflightPropertyResponseModel
+                    SendTestResult(new PreflightPropertyResponseModel
                     {
                         Name = prop.PropertyType.Name,
                         Remove = true
@@ -158,10 +168,10 @@ namespace Preflight.Services.Implement
                     continue;
                 }
 
-                failed = TestAndBroadcast(prop.PropertyType.Name, propValue, prop.PropertyType.PropertyEditorAlias) || failed;
+                failed = TestAndBroadcast(prop.PropertyType.Name, culture, propValue, prop.PropertyType.PropertyEditorAlias) || failed;
             }
 
-            _hubContext.Clients.All.SendAsync("PreflightComplete");
+            PreflightComplete();
 
             return failed;
         }
@@ -174,7 +184,7 @@ namespace Preflight.Services.Implement
         /// <param name="value"></param>
         /// <param name="alias"></param>
         /// <returns></returns>
-        private bool TestAndBroadcast(string name, string value, string alias)
+        private bool TestAndBroadcast(string name, string culture, string value, string alias)
         {
             List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
 
@@ -183,15 +193,15 @@ namespace Preflight.Services.Implement
             switch (alias)
             {
                 case KnownPropertyAlias.NestedContent:
-                    testResult = ExtractValuesFromNestedContentProperty(name, value);
+                    testResult = ExtractValuesFromNestedContentProperty(name, culture, value);
                     break;
                 case KnownPropertyAlias.Grid:
-                    testResult = ExtractValuesFromGridProperty(name, value);
+                    testResult = ExtractValuesFromGridProperty(name, culture, value);
                     break;
                 case KnownPropertyAlias.Rte:
                 case KnownPropertyAlias.Textarea:
                 case KnownPropertyAlias.Textbox:
-                    testResult = new[] { RunPluginsAgainstValue(name, value, alias) }.ToList();
+                    testResult = new[] { RunPluginsAgainstValue(name, culture, value, alias) }.ToList();
                     break;
             }
 
@@ -207,7 +217,7 @@ namespace Preflight.Services.Implement
                     }
 
                     // announce the result
-                    _hubContext.Clients.All.SendAsync("PreflightTest", result);
+                    SendTestResult(result);
                 }
             }
 
@@ -221,7 +231,7 @@ namespace Preflight.Services.Implement
         /// <param name="propName"></param>
         /// <param name="propValue"></param>
         /// <returns></returns>
-        private List<PreflightPropertyResponseModel> ExtractValuesFromNestedContentProperty(string propName, string propValue)
+        private List<PreflightPropertyResponseModel> ExtractValuesFromNestedContentProperty(string propName, string culture, string propValue)
         {
             Dictionary<string, IContentType> cache = new Dictionary<string, IContentType>();
             List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
@@ -248,7 +258,7 @@ namespace Preflight.Services.Implement
 
                     if (!value.HasValue())
                     {
-                        _hubContext.Clients.All.SendAsync("PreflightTest", new PreflightPropertyResponseModel
+                        SendTestResult(new PreflightPropertyResponseModel
                         {
                             Name = property.Name,
                             Label = label,
@@ -257,7 +267,7 @@ namespace Preflight.Services.Implement
                     }
                     else
                     {
-                        PreflightPropertyResponseModel model = RunPluginsAgainstValue(propName, value, property.PropertyEditorAlias, KnownPropertyAlias.NestedContent);
+                        PreflightPropertyResponseModel model = RunPluginsAgainstValue(propName, culture, value, property.PropertyEditorAlias, KnownPropertyAlias.NestedContent);
 
                         model.Label = label;
                         model.TotalTests = model.Plugins.Aggregate(0, (acc, x) => acc + x.TotalTests);
@@ -279,7 +289,7 @@ namespace Preflight.Services.Implement
         /// <param name="propName"></param>
         /// <param name="propValue"></param>
         /// <returns></returns>
-        private List<PreflightPropertyResponseModel> ExtractValuesFromGridProperty(string name, string propValue)
+        private List<PreflightPropertyResponseModel> ExtractValuesFromGridProperty(string name, string culture, string propValue)
         {
             JObject asJson = JObject.Parse(propValue);
             List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
@@ -305,7 +315,7 @@ namespace Preflight.Services.Implement
                     JToken value = editor.SelectToken(KnownStrings.GridValueJsonPath);
                     if (value == null || !value.ToString().HasValue())
                     {
-                        _hubContext.Clients.All.SendAsync("PreflightTest", new PreflightPropertyResponseModel
+                        SendTestResult(new PreflightPropertyResponseModel
                         {
                             Name = gridEditorName,
                             Label = label,
@@ -324,7 +334,7 @@ namespace Preflight.Services.Implement
                             }
                         }
 
-                        PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, value.ToString(), editorViewAlias, KnownPropertyAlias.Grid);
+                        PreflightPropertyResponseModel model = RunPluginsAgainstValue(name, culture, value.ToString(), editorViewAlias, KnownPropertyAlias.Grid);
 
                         model.Label = label;
                         model.TotalTests = model.Plugins.Aggregate(0, (acc, x) => acc + x.TotalTests);
@@ -344,7 +354,7 @@ namespace Preflight.Services.Implement
         /// <param name="name"></param>
         /// <param name="val"></param>
         /// <returns></returns>
-        private PreflightPropertyResponseModel RunPluginsAgainstValue(string name, string val, string alias, string parentAlias = "")
+        private PreflightPropertyResponseModel RunPluginsAgainstValue(string name, string culture, string val, string alias, string parentAlias = "")
         {
             var model = new PreflightPropertyResponseModel
             {
@@ -364,7 +374,8 @@ namespace Preflight.Services.Implement
                 if (plugin.IsDisabled()) continue;
                 if (!_fromSave && plugin.IsOnSaveOnly()) continue;
 
-                string propsToTest = plugin.Settings.FirstOrDefault(x => x.Alias.Contains("PropertiesToTest"))?.Value ?? string.Join(",", KnownPropertyAlias.All);
+                string propsValue = plugin.Settings.FirstOrDefault(x => x.Alias.Contains("PropertiesToTest"))?.Value.ForVariant(culture);
+                string propsToTest = propsValue ?? string.Join(",", KnownPropertyAlias.All);
 
                 // only continue if the field alias is include for testing, or the parent alias has been set, and is included for testing
                 if (!propsToTest.Contains(alias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias))) continue;
@@ -374,7 +385,7 @@ namespace Preflight.Services.Implement
                     Type pluginType = plugin.GetType();
                     if (pluginType.GetMethod("Check") == null) continue;
 
-                    plugin.Check(_id, val, _settings);
+                    plugin.Check(_id, culture, val, _settings);
 
                     if (plugin.Result != null)
                     {

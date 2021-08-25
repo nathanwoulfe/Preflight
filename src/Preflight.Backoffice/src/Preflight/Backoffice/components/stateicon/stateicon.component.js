@@ -2,7 +2,7 @@
 
     static template = `
         <div class="state-icon {{ ::$ctrl.className }}">
-            <i class="icon icon-{{ ::$ctrl.icon }}"></i>
+            <umb-icon icon="icon-{{ ::$ctrl.icon }}"></umb-icon>
         </div>`;
 
     icon = 'power';
@@ -18,7 +18,7 @@
 
 export const StateIconComponent = {
     transclude: true,
-    name: 'stateIcon',
+    name: 'preflightStateIcon',
     bindings: {
         failed: '<',
         disabled: '<'

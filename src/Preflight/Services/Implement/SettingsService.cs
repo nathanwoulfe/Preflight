@@ -26,19 +26,27 @@ namespace Preflight.Services.Implement
         private readonly IUserService _userService;
         private readonly IIOHelper _ioHelper;
         private readonly ICacheManager _cacheManager;
+        private readonly ILocalizationService _localizationService;
         private readonly PreflightPluginCollection _plugins;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
-        public SettingsService(ILogger<SettingsService> logger, IUserService userService, PreflightPluginCollection plugins, IIOHelper ioHelper, ICacheManager cacheManager)
+        public SettingsService(
+            ILogger<SettingsService> logger, 
+            IUserService userService, 
+            PreflightPluginCollection plugins, 
+            IIOHelper ioHelper, 
+            ICacheManager cacheManager, 
+            ILocalizationService localizationService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _plugins = plugins ?? throw new ArgumentNullException(nameof(plugins));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
         /// <summary>
@@ -46,8 +54,8 @@ namespace Preflight.Services.Implement
         /// </summary>
         public PreflightSettings Get()
         {
-            if (_cacheManager.TryGet(KnownStrings.SettingsCacheKey, out PreflightSettings fromCache))
-                return fromCache;
+            //if (_cacheManager.TryGet(KnownStrings.SettingsCacheKey, out PreflightSettings fromCache))
+            //    return fromCache;
 
             PreflightSettings settings = GetSettings();
 
@@ -89,8 +97,13 @@ namespace Preflight.Services.Implement
 
         private PreflightSettings GetSettings()
         {
+            // not all settings are variant, so use the default culture
+            var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
+            var allLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode);
+
             // only get here when nothing is cached 
-            List<SettingsModel> settings;
+            List<SettingsModel> settings = new List<SettingsModel>();
+            List<SettingsTab> tabs = new List<SettingsTab>();
 
             // json initially stores the core checks only
             // once it has been saved in the backoffice, settings store all current plugins, with alias
@@ -99,6 +112,7 @@ namespace Preflight.Services.Implement
                 string json = file.ReadToEnd();
                 settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json);
             }
+
 
             // populate prevalues for the groups setting
             // intersect ensures any removed groups aren't kept as settings values
@@ -111,10 +125,19 @@ namespace Preflight.Services.Implement
                 var groupNames = allGroups.Select(x => new { value = x.Name, key = x.Alias });
                 groupSetting.Prevalues = groupNames;
 
-                if (groupSetting.Value.HasValue())
+                // here the value is a string and needs to be manually updated to a dictionary
+
+                var value = allLanguages.ToDictionary(k => k, v => groupSetting.Value?.ToString());
+                if (value.Any())
                 {
-                    var groupSettingValue = groupSetting.Value.Split(',').Intersect(groupNames.Select(x => x.value));
-                    groupSetting.Value = string.Join(",", groupSettingValue);
+                    var newValue = new Dictionary<string, string>();
+                    foreach (var variantValue in value)
+                    {
+                        var groupSettingValue = variantValue.Value.Split(',').Intersect(groupNames.Select(x => x.value));
+                        newValue.Add(variantValue.Key, string.Join(",", groupSettingValue));
+                    }
+
+                    groupSetting.Value = newValue;
                 }
             }
 
@@ -125,15 +148,20 @@ namespace Preflight.Services.Implement
             {
                 testablePropertiesProp.Prevalues = KnownPropertyAlias.All.Select(x => new { value = x, key = x });
 
-                if (!testablePropertiesProp.Value.HasValue())
+                var value = allLanguages.ToDictionary(k => k, v => testablePropertiesProp.Value?.ToString());
+                if (!value.Any())
                 {
-                    testablePropertiesProp.Value = string.Join(",", KnownPropertyAlias.All);
+                    var newValue = new Dictionary<string, string>();
+                    foreach (var variantValue in value)
+                    {
+                        newValue.Add(variantValue.Key, string.Join(",", KnownPropertyAlias.All));
+                    }
+
+                    testablePropertiesProp.Value = newValue;
                 }
             }
 
-            // add tabs for core items
-            List<SettingsTab> tabs = new List<SettingsTab>();
-
+            // adds all discovered plugins
             foreach (IPreflightPlugin plugin in _plugins)
             {
                 foreach (SettingsModel setting in plugin.Settings)
@@ -162,12 +190,28 @@ namespace Preflight.Services.Implement
                     s.Alias = s.Label.Camel();
                 }
 
+                if (!s.View.Contains(".html"))
+                {
+                    s.View = "views/propertyeditors/" + s.View + "/" + s.View + ".html";
+                }
+
                 if (!tabs.Any(x => x.Name == s.Tab))
                 {
                     tabs.Add(new SettingsTab
                     {
                         Name = s.Tab
                     });
+                }
+
+                // if the values are already variant, do nothing
+                // otherwise create a dictionary for all languages, with the default value
+                try
+                {
+                    var _ = s.Value.ToVariantDictionary();
+                }
+                catch
+                {
+                    s.Value = allLanguages.ToDictionary(key => key, value => s.Value?.ToString() ?? "");
                 }
             }
 

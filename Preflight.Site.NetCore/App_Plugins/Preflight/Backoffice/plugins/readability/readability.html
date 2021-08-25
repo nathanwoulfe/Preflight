@@ -1,4 +1,4 @@
-﻿<div class="preflight-cards" ng-controller="readability.plugin.controller as vm">
+<div class="preflight-cards preflight-readability" ng-controller="readability.plugin.controller as vm">
     <preflight-card tokens="[model.result.targetMin, model.result.targetMax]"
                     title="@preflightReadability_readingEaseScore"
                     subtitle="@preflightReadability_readingEaseRange"
@@ -16,7 +16,11 @@
                     score="model.result.sentenceLength">
     </preflight-card>
     
-    <button class="btn btn-help" ng-click="vm.help($event)"><ins class="icon-help-alt"></ins></button>
+    <umb-button type="button"
+                button-style="link"
+                icon="icon-help-alt"
+                action="vm.help()">
+    </umb-button>
 
     <umb-overlay ng-if="vm.overlay.show"
                      model="vm.overlay"
@@ -25,7 +29,7 @@
     </umb-overlay>
 </div>
 
-<div class="flex mt-30">
+<div class="flex relative mt4">
     <preflight-state-icon failed="model.result.longWords.length > 0"></preflight-state-icon>
     <div class="preflight-result">
         <preflight-result-intro tokens="[model.result.longWordSyllables]"
@@ -47,7 +51,7 @@
     </div>
 </div>
 
-<div class="flex mt-30">
+<div class="flex relative mt4">
     <preflight-state-icon failed="model.result.blacklist.length > 0"></preflight-state-icon>
     <div class="preflight-result">
         <preflight-result-intro heading="@preflightReadability_blacklistHeading"

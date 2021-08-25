@@ -1,49 +1,4 @@
-﻿$red: #d42054;
-$orange: #f9b945;
-$green: #35c786;
-$purple: #413659;
-$grey: #f3f3f5;
-
-$umbGreen: #00aea2;
-$umbBlue: #1b264f;
-
-[data-element="sub-view-preflight"] .badge {
-    transition: background-color ease-in-out .5s;
-
-    &.-type-success {
-        background-color: $green;
-
-        &::before {
-            transform: translateY(-2px);
-            content: '\e165';
-        }
-    }
-}
-
-.preflight-progress {
-    margin: 15px auto 30px;
-
-    .umb-progress-circle__highlight {
-        transition: stroke-dasharray ease-in-out 500ms;
-    }
-
-    .umb-progress-circle__percentage {
-        position:absolute;
-        top:0;
-        right:0;
-        bottom:0;
-        left:0;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        flex-direction:column;
-        padding-top:10%;
-
-        small {
-            font-size:12px;
-        }
-    }
-}
+﻿@import '_variables';
 
 .pf-disabled {
     cursor:not-allowed!important;
@@ -52,109 +7,6 @@ $umbBlue: #1b264f;
 }
 
 .preflight {
-
-    > div {
-        position: relative;
-    }
-
-    &-settings {
-        overflow: hidden;
-
-        .umb-control-group {
-            position: relative;
-        }
-    }
-
-    &-overlay, .umb-overlay-header {
-        text-align: left;
-    }
-
-    .flex {
-        display: flex;
-        position: relative;
-    }
-
-    .mt-30 {
-        margin-top: 30px;
-
-        &:first-child {
-            margin-top: 0;
-        }
-    }
-
-    .mb-20 {
-        margin-bottom:20px;
-    }
-
-    h5 {
-        margin-top: 0;
-    }
-
-    preflight-state-icon {
-        position: absolute;
-        top: 0;
-        left: 0;
-
-        .state-icon {
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 15px;
-            width: 30px;
-            height: 30px;
-            min-width: 30px;
-            border-radius: 50%;
-        }
-
-        .icon {
-            font-size: 22px;
-            color: #fff;
-        }
-
-        + .preflight-result {
-            padding-left: 77px;
-        }
-    }
-
-    .count-badge {
-        color: #fff;
-        background-color: $red;
-        border: 2px solid #fff;
-        border-radius: 50%;
-        font-size: 10px;
-        font-weight: bold;
-        padding: 2px;
-        line-height: 16px;
-        position: absolute;
-        text-align: center;
-        min-width: 16px;
-        transform: translate(-110%, -60%);
-
-        &.pass {
-            background-color: $green;
-
-            ins::before {
-                content: '\e165';
-            }
-        }
-
-        &.pending {
-            background-color: $orange;
-
-            ins::before {
-                content: '';
-            }
-        }
-    }
-
-    .broken-link-type {
-        color: $orange;
-
-        &.unsafe {
-            color: $red;
-        }
-    }
 
     &-alert {
         background: $umbBlue;
@@ -165,100 +17,27 @@ $umbBlue: #1b264f;
         }
     }
 
-    .title {
-        font-size: 30px;
-        color: #363636;
-        line-height: 1.3em;
-        text-align: center;
-        max-width: 750px;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
+    .title,
     .intro-text {
-        font-size: 18px;
-        color: #666666;
         text-align: center;
         max-width: 750px;
         margin-left: auto;
         margin-right: auto;
-        line-height: 1.6em;
     }
 
-    .badge-list {
-        margin: 0 -5px -5px;
-        display: flex;
-        flex-wrap: wrap;
+    $states: '.disabled', '.fail', '.pending', '.pass';
+    $colors: $grey, $red, $orange, $green;
 
-        .umb-badge {
-            margin: 0 5px 5px;
+    @for $i from 1 through 4 {
+        $s: nth($states, $i);
+        $c: nth($colors, $i);
 
-            &[role=button] {
-                cursor: pointer;
+        #{$s} {
+            background: $c;
+
+            &-color {
+                color: $c;
             }
-        }
-    }
-
-    &-plugin-wrapper {
-        width: 100%;
-    }
-
-    &-cards {
-        display: flex;
-        justify-content: center;
-        text-align: center;
-        padding: 10px;
-        margin: 0 -10px;
-    }
-
-    .card {
-        display: flex;
-        flex-direction: column;
-        padding: 20px;
-        border-radius: 6px;
-        border-width: 2px;
-        border-style: solid;
-        background: rgba($grey, 0.75) !important;
-        margin: 0 10px;
-
-        &.pass {
-            border-color: $green;
-        }
-
-        &.fail {
-            border-color: $red;
-        }
-
-        &-score {
-            font-size: 36px;
-            line-height: 1;
-            margin-bottom: 10px;
-        }
-    }
-
-    .disabled {
-        background: $grey;
-
-        &-color {
-            color: $grey;
-        }
-    }
-
-    .fail {
-        background: $red;
-
-        &-color {
-            color: $red;
-        }
-    }
-
-    .pass {
-        background: $green;
-
-        &-color {
-            color: $green;
         }
     }
 
@@ -268,33 +47,17 @@ $umbBlue: #1b264f;
             opacity: .5;
             pointer-events: none;
         }
-    }
 
-    .umb-expansion-panel__header {
-        text-align:left;
-
-        span span {
-            font-weight: 400
-        }
-    }
-
-    .btn-help {
-        background: 0;
-        font-size: 20px;
-        position: absolute;
-        right: 0;
-    }
-
-    .linkhealth-result-table {
-        th {
+        &__header {
             text-align: left;
-            padding: 5px 10px;
-            background: rgba($grey, 0.75);
-        }
 
-        td {
-            padding: 5px 10px;
+            span span {
+                font-weight: 400
+            }
+
+            .umb-icon {
+                transform: translateY(2px);
+            }
         }
     }
 }
-

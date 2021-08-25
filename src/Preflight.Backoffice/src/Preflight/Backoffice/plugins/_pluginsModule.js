@@ -1,5 +1,5 @@
-﻿import { LinkHealthResultComponent } from './linkhealth.result.component';
-import { ReadabilityPluginController } from './readability.plugin.controller';
+﻿import { LinkHealthResultComponent } from './linkhealth/linkhealth.result.component';
+import { ReadabilityPluginController } from './readability/readability.plugin.controller';
 
 export const PluginsModule = angular
     .module('preflight.plugins', [])
