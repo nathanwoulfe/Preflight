@@ -1,4 +1,4 @@
-﻿#if NET472
+﻿#if NETFRAMEWORK
 using Preflight.Executors;
 using Preflight.Migrations;
 using System;
@@ -50,8 +50,8 @@ namespace Preflight
 
         public void Initialize()
         {
-            //var upgrader = new Upgrader(new PreflightMigrationPlan());
-            //upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger);
+            var upgrader = new Upgrader(new PreflightMigrationPlan());
+            upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _logger);
 
             ServerVariablesParser.Parsing += ServerVariablesParser_Parsing;
             ContentService.Saving += ContentService_Saving;

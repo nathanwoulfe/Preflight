@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-#if NET472
-using Umbraco.Core.Composing;
-#else
+#if NETCOREAPP
 using System;
 using Umbraco.Cms.Core.Composing;
+#else
+using Umbraco.Core.Composing;
 #endif
 
 namespace Preflight.Plugins
@@ -15,10 +15,10 @@ namespace Preflight.Plugins
 
     public class PreflightPluginCollection : BuilderCollectionBase<IPreflightPlugin>
     {
-#if NET472
-        public PreflightPluginCollection(IEnumerable<IPreflightPlugin> plugins) : base(plugins) {}
-#else
+#if NETCOREAPP
         public PreflightPluginCollection(Func<IEnumerable<IPreflightPlugin>> plugins) : base(plugins) { }
+#else
+        public PreflightPluginCollection(IEnumerable<IPreflightPlugin> plugins) : base(plugins) {}
 #endif
     }
 }

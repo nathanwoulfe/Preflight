@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-#if NET472 
-using UmbConstants = Umbraco.Core.Constants;
-#else 
+#if NETCOREAPP 
 using UmbConstants = Umbraco.Cms.Core.Constants;
+#else 
+using UmbConstants = Umbraco.Core.Constants;
 #endif
 
-namespace Preflight.Constants
+namespace Preflight
 {
     public static class KnownPropertyAlias
     {
@@ -15,6 +15,7 @@ namespace Preflight.Constants
         public const string Textarea = UmbConstants.PropertyEditors.Aliases.TextArea;
         public const string Textbox = UmbConstants.PropertyEditors.Aliases.TextBox;
         public const string NestedContent = UmbConstants.PropertyEditors.Aliases.NestedContent;
+        public const string BlockList = UmbConstants.PropertyEditors.Aliases.BlockList;
 
         public static IEnumerable<string> All = typeof(KnownPropertyAlias).GetFields()
                 .Where(x => x.IsLiteral).Select(x => x.GetRawConstantValue().ToString());

@@ -1,5 +1,4 @@
-﻿#if NET472
-#else
+﻿#if NETCOREAPP
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;

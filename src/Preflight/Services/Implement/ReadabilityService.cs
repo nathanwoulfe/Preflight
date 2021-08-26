@@ -1,14 +1,14 @@
-﻿using Preflight.Constants;
-using Preflight.Extensions;
+﻿using Preflight.Extensions;
 using Preflight.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-#if NET472
-using CharArrays = Umbraco.Core.Constants.CharArrays;
-#else
+using Readability = Preflight.Constants.Readability;
+#if NETCOREAPP
 using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
+#else
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 #endif
 
 namespace Preflight.Services.Implement
@@ -47,12 +47,12 @@ namespace Preflight.Services.Implement
             List<string> longWords = new List<string>();
             List<string> blacklisted = new List<string>();
 
-            text = Regex.Replace(text, KnownStrings.ClosingHtmlTags, ".");
-            text = text.Replace(KnownStrings.NewLine, " ");
-            text = Regex.Replace(text, KnownStrings.CharsToRemove, string.Empty).Replace("&amp;", "&");
-            text = Regex.Replace(text, KnownStrings.DuplicateSpaces, " ");
+            text = Regex.Replace(text, Readability.ClosingHtmlTags, Readability.Period);
+            text = text.Replace(Environment.NewLine, Readability.Space);
+            text = Regex.Replace(text, Readability.CharsToRemove, string.Empty).Replace(Readability.AmpersandEntity, Readability.Ampersand);
+            text = Regex.Replace(text, Readability.DuplicateSpaces, Readability.Space);
 
-            List<string> sentences = text.Split(KnownStrings.WordDelimiters).Where(s => s.HasValue() && s.Length > 3).ToList();
+            List<string> sentences = text.Split(Readability.WordDelimiters).Where(s => s.HasValue() && s.Length > 3).ToList();
 
             // calc words/sentence
             double totalWords = 0;
@@ -125,7 +125,7 @@ namespace Preflight.Services.Implement
             {
                 var foundVowel = false;
 
-                foreach (char vowel in KnownStrings.Vowels)
+                foreach (char vowel in Constants.Readability.Vowels)
                 {
                     //don't count diphthongs
                     if (vowel == character && lastWasVowel)
@@ -157,7 +157,7 @@ namespace Preflight.Services.Implement
             string lastTwoChars = currentWord.Substring(currentWord.Length - 2).ToLower();
             string lastThreeChars = currentWord.Substring(currentWord.Length - 3).ToLower();
 
-            if (KnownStrings.Endings.Contains(lastTwoChars) && lastThreeChars != "ied" || lastTwoChars.First() != 'l' && lastTwoChars.Last() == 'e')
+            if (Readability.Endings.Contains(lastTwoChars) && lastThreeChars != Readability.Ied || lastTwoChars.First() != Readability.l && lastTwoChars.Last() == Readability.e)
             {
                 numVowels--;
             }

@@ -1,18 +1,43 @@
 ﻿using System.Diagnostics;
-
-#if NET472
-using System.Web;
-#else 
+#if NETCOREAPP 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+#else
+using System.Web;
 #endif
 
 namespace Preflight
 {
     public static class PreflightContext
     {
-#if NET472
+#if NETCOREAPP
+        public static HttpContext Current => _httpContextAccessor.HttpContext;
+
+        private static bool _isDebuggingEnabled;
+        public static bool IsDebuggingEnabled
+        {
+            get
+            {
+                return _isDebuggingEnabled || _hostEnvironment.IsDevelopment() && Debugger.IsAttached; ;
+            }
+            private set
+            {
+                _isDebuggingEnabled = value;
+            }
+        }
+        public static string HostUrl => Current.Request.Host.Value;
+
+        private static IHttpContextAccessor _httpContextAccessor;
+        private static IWebHostEnvironment _hostEnvironment;
+
+        internal static void Set(IHttpContextAccessor httpContextAccessor, IWebHostEnvironment hostEnvironment, bool isDebuggingEnabled = false)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _hostEnvironment = hostEnvironment;
+            IsDebuggingEnabled = isDebuggingEnabled;
+        }
+#else
         private static HttpContextBase _context;
 
         /// <summary>
@@ -56,32 +81,6 @@ namespace Preflight
         internal static void Set(HttpContextBase context, bool isDebuggingEnabled = false)
         {
             _context = context;
-            IsDebuggingEnabled = isDebuggingEnabled;
-        }
-#else
-        public static HttpContext Current => _httpContextAccessor.HttpContext;
-
-        private static bool _isDebuggingEnabled;
-        public static bool IsDebuggingEnabled
-        {
-            get
-            {
-                return _isDebuggingEnabled || _hostEnvironment.IsDevelopment() && Debugger.IsAttached; ;
-            }
-            private set
-            {
-                _isDebuggingEnabled = value;
-            }
-        }
-        public static string HostUrl => Current.Request.Host.Value;
-
-        private static IHttpContextAccessor _httpContextAccessor;
-        private static IWebHostEnvironment _hostEnvironment;
-
-        internal static void Set(IHttpContextAccessor httpContextAccessor, IWebHostEnvironment hostEnvironment, bool isDebuggingEnabled = false)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _hostEnvironment = hostEnvironment;
             IsDebuggingEnabled = isDebuggingEnabled;
         }
 #endif

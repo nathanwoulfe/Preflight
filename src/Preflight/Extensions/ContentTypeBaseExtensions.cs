@@ -1,11 +1,10 @@
-﻿using Preflight.Constants;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-#if NET472
+#if NETCOREAPP
+using Umbraco.Cms.Core.Models;
+#else
 using Umbraco.Core.Models;
 using IPropertyType = Umbraco.Core.Models.PropertyType;
-#else
-using Umbraco.Cms.Core.Models;
 #endif
 
 namespace Preflight.Extensions
@@ -19,6 +18,7 @@ namespace Preflight.Extensions
                             p.PropertyEditorAlias == KnownPropertyAlias.NestedContent ||
                             p.PropertyEditorAlias == KnownPropertyAlias.Textbox ||
                             p.PropertyEditorAlias == KnownPropertyAlias.Textarea ||
+                            p.PropertyEditorAlias == KnownPropertyAlias.BlockList ||
                             p.PropertyEditorAlias == KnownPropertyAlias.Rte);
         }
     }

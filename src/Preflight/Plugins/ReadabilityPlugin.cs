@@ -1,6 +1,6 @@
-﻿using Preflight.Constants;
-using Preflight.Models;
+﻿using Preflight.Models;
 using Preflight.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,6 +38,7 @@ namespace Preflight.Plugins
             Settings = PluginSettingsList.Populate(Name,
                 false,
                 false,
+                new[] { "dfeab01a-e5c0-49ed-a018-9f1c546dfe10", "1485f35b-4c2e-4a53-a0b2-fefa02bcf810", "3984cf76-b598-4bb8-b073-698f39111f7c" },
                 settings: new SettingsModel[] {
                     new GenericSettingModel("Readability target - minimum")
                     {
@@ -46,6 +47,7 @@ namespace Preflight.Plugins
                         View = SettingType.Slider,
                         Order = 1,
                         Core = true,
+                        Guid = new Guid(KnownSettings.ReadabilityMin),
                     },
                     new GenericSettingModel("Readability target - maximum")
                     {
@@ -54,6 +56,7 @@ namespace Preflight.Plugins
                         View = SettingType.Slider,
                         Order = 2,
                         Core = true,
+                        Guid = new Guid(KnownSettings.ReadabilityMax),
                     },
                     new GenericSettingModel("Long word syllable count")
                     {
@@ -63,6 +66,7 @@ namespace Preflight.Plugins
                         View = SettingType.Slider,
                         Order = 3,
                         Core = true,
+                        Guid = new Guid(KnownSettings.LongWordSyllables),
                     }
                 }
             );

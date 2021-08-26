@@ -1,4 +1,4 @@
-﻿#if NET472
+﻿#if NETFRAMEWORK
 using System;
 using Umbraco.Core.Logging;
 

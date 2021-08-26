@@ -1,14 +1,12 @@
 ﻿using HtmlAgilityPack;
 using Newtonsoft.Json;
-using Preflight.Constants;
 using Preflight.Extensions;
 using Preflight.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-#if NET472
-#else
+#if NETCOREAPP
 using Umbraco.Extensions;
 #endif
 
@@ -17,6 +15,8 @@ namespace Preflight.Services.Implement
     public class SafeBrowsingService : ISafeBrowsingService
     {
         private readonly ICacheManager _cacheManager;
+        private const string _safeBrowsingUrl = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key=";
+        private const string _cacheKey = "Preflight_SafeBrowsing_";
 
         public SafeBrowsingService(ICacheManager cacheManager)
         {
@@ -50,7 +50,7 @@ namespace Preflight.Services.Implement
 
             foreach (string href in hrefs)
             {
-                if (!_cacheManager.TryGet(KnownStrings.CacheKey + href, out BrokenLinkModel cacheItem))
+                if (!_cacheManager.TryGet(_cacheKey + href, out BrokenLinkModel cacheItem))
                     continue;
 
                 fromCache.Add(cacheItem);
@@ -72,7 +72,7 @@ namespace Preflight.Services.Implement
 
                 foreach (BrokenLinkModel item in response)
                 {
-                    _cacheManager.Set(KnownStrings.CacheKey + item.Href, item);
+                    _cacheManager.Set(_cacheKey + item.Href, item);
                 }
             }
 
@@ -92,7 +92,7 @@ namespace Preflight.Services.Implement
             try
             {
                 string result;
-                string url = KnownStrings.SafeBrowsingUrl + apiKey;
+                string url = _safeBrowsingUrl + apiKey;
 
                 ThreatEntry[] threatEntries = urls.Select(u => new ThreatEntry { Url = u }).ToArray();
 

@@ -3,17 +3,17 @@ using Preflight.Models;
 using Preflight.Services;
 using System;
 using System.Net;
-#if NET472
+#if NETCOREAPP
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Attributes;
+#else
 using System.Web.Http;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using IActionResult = System.Web.Http.IHttpActionResult;
-#else
-using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.Common.Attributes;
 #endif
 
 namespace Preflight.Controllers

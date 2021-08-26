@@ -1,20 +1,19 @@
-﻿using Preflight.Constants;
-using Preflight.Extensions;
+﻿using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if NET472
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Preflight.Security;
-using CharArrays = Umbraco.Core.Constants.CharArrays;
-#else
+#if NETCOREAPP
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
+#else
+using Umbraco.Core.Events;
+using Umbraco.Core.Models;
+using Preflight.Security;
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 #endif
 
 namespace Preflight.Executors
@@ -69,17 +68,6 @@ namespace Preflight.Executors
 
             // at least one property on the current document fails the preflight check
             if (!failed) return false;
-
-            // these values are retrieved in the notifications handler, and passed down to the client
-            // TODO => make it work
-            //HttpContext.Current.Items["PreflightFailed"] = true;
-            //HttpContext.Current.Items["PreflightCancelSaveOnFail"] = cancelSaveOnFail;
-            //HttpContext.Current.Items["PreflightNodeId"] = content.Id;
-
-            //if (e.CanCancel && cancelSaveOnFail)
-            //{
-            //    e.CancelOperation(new EventMessage("PreflightFailed", content.Id.ToString()));
-            //}
 
             message = new EventMessage("Save cancelled", content.Id.ToString());
 

@@ -1,8 +1,7 @@
-﻿using Preflight.Constants;
-#if NET472
-using Umbraco.Core.Migrations;
-#else
+﻿#if NETCOREAPP
 using Umbraco.Cms.Infrastructure.Migrations;
+#else
+using Umbraco.Core.Migrations;
 #endif
 
 namespace Preflight.Migrations

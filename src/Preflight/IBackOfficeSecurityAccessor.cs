@@ -1,4 +1,4 @@
-﻿#if NET472
+﻿#if NETFRAMEWORK
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
 

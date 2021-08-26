@@ -7,9 +7,10 @@ namespace Preflight.Extensions
 {
     public static class SettingsModelListExtensions
     {
-        public static T GetValue<T>(this IEnumerable<SettingsModel> settings, string label, string culture) where T: IConvertible
+        public static T GetValue<T>(this IEnumerable<SettingsModel> settings, string guid, string culture) where T: IConvertible
         {
-            var stringValue = settings.FirstOrDefault(x => string.Equals(x.Label, label, StringComparison.InvariantCultureIgnoreCase)).Value.ForVariant(culture);
+            var guidGuid = new Guid(guid);
+            var stringValue = settings.FirstOrDefault(x => x.Guid == guidGuid).Value.ForVariant(culture);
             return ConvertObject<T>(stringValue);            
         }
 

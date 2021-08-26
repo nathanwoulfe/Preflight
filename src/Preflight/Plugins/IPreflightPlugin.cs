@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Preflight.Models;
 using System.Collections.Generic;
-#if NET472
-using Umbraco.Core.Composing;
-#else
+#if NETCOREAPP
 using Umbraco.Cms.Core.Composing;
+#else
+using Umbraco.Core.Composing;
 #endif
 
 namespace Preflight.Plugins

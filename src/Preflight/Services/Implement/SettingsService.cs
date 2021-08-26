@@ -1,21 +1,23 @@
-﻿using Newtonsoft.Json;
-using Preflight.Constants;
-using Preflight.Extensions;
+﻿using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Plugins;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Preflight.IO;
-#if NET472
-using Preflight.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-#else
+using Preflight.Migrations.Schema;
+using Preflight.Settings;
+#if NETCOREAPP
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
+#else
+using Preflight.Logging;
+using Umbraco.Core;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 #endif
 
 namespace Preflight.Services.Implement
@@ -24,29 +26,31 @@ namespace Preflight.Services.Implement
     {
         private readonly ILogger<SettingsService> _logger;
         private readonly IUserService _userService;
-        private readonly IIOHelper _ioHelper;
         private readonly ICacheManager _cacheManager;
         private readonly ILocalizationService _localizationService;
+        private readonly IScopeProvider _scopeProvider;
         private readonly PreflightPluginCollection _plugins;
+
+        private const string _settingsCacheKey = "Preflight_Settings_";
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
         public SettingsService(
-            ILogger<SettingsService> logger, 
-            IUserService userService, 
-            PreflightPluginCollection plugins, 
-            IIOHelper ioHelper, 
-            ICacheManager cacheManager, 
-            ILocalizationService localizationService)
+            ILogger<SettingsService> logger,
+            IUserService userService,
+            PreflightPluginCollection plugins,
+            ICacheManager cacheManager,
+            ILocalizationService localizationService, 
+            IScopeProvider scopeProvider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _plugins = plugins ?? throw new ArgumentNullException(nameof(plugins));
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
         }
 
         /// <summary>
@@ -54,14 +58,14 @@ namespace Preflight.Services.Implement
         /// </summary>
         public PreflightSettings Get()
         {
-            //if (_cacheManager.TryGet(KnownStrings.SettingsCacheKey, out PreflightSettings fromCache))
-            //    return fromCache;
+            if (_cacheManager.TryGet(_settingsCacheKey, out PreflightSettings fromCache))
+                return fromCache;
 
             PreflightSettings settings = GetSettings();
 
             if (settings != null)
             {
-                _cacheManager.Set(KnownStrings.SettingsCacheKey, settings);
+                _cacheManager.Set(_settingsCacheKey, settings);
                 return settings;
             }
 
@@ -78,13 +82,20 @@ namespace Preflight.Services.Implement
         {
             try
             {                
-                _cacheManager.Set(KnownStrings.SettingsCacheKey, settings);
+                _cacheManager.Set(_settingsCacheKey, settings);
 
-                // only persist the settings, tabs can be regenerated on startup
-                using (var file = new StreamWriter(_ioHelper.MapPath(KnownStrings.SettingsFilePath), false))
+                using (var scope = _scopeProvider.CreateScope())
                 {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(file, settings.Settings);
+                    foreach (var setting in settings.Settings)
+                    {
+                        scope.Database.Update(new SettingsSchema
+                        {
+                            Id = setting.Id,
+                            Setting = setting.Guid,
+                            Value = setting.Value.ToString(),
+                        });
+                    }
+                    scope.Complete();
                 }
                 return true;
             }
@@ -101,67 +112,82 @@ namespace Preflight.Services.Implement
             var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
             var allLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode);
 
-            // only get here when nothing is cached 
-            List<SettingsModel> settings = new List<SettingsModel>();
+            List<SettingsSchema> schema = new List<SettingsSchema>();
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                schema = scope.Database.Fetch<SettingsSchema>();
+                scope.Complete();
+            }
+
+            List<SettingsModel> settings = CollateCoreAndPluginSettings();
+
+            MergeSchemaValuesIntoSettings(allLanguages, schema, settings);
+
+            EnsureGroupsAreStillValid(settings);
+
+            var tabs = GenerateTabsFromSettings(settings);
+
+            FinaliseSettings(tabs, settings);
+
+            // tabs are sorted alpha, with general first
+            return new PreflightSettings
+            {
+                Settings = settings.DistinctBy(s => (s.Tab, s.Label)).ToList(),
+                Tabs = tabs.GroupBy(x => x.Name)
+                    .Select(y => y.First())
+                    .OrderBy(i => i.Name != SettingsTabNames.General)
+                    .ThenBy(i => i.Name).ToList()
+            };
+        }
+
+        private List<SettingsModel> CollateCoreAndPluginSettings()
+        {
+            var settings = new CoreSettings().Settings
+                .Concat(new NaughtyNiceSettings().Settings).ToList();
+
+            var pluginSettings = _plugins.Where(p => p.Settings.Any()).SelectMany(p => p.Settings);
+            settings.AddRange(pluginSettings);
+            return settings;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tabs"></param>
+        /// <param name="settings"></param>
+        private static void FinaliseSettings(List<SettingsTab> tabs, List<SettingsModel> settings)
+        {
+            foreach (SettingsModel s in settings)
+            {
+                if (!s.Alias.HasValue())
+                {
+                    s.Alias = s.Label.Camel();
+                }
+
+                if (!s.View.Contains(".html"))
+                {
+                    s.View = "views/propertyeditors/" + s.View + "/" + s.View + ".html";
+                }
+
+                if (!tabs.Any(x => x.Name == s.Tab))
+                {
+                    tabs.Add(new SettingsTab
+                    {
+                        Name = s.Tab
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tabs"></param>
+        /// <param name="settings"></param>
+        private List<SettingsTab> GenerateTabsFromSettings(List<SettingsModel> settings)
+        {
             List<SettingsTab> tabs = new List<SettingsTab>();
 
-            // json initially stores the core checks only
-            // once it has been saved in the backoffice, settings store all current plugins, with alias
-            using (var file = new StreamReader(_ioHelper.MapPath(KnownStrings.SettingsFilePath)))
-            {
-                string json = file.ReadToEnd();
-                settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json);
-            }
-
-
-            // populate prevalues for the groups setting
-            // intersect ensures any removed groups aren't kept as settings values
-            // since group name and alias can differ, needs to store both in the prevalue, and manage rebuilding this on the client side
-            var allGroups = _userService.GetAllUserGroups();
-            var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
-
-            if (groupSetting != null)
-            {
-                var groupNames = allGroups.Select(x => new { value = x.Name, key = x.Alias });
-                groupSetting.Prevalues = groupNames;
-
-                // here the value is a string and needs to be manually updated to a dictionary
-
-                var value = allLanguages.ToDictionary(k => k, v => groupSetting.Value?.ToString());
-                if (value.Any())
-                {
-                    var newValue = new Dictionary<string, string>();
-                    foreach (var variantValue in value)
-                    {
-                        var groupSettingValue = variantValue.Value.Split(',').Intersect(groupNames.Select(x => x.value));
-                        newValue.Add(variantValue.Key, string.Join(",", groupSettingValue));
-                    }
-
-                    groupSetting.Value = newValue;
-                }
-            }
-
-            // populate prevalues for subsetting testable properties, default value to all if nothing exists
-            var testablePropertiesProp = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.PropertiesToTest, StringComparison.InvariantCultureIgnoreCase));
-
-            if (testablePropertiesProp != null)
-            {
-                testablePropertiesProp.Prevalues = KnownPropertyAlias.All.Select(x => new { value = x, key = x });
-
-                var value = allLanguages.ToDictionary(k => k, v => testablePropertiesProp.Value?.ToString());
-                if (!value.Any())
-                {
-                    var newValue = new Dictionary<string, string>();
-                    foreach (var variantValue in value)
-                    {
-                        newValue.Add(variantValue.Key, string.Join(",", KnownPropertyAlias.All));
-                    }
-
-                    testablePropertiesProp.Value = newValue;
-                }
-            }
-
-            // adds all discovered plugins
             foreach (IPreflightPlugin plugin in _plugins)
             {
                 foreach (SettingsModel setting in plugin.Settings)
@@ -183,47 +209,71 @@ namespace Preflight.Services.Implement
                 });
             }
 
-            foreach (SettingsModel s in settings)
+            return tabs;
+        }
+
+        /// <summary>
+        /// populate prevalues for the groups setting
+        /// intersect ensures any removed groups aren't kept as settings values
+        /// since group name and alias can differ, needs to store both in the prevalue, and manage rebuilding this on the client side
+        /// </summary>
+        /// <param name="settings"></param>
+        private void EnsureGroupsAreStillValid(List<SettingsModel> settings)
+        {
+            var allGroups = _userService.GetAllUserGroups();
+            var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
+
+            if (groupSetting != null)
             {
-                if (!s.Alias.HasValue())
-                {
-                    s.Alias = s.Label.Camel();
-                }
+                var groupNames = allGroups.Select(x => new { value = x.Name, key = x.Alias });
+                groupSetting.Prevalues = groupNames;
 
-                if (!s.View.Contains(".html"))
+                if (groupSetting.Value != null)
                 {
-                    s.View = "views/propertyeditors/" + s.View + "/" + s.View + ".html";
-                }
-
-                if (!tabs.Any(x => x.Name == s.Tab))
-                {
-                    tabs.Add(new SettingsTab
+                    var newValue = new Dictionary<string, string>();
+                    foreach (var variantValue in groupSetting.Value.ToVariantDictionary())
                     {
-                        Name = s.Tab
-                    });
-                }
+                        var groupSettingValue = variantValue.Value.Split(CharArrays.Comma).Intersect(groupNames.Select(x => x.value));
+                        newValue.Add(variantValue.Key, string.Join(KnownStrings.Comma, groupSettingValue));
+                    }
 
-                // if the values are already variant, do nothing
-                // otherwise create a dictionary for all languages, with the default value
-                try
-                {
-                    var _ = s.Value.ToVariantDictionary();
-                }
-                catch
-                {
-                    s.Value = allLanguages.ToDictionary(key => key, value => s.Value?.ToString() ?? "");
+                    groupSetting.Value = newValue;
                 }
             }
+        }
 
-            // tabs are sorted alpha, with general first
-            return new PreflightSettings
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="allLanguages"></param>
+        /// <param name="schema"></param>
+        /// <param name="settings"></param>
+        private static void MergeSchemaValuesIntoSettings(IEnumerable<string> allLanguages, List<SettingsSchema> schema, List<SettingsModel> settings)
+        {
+            foreach (SettingsModel setting in settings)
             {
-                Settings = settings.DistinctBy(s => (s.Tab, s.Label)).ToList(),
-                Tabs = tabs.GroupBy(x => x.Name)
-                    .Select(y => y.First())
-                    .OrderBy(i => i.Name != SettingsTabNames.General)
-                    .ThenBy(i => i.Name).ToList()
-            };
-        }      
+                var schemaItem = schema.FirstOrDefault(s => s.Setting == setting.Guid);
+                var value = schemaItem.Value;
+
+                // if no value came from the db, assume it's a new plugin and use the default
+                var valueDictionary = value.HasValue() ?
+                    value.ToVariantDictionary() :
+                    allLanguages.ToDictionary(k => k, v => setting.Value.ToString());
+
+                // have new languages been added? better check...
+                // if any are missing, add the default value
+                if (valueDictionary.Count != allLanguages.Count())
+                {
+                    var missingLangs = allLanguages.Except(valueDictionary.Keys);
+                    foreach (var lang in missingLangs)
+                    {
+                        valueDictionary[lang] = setting.Value.ToString();
+                    }
+                }
+
+                setting.Value = valueDictionary;
+                setting.Id = schemaItem.Id;
+            }
+        }
     }
 }

@@ -1,11 +1,10 @@
-﻿using Preflight.Constants;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-#if NET472
+#if NETCOREAPP
+using Umbraco.Cms.Core.Models;
+#else
 using Umbraco.Core.Models;
 using IProperty = Umbraco.Core.Models.Property;
-#else
-using Umbraco.Cms.Core.Models;
 #endif
 
 namespace Preflight.Extensions

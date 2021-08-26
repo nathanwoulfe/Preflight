@@ -1,20 +1,19 @@
-﻿using Preflight.Constants;
-using Preflight.Extensions;
+﻿using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if NET472
-using Preflight.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
-using CharArrays = Umbraco.Core.Constants.CharArrays;
-#else
+#if NETCOREAPP
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
+#else
+using Preflight.Security;
+using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 #endif
 
 namespace Preflight.Executors

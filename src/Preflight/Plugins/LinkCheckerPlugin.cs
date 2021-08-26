@@ -1,7 +1,7 @@
-﻿using Preflight.Constants;
-using Preflight.Extensions;
+﻿using Preflight.Extensions;
 using Preflight.Models;
 using Preflight.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,6 +37,7 @@ namespace Preflight.Plugins
             Settings = PluginSettingsList.Populate(Name,
                 false,
                 true,
+                new[] { "3f7e0bbc-7f76-4471-b700-ac1f20aaa015", "cec5f2d4-d8de-4271-97fe-e9e38cad5259", "a69f2558-2c79-48c5-9ee2-aede89515f74" },
                 settings: new SettingsModel[] {
                     new GenericSettingModel("Ensure safe links")
                     {
@@ -44,7 +45,8 @@ namespace Preflight.Plugins
                         View = SettingType.Boolean,
                         Value = "0",
                         Order = 1,
-                        Core = true
+                        Core = true,
+                        Guid = new Guid(KnownSettings.EnsureSafeLinks),
                     },
                     new GenericSettingModel("Google SafeBrowsing API key")
                     {
@@ -52,7 +54,8 @@ namespace Preflight.Plugins
                         View = SettingType.String,
                         Value = "Get your key from the Google API Console",
                         Order = 2,
-                        Core = true
+                        Core = true,
+                        Guid = new Guid(KnownSettings.GoogleApiKey),
                     }
                 }
             );

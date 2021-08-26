@@ -1,8 +1,8 @@
 ﻿using Preflight.Models;
-#if NET472
-using Umbraco.Core.Models;
-#else
+#if NETCOREAPP
 using Umbraco.Cms.Core.Models;
+#else
+using Umbraco.Core.Models;
 #endif
 
 namespace Preflight.Services

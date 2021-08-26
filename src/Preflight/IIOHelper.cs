@@ -1,8 +1,8 @@
-﻿#if NET472
-using Umbraco.Core.IO;
-#else 
+﻿#if NETCOREAPP
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+#else
+using Umbraco.Core.IO;
 #endif
 
 namespace Preflight.IO
@@ -14,30 +14,29 @@ namespace Preflight.IO
         string MapPath(string path);
     }
 
+#if NETCOREAPP
     public class PreflightIoHelper : IIOHelper
     {
-#if NET5_0
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly char[] TrimChars = new[] { '~', '/' };
 
-        public PreflightIoHelper(IWebHostEnvironment webHostEnvironment)
-        {
-            _webHostEnvironment = webHostEnvironment;
-        }
-#endif
+        public PreflightIoHelper(IWebHostEnvironment webHostEnvironment) =>        
+            _webHostEnvironment = webHostEnvironment;        
 
         public string ResolveUrl(string url) =>
-#if NET472
-            IOHelper.ResolveUrl(url);
-#else
             Path.Combine(_webHostEnvironment.WebRootPath, url);
-#endif
 
         public string MapPath(string path) =>
-#if NET472
-            IOHelper.MapPath(path);
-#else
             Path.Combine(_webHostEnvironment.ContentRootPath, path.TrimStart(TrimChars));
-#endif
     }
+#else
+    public class PreflightIoHelper : IIOHelper
+    {
+        public string ResolveUrl(string url) =>
+            IOHelper.ResolveUrl(url);
+
+        public string MapPath(string path) =>
+            IOHelper.MapPath(path);
+    }
+#endif
 }

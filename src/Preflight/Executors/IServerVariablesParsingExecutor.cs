@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using Preflight.Constants;
 using Preflight.Controllers;
 using System.Linq;
-#if NET472
+#if NETCOREAPP
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core;
+#else
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web;
-#else
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core;
 #endif
 
 namespace Preflight.Executors
@@ -35,10 +34,10 @@ namespace Preflight.Executors
             if (_runtimeState.Level != RuntimeLevel.Run)
                 return;
 
-#if NET472
-            var platform = KnownStrings.FRAMEWORK;
-#else
+#if NETCOREAPP
             var platform = KnownStrings.CORE;
+#else
+            var platform = KnownStrings.FRAMEWORK;
 #endif
 
             Dictionary<string, object> umbracoSettings = dictionary["umbracoSettings"] as Dictionary<string, object> ?? new Dictionary<string, object>();

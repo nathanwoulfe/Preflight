@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Preflight.Constants;
 using Preflight.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,6 +32,18 @@ namespace Preflight.Models
     /// </summary>
     public class SettingsModel
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonProperty("guid")]
+        public Guid Guid { get; set; }
+
+        [JsonProperty("id")]
+        internal int Id { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         [JsonProperty("core")]
         internal bool Core { get; set; }
 
@@ -103,9 +115,9 @@ namespace Preflight.Models
     /// </summary>
     internal class DisabledSettingModel : SettingsModel
     {
-        public DisabledSettingModel(string tab, bool val)
+        public DisabledSettingModel(string tab, bool val, Guid guid)
         {
-            Value = val ? "1" : "0";
+            Value = val ? KnownStrings.One : KnownStrings.Zero;
             Label = "Disabled";
             Alias = tab.DisabledAlias();
             Description = $"Disable the {tab} plugin";
@@ -113,6 +125,7 @@ namespace Preflight.Models
             Order = -10;
             Core = true;
             Tab = tab;
+            Guid = guid;
         }
     }
 
@@ -121,9 +134,9 @@ namespace Preflight.Models
     /// </summary>
     internal class OnSaveOnlySettingModel : SettingsModel
     {
-        public OnSaveOnlySettingModel(string tab, bool val)
+        public OnSaveOnlySettingModel(string tab, bool val, Guid guid)
         {
-            Value = val ? "1" : "0";
+            Value = val ? KnownStrings.One : KnownStrings.Zero;
             Label = "Run on save only";
             Alias = tab.OnSaveOnlyAlias();
             Description = "Restrict this plugin to run only in a save event";
@@ -131,6 +144,7 @@ namespace Preflight.Models
             Order = -5;
             Core = true;
             Tab = tab;
+            Guid = guid;
         }
     }
 
@@ -139,7 +153,7 @@ namespace Preflight.Models
     /// </summary>
     internal class PropertiesToTestSettingModel : SettingsModel
     {
-        public PropertiesToTestSettingModel(string tab, string propsToTest)
+        public PropertiesToTestSettingModel(string tab, string propsToTest, Guid guid)
         {
             Value = propsToTest;
             Label = "Properties to test";
@@ -150,6 +164,7 @@ namespace Preflight.Models
             Order = -15;
             Core = true;
             Tab = tab;
+            Guid = guid;
         }
     }
 
@@ -159,21 +174,30 @@ namespace Preflight.Models
     /// </summary>
     public static class PluginSettingsList
     {
-        public static IEnumerable<SettingsModel> Populate(string name, bool disabled, bool runOnSaveOnly, string propsToTest = "", params SettingsModel[] settings)
+        public static IEnumerable<SettingsModel> Populate(
+            string name, 
+            bool disabled, 
+            bool runOnSaveOnly, 
+            string[] defaultSettingsGuids, 
+            string propsToTest = "", 
+            params SettingsModel[] settings)
         {
             if (!settings.Any())
                 return new List<SettingsModel>();
 
+            if (defaultSettingsGuids.Length != 3)
+                throw new ArgumentOutOfRangeException(nameof(defaultSettingsGuids));
+
             if (!propsToTest.HasValue())
             {
-                propsToTest = string.Join(",", KnownPropertyAlias.All);
+                propsToTest = string.Join(KnownStrings.Comma, KnownPropertyAlias.All);
             }
 
             List<SettingsModel> response = new List<SettingsModel>
             {
-                new DisabledSettingModel(name, disabled),
-                new OnSaveOnlySettingModel(name, runOnSaveOnly),
-                new PropertiesToTestSettingModel(name, propsToTest)
+                new DisabledSettingModel(name, disabled, new Guid(defaultSettingsGuids[0])),
+                new OnSaveOnlySettingModel(name, runOnSaveOnly, new Guid(defaultSettingsGuids[1])),
+                new PropertiesToTestSettingModel(name, propsToTest, new Guid(defaultSettingsGuids[2])),
             };
 
             foreach (SettingsModel s in settings)

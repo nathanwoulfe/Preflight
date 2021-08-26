@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq.Expressions;
-#if NET472
+#if NETCOREAPP
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Extensions;
+using CoreLinkGenerator = Microsoft.AspNetCore.Routing.LinkGenerator;
+#else
 using Umbraco.Web;
 using Umbraco.Web.WebApi;
 using System.Web.Routing;
 using System.Web;
 using System.Web.Mvc;
-#else
-using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Extensions;
-using CoreLinkGenerator = Microsoft.AspNetCore.Routing.LinkGenerator;
 #endif
 
 namespace Preflight.Executors
@@ -21,15 +21,7 @@ namespace Preflight.Executors
 
     public class LinkGenerator : ILinkGenerator
     {
-#if NET472
-        public string GetUmbracoApiServiceBaseUrl<T>(Expression<Func<T, object>> methodSelector) where T : UmbracoApiController
-        {
-            RequestContext requestContext = HttpContext.Current.Request.RequestContext;
-            var urlHelper = new UrlHelper(requestContext);
-
-            return urlHelper.GetUmbracoApiServiceBaseUrl(methodSelector);
-        }
-#else
+#if NETCOREAPP
         private readonly CoreLinkGenerator _coreLinkGenerator;
 
         public LinkGenerator(CoreLinkGenerator coreLinkGenerator)
@@ -39,6 +31,14 @@ namespace Preflight.Executors
 
         public string GetUmbracoApiServiceBaseUrl<T>(Expression<Func<T, object>> methodSelector) where T : UmbracoApiController =>
             _coreLinkGenerator.GetUmbracoApiServiceBaseUrl(methodSelector);
+#else
+        public string GetUmbracoApiServiceBaseUrl<T>(Expression<Func<T, object>> methodSelector) where T : UmbracoApiController
+        {
+            RequestContext requestContext = HttpContext.Current.Request.RequestContext;
+            var urlHelper = new UrlHelper(requestContext);
+
+            return urlHelper.GetUmbracoApiServiceBaseUrl(methodSelector);
+        }
 #endif
     }
 }

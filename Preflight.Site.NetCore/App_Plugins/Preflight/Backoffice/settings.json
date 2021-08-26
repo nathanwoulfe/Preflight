@@ -41,7 +41,8 @@
     "tab": "General",
     "order": 2,
     "view": "checkboxlist",
-    "core": true
+    "core": true,
+    "value": "Umbraco.Grid,Umbraco.TinyMCE,Umbraco.TextArea,Umbraco.TextBox,Umbraco.NestedContent"
   },
   {
     "label": "User group opt in/out",
