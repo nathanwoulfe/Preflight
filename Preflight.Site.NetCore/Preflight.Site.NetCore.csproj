@@ -50,6 +50,9 @@
       <Content Include="App_Plugins\PreflightPlugins\testcontroller.js" />
       <Content Include="App_Plugins\PreflightPlugins\testPluginView.html" />
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\src\Preflight\Preflight.csproj" />
+    </ItemGroup>
 
     <!-- Set this to true if ModelsBuilder mode is not InMemoryAuto-->
     <PropertyGroup>

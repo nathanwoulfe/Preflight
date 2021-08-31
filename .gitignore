@@ -23,7 +23,8 @@ dist
 [Dd]ebug/
 [Rr]elease/
 x64/
-build/
+# except Plumber.Backoffice/build
+!**/Preflight.Backoffice/build/
 [Bb]in/
 [Oo]bj/
 
