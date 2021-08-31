@@ -95,6 +95,17 @@ namespace Preflight.Models
         /// </summary>
         [JsonProperty("prevalues")]
         public object Prevalues { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as SettingsModel;
+
+            if (other == null) return false;
+            if (other.Guid != Guid) return false;
+            if (!other.Value.ToString().Equals(Value.ToString())) return false;
+
+            return true;
+        }
     }
 
 

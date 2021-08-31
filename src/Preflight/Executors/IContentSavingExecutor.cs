@@ -8,10 +8,12 @@ using System.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
 #else
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Preflight.Security;
 using CharArrays = Umbraco.Core.Constants.CharArrays;
 #endif
@@ -27,16 +29,19 @@ namespace Preflight.Executors
     {
         private readonly ISettingsService _settingsService;
         private readonly IContentChecker _contentChecker;
+        private readonly ILocalizationService _localizationService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
         public ContentSavingExecutor(
             ISettingsService settingsService,
             IContentChecker contentChecker,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor, 
+            ILocalizationService localizationService)
         {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _contentChecker = contentChecker ?? throw new ArgumentNullException(nameof(contentChecker));
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
         public bool SaveCancelledDueToFailedTests(IContent content, out EventMessage message)
@@ -44,7 +49,9 @@ namespace Preflight.Executors
             message = null;
 
             List<SettingsModel> settings = _settingsService.Get().Settings;
-            string culture = content.AvailableCultures.First();
+            string culture = content.AvailableCultures.Any() ? 
+                content.AvailableCultures.First() : 
+                _localizationService.GetDefaultLanguageIsoCode();
 
             // only check if current user group is opted in to testing on save
             var groupSetting = settings.GetValue<string>(KnownSettings.UserGroupOptIn, culture);
@@ -69,7 +76,7 @@ namespace Preflight.Executors
             // at least one property on the current document fails the preflight check
             if (!failed) return false;
 
-            message = new EventMessage("Save cancelled", content.Id.ToString());
+            message = new EventMessage(KnownStrings.ContentFailedChecks, $"PreflightCancelSaveOnFail_{cancelSaveOnFail}", EventMessageType.Error);
 
             return true;
         }

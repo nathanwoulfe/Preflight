@@ -71,7 +71,6 @@
                     proxy.on(eventName, result => {
                         this.$rootScope.$apply(() => {
                             if (callback) {
-                                console.log(result);
                                 callback(result);
                             }
                         });

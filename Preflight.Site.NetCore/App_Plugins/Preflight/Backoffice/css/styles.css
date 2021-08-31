@@ -26,7 +26,7 @@
   border: 2px solid #fff;
   border-radius: 50%;
   font-size: 10px;
-  font-weight: bold;
+  font-weight: 900 !important;
   padding: 2px;
   line-height: 16px;
   position: absolute;
@@ -38,6 +38,10 @@
   cursor: not-allowed !important;
   opacity: 0.5;
   pointer-events: none;
+}
+
+.pf-block {
+  display: block !important;
 }
 
 .preflight-alert {

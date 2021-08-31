@@ -24,9 +24,7 @@ namespace Preflight.Controllers
     [Tree(UmbConstants.Applications.Settings, 
         treeAlias: KnownStrings.Alias, 
         TreeTitle = KnownStrings.Name, 
-        TreeGroup = UmbConstants.Trees.Groups.Settings, 
-        SortOrder = 12, 
-        IsSingleNodeTree = true)]
+        TreeGroup = UmbConstants.Trees.Groups.ThirdParty)]
     [PluginController(KnownStrings.Name)]
     public class PreflightTreeController : TreeController
     {

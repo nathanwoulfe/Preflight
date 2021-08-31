@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
-#if NETCOREAPP 
-using Microsoft.AspNetCore.Hosting;
+﻿#if NETCOREAPP 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 #else
 using System.Web;
 #endif
@@ -13,29 +10,13 @@ namespace Preflight
     {
 #if NETCOREAPP
         public static HttpContext Current => _httpContextAccessor.HttpContext;
-
-        private static bool _isDebuggingEnabled;
-        public static bool IsDebuggingEnabled
-        {
-            get
-            {
-                return _isDebuggingEnabled || _hostEnvironment.IsDevelopment() && Debugger.IsAttached; ;
-            }
-            private set
-            {
-                _isDebuggingEnabled = value;
-            }
-        }
         public static string HostUrl => Current.Request.Host.Value;
 
         private static IHttpContextAccessor _httpContextAccessor;
-        private static IWebHostEnvironment _hostEnvironment;
 
-        internal static void Set(IHttpContextAccessor httpContextAccessor, IWebHostEnvironment hostEnvironment, bool isDebuggingEnabled = false)
+        internal static void Set(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
-            _hostEnvironment = hostEnvironment;
-            IsDebuggingEnabled = isDebuggingEnabled;
         }
 #else
         private static HttpContextBase _context;
@@ -60,28 +41,13 @@ namespace Preflight
 
         public static string HostUrl => Current.Request.Url.Host.ToString();
 
-        // backing field allows setting in tests
-        private static bool _isDebuggingEnabled;
-        public static bool IsDebuggingEnabled
-        {
-            get
-            {
-                return _isDebuggingEnabled || Current.IsDebuggingEnabled && Debugger.IsAttached;
-            }
-            private set
-            {
-                _isDebuggingEnabled = value;
-            }
-        }
-
         /// <summary>
         /// Is set on startup
         /// </summary>
         /// <param name="context"></param>
-        internal static void Set(HttpContextBase context, bool isDebuggingEnabled = false)
+        internal static void Set(HttpContextBase context)
         {
             _context = context;
-            IsDebuggingEnabled = isDebuggingEnabled;
         }
 #endif
     }

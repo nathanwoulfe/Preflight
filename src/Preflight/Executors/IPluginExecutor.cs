@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Preflight.Services;
 using System.Collections.Generic;
+using Preflight.Parsers;
 #if NETCOREAPP
 using Microsoft.Extensions.Logging;
 #else
@@ -15,7 +16,7 @@ namespace Preflight.Executors
 {
     public interface IPluginExecutor
     {
-        PreflightPropertyResponseModel Execute(string name, string culture, string val, string alias, int id, bool fromSave, string parentAlias = "");
+        PreflightPropertyResponseModel Execute(ContentParserParams parserParams, string parentAlias = "");
     }
 
     public class PluginExecutor : IPluginExecutor
@@ -23,14 +24,15 @@ namespace Preflight.Executors
         private string _testableProperties;
         private List<SettingsModel> _settings;
 
-        private readonly ILogger<PluginExecutor> _logger;
+        private readonly ILogger<IPreflightValueParser> _logger;
         private readonly ISettingsService _settingsService;
         private readonly PreflightPluginCollection _plugins;
 
-        public PluginExecutor(PreflightPluginCollection plugins, ISettingsService settingsService)
+        public PluginExecutor(PreflightPluginCollection plugins, ISettingsService settingsService, ILogger<IPreflightValueParser> logger)
         {
             _plugins = plugins;
             _settingsService = settingsService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,19 +41,23 @@ namespace Preflight.Executors
         /// <param name="name"></param>
         /// <param name="val"></param>
         /// <returns></returns>
-        public PreflightPropertyResponseModel Execute(string name, string culture, string val, string alias, int id, bool fromSave, string parentAlias = "")
+        public PreflightPropertyResponseModel Execute(ContentParserParams parserParams, string parentAlias = "")
         {
             _settings = _settingsService.Get().Settings;
-            _testableProperties = _settings.GetValue<string>(KnownSettings.PropertiesToTest, culture);
+            _testableProperties = _settings.GetValue<string>(KnownSettings.PropertiesToTest, parserParams.Culture);
 
             var model = new PreflightPropertyResponseModel
             {
-                Label = name,
-                Name = name
+                Label = parserParams.PropertyName,
+                Name = parserParams.PropertyName,
             };
 
-            if (val == null || !_testableProperties.Contains(alias) || (parentAlias.HasValue() && !_testableProperties.Contains(parentAlias)))
+            if (parserParams.PropertyValue == null ||
+                !_testableProperties.Contains(parserParams.PropertyEditorAlias) ||
+                (parentAlias.HasValue() && !_testableProperties.Contains(parentAlias)))
+            {
                 return model;
+            }
 
             foreach (IPreflightPlugin plugin in _plugins)
             {
@@ -59,30 +65,28 @@ namespace Preflight.Executors
                 plugin.Settings = _settings.Where(s => s.Tab == plugin.Name)?.ToList();
 
                 // ignore disabled plugins
-                if (plugin.IsDisabled(culture)) continue;
-                if (!fromSave && plugin.IsOnSaveOnly(culture)) continue;
+                if (plugin.IsDisabled(parserParams.Culture)) continue;
+                if (!parserParams.FromSave && plugin.IsOnSaveOnly(parserParams.Culture)) continue;
 
-                string propsValue = plugin.Settings.FirstOrDefault(x => x.Alias.EndsWith(KnownStrings.PropertiesToTestSuffix))?.Value.ForVariant(culture);
+                string propsValue = plugin.Settings.FirstOrDefault(x => x.Alias.EndsWith(KnownStrings.PropertiesToTestSuffix))?.Value.ForVariant(parserParams.Culture);
                 string propsToTest = propsValue ?? string.Join(KnownStrings.Comma, KnownPropertyAlias.All);
 
                 // only continue if the field alias is include for testing, or the parent alias has been set, and is included for testing
-                if (!propsToTest.Contains(alias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias))) continue;
+                if (!propsToTest.Contains(parserParams.PropertyEditorAlias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias))) continue;
 
                 try
                 {
                     Type pluginType = plugin.GetType();
                     if (pluginType.GetMethod("Check") == null) continue;
 
-                    plugin.Check(id, culture, val, _settings);
+                    plugin.Result = null;
+                    plugin.Check(parserParams.NodeId, parserParams.Culture, parserParams.PropertyValue, _settings);
 
                     if (plugin.Result != null)
                     {
-                        if (plugin.FailedCount == 0)
-                        {
-                            plugin.FailedCount = plugin.Failed ? 1 : 0;
-                        }
-
-                        model.Plugins.Add(plugin);
+                        // must be a new object, otherwise returns the plugin instance from the collection
+                        var resultModel = new PreflightPluginResponseModel(plugin);
+                        model.Plugins.Add(resultModel);
                     }
                 }
                 catch (Exception e)

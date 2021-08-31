@@ -13,7 +13,7 @@ namespace Preflight.Models
         internal string Label { get; set; }
 
         [JsonProperty("plugins")]
-        public List<IPreflightPlugin> Plugins { get; set; }
+        public List<PreflightPluginResponseModel> Plugins { get; set; }
 
         [JsonProperty("open")]
         public bool Open { get; set; }
@@ -37,7 +37,7 @@ namespace Preflight.Models
             FailedCount = -1;
             Remove = false;
 
-            Plugins = new List<IPreflightPlugin>();
+            Plugins = new List<PreflightPluginResponseModel>();
         }
     }
 }

@@ -324,35 +324,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var NotificationController = function NotificationController($rootScope, notificationsService, editorState) {
-  var _this = this;
-
+var NotificationController = function NotificationController() {
   _classCallCheck(this, NotificationController);
 
-  _defineProperty(this, "$rootScope", void 0);
-
-  _defineProperty(this, "notificationsService", void 0);
-
-  _defineProperty(this, "editorState", void 0);
-
   _defineProperty(this, "saveCancelled", void 0);
-
-  _defineProperty(this, "switch", function (n) {
-    _this.$rootScope.$emit('showPreflight', {
-      nodeId: _this.editorState.current.id
-    });
-
-    _this.discard(n);
-  });
-
-  _defineProperty(this, "discard", function (n) {
-    _this.notificationsService.remove(n);
-  });
-
-  this.$rootScope = $rootScope;
-  this.notificationsService = notificationsService;
-  this.editorState = editorState;
-  this.saveCancelled = +notificationsService.current[0].args.saveCancelled === 1;
 };
 
 exports.NotificationController = NotificationController;
@@ -416,6 +391,10 @@ var PreflightController = /*#__PURE__*/function () {
     _defineProperty(this, "results", {
       properties: []
     });
+
+    _defineProperty(this, "jsonProperties", ['Umbraco.Grid', 'Umbraco.NestedContent']);
+
+    _defineProperty(this, "blockListEditorAlias", 'Umbraco.BlockList');
 
     _defineProperty(this, "noTests", false);
 
@@ -508,10 +487,6 @@ var PreflightController = /*#__PURE__*/function () {
       _this.done = true;
     });
 
-    _defineProperty(this, "isJsonProperty", function (editor) {
-      return editor === 'Umbraco.Grid' || editor === 'Umbraco.NestedContent';
-    });
-
     _defineProperty(this, "setBadgeCount", function (pending) {
       if (pending) {
         _this.$scope.model.badge = {
@@ -523,7 +498,7 @@ var PreflightController = /*#__PURE__*/function () {
       if (_this.results && _this.results.failedCount > 0) {
         _this.$scope.model.badge = {
           count: _this.results.failedCount,
-          type: 'alert'
+          type: 'alert --error-badge pf-block'
         };
       } else {
         _this.$scope.model.badge = {
@@ -592,7 +567,11 @@ var PreflightController = /*#__PURE__*/function () {
 
           var currentValue = _this.getProperty(prop.alias).value;
 
-          currentValue = _this.isJsonProperty(prop.editor) ? JSON.stringify(currentValue) : currentValue;
+          if (prop.editor === _this.blockListEditorAlias) {
+            currentValue = JSON.stringify(currentValue.contentData);
+          } else {
+            currentValue = _this.jsonProperties.includes(prop.editor) ? JSON.stringify(currentValue) : currentValue;
+          }
 
           var hash = _this.getHash(currentValue);
 
@@ -656,7 +635,7 @@ var PreflightController = /*#__PURE__*/function () {
           var payload = {
             properties: _this.dirtyProps,
             culture: _this.getCurrentCulture(),
-            nodeId: _this.editorState.current.id
+            id: _this.editorState.current.id
           };
 
           _this.setBadgeCount(true);
@@ -761,6 +740,7 @@ var PreflightController = /*#__PURE__*/function () {
       this.activeVariant = this.editorState.current.variants.find(function (x) {
         return x.active;
       });
+      this.propertiesToTrack = [];
 
       if (this.activeVariant) {
         this.activeVariant.tabs.forEach(function (x) {
@@ -1101,24 +1081,30 @@ _defineProperty(SettingsController, "controllerName", 'preflight.settings.contro
 
 (function () {
   var postSaveUrl = '/umbracoapi/content/postsave';
+  var presaveText;
 
-  function interceptor(notificationsService, $q, $injector) {
-    var checkGroup = function checkGroup(userGroupOptInOut) {
-      // use the stored value to get the corresponding key from the setting's prevalues (which is value,key paring of all groups)
+  function interceptor(notificationsService, overlayService, editorState, $rootScope, $q, $injector) {
+    var checkGroup = function checkGroup(userGroupOptInOut, culture) {
+      var value = userGroupOptInOut.value[culture];
       var enabledGroups = userGroupOptInOut.prevalues.filter(function (x) {
-        return userGroupOptInOut.value.includes(x.value);
+        return value.includes(x.value);
       }).map(function (x) {
         return x.key;
       });
+      var localizationService;
+      $injector.invoke(['localizationService', function (service) {
+        return localizationService = service;
+      }]);
       $injector.invoke(['authResource', function (authResource) {
-        authResource.getCurrentUser().then(function (currentUser) {
+        var promises = [authResource.getCurrentUser(), localizationService.localize('preflight_presaveText')];
+        $q.all(promises).then(function (resp) {
+          var currentUser = resp[0];
+          presaveText = resp[1];
+
           if (enabledGroups.some(function (x) {
             return currentUser.userGroups.includes(x);
           })) {
-            notificationsService.add({
-              key: 'preflight_notice',
-              view: "".concat(Umbraco.Sys.ServerVariables.Preflight.PluginPath, "/views/warning.notification.html")
-            });
+            notificationsService.info('Preflight', presaveText);
           }
         });
       }]);
@@ -1126,20 +1112,29 @@ _defineProperty(SettingsController, "controllerName", 'preflight.settings.contro
 
     return {
       request: function request(_request) {
-        if (_request.url.toLowerCase().indexOf(postSaveUrl) !== -1) {
+        if (_request.url.toLowerCase().includes(postSaveUrl)) {
           $injector.invoke(['preflightService', function (s) {
             s.getSettings().then(function (resp) {
-              var settings = resp.data.settings;
-              var runOnSave = settings.find(function (x) {
-                return x.alias === 'runPreflightOnSave';
+              var settings = resp.data.settings; // settings values are a dictionary keyed by culture
+
+              var variantsToSave = _request.data.value.variants.filter(function (v) {
+                return v.save;
               });
 
-              if (runOnSave && runOnSave.value === '1') {
-                var userGroupOptInOut = settings.find(function (x) {
-                  return x.alias === 'userGroupOptInOut';
+              var preflightVars = Umbraco.Sys.ServerVariables.Preflight;
+              variantsToSave.forEach(function (variant) {
+                var culture = variant.language ? variant.language.culture : preflightVars.DefaultCulture;
+                var runOnSave = settings.find(function (x) {
+                  return x.guid === preflightVars.SettingsGuid.BindSaveHandler;
                 });
-                checkGroup(userGroupOptInOut);
-              }
+
+                if (runOnSave && runOnSave.value[culture] === '1') {
+                  var userGroupOptInOut = settings.find(function (x) {
+                    return x.guid === preflightVars.SettingsGuid.UserGroupOptIn;
+                  });
+                  checkGroup(userGroupOptInOut, culture);
+                }
+              });
             });
           }]);
         }
@@ -1148,13 +1143,15 @@ _defineProperty(SettingsController, "controllerName", 'preflight.settings.contro
       },
       response: function response(_response) {
         try {
-          if (_response.config.url.toLowerCase().indexOf(postSaveUrl) !== -1) {
-            var index = notificationsService.current.map(function (c) {
-              return c.key === 'preflight_notice';
-            }).indexOf(true);
+          if (_response.config.url.toLowerCase().includes(postSaveUrl)) {
+            var index = notificationsService.current.findIndex(function (x) {
+              return x.message === presaveText;
+            });
 
-            if (index !== -1) {
-              notificationsService.remove(index);
+            if (index > -1) {
+              setTimeout(function () {
+                return notificationsService.remove(index);
+              }, 1500);
             }
 
             if (_response.data.notifications) {
@@ -1164,10 +1161,19 @@ _defineProperty(SettingsController, "controllerName", 'preflight.settings.contro
 
               if (notification) {
                 _response.data.notifications = [];
-                notificationsService.add({
+                overlayService.open({
                   view: "".concat(Umbraco.Sys.ServerVariables.Preflight.PluginPath, "/views/failed.notification.html"),
-                  args: {
-                    saveCancelled: notification.message.indexOf('_true') !== -1
+                  submitButtonLabelKey: 'preflight_review',
+                  hideHeader: true,
+                  saveCancelled: notification.message.includes('_True'),
+                  submit: function submit() {
+                    $rootScope.$emit('showPreflight', {
+                      nodeId: editorState.current.id
+                    });
+                    overlayService.close();
+                  },
+                  close: function close() {
+                    return overlayService.close();
                   }
                 });
               }
@@ -1182,7 +1188,7 @@ _defineProperty(SettingsController, "controllerName", 'preflight.settings.contro
     };
   }
 
-  angular.module('preflight').factory('preflight.save.interceptor', ['notificationsService', '$q', '$injector', interceptor]).config(["$httpProvider", function ($httpProvider) {
+  angular.module('preflight').factory('preflight.save.interceptor', ['notificationsService', 'overlayService', 'editorState', '$rootScope', '$q', '$injector', interceptor]).config(["$httpProvider", function ($httpProvider) {
     return $httpProvider.interceptors.push('preflight.save.interceptor');
   }]);
 })();

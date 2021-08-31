@@ -47,7 +47,7 @@ namespace Preflight.Settings
                         Description = "Select user groups to opt in to testing.",
                         View = SettingType.CheckboxList,
                         Tab = SettingsTabNames.General,
-                        Value = "Administrators,Editors",
+                        Value = "Administrators,Editors",                        
                         Order = 3,
                         Core = true,
                         Guid = new Guid(KnownSettings.UserGroupOptIn),

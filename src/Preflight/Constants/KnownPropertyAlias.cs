@@ -20,4 +20,11 @@ namespace Preflight
         public static IEnumerable<string> All = typeof(KnownPropertyAlias).GetFields()
                 .Where(x => x.IsLiteral).Select(x => x.GetRawConstantValue().ToString());
     }
+
+    public static class KnownGridEditorAlias
+    {
+        public const string Rte = "rte";
+        public const string Textarea = "textarea";
+        public const string Textstring = "textstring";
+    }
 }

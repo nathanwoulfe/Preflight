@@ -1,14 +1,16 @@
-﻿using Preflight.Extensions;
+﻿using Newtonsoft.Json;
+using Preflight.Extensions;
 using Preflight.Models;
+using Preflight.Parsers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 #if NETCOREAPP
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Services;
 #else
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.Services;
 using IProperty = Umbraco.Core.Models.Property;
 #endif
@@ -22,16 +24,16 @@ namespace Preflight.Services.Implement
     {
         private readonly IContentService _contentService;
         private readonly IMessenger _messenger;
-        private readonly IValueParserService _valueParserService;
+        private readonly Func<ParserType, IPreflightValueParser> _parserDelegate;
 
-        private int _id;
-        private bool _fromSave;
-
-        public ContentChecker(IContentService contentService, IMessenger messenger, IValueParserService valueParserService)
+        public ContentChecker(
+            IContentService contentService, 
+            IMessenger messenger, 
+            Func<ParserType, IPreflightValueParser> parserDelegate)
         {
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
-            _valueParserService = valueParserService ?? throw new ArgumentNullException(nameof(valueParserService));
+            _parserDelegate = parserDelegate ?? throw new ArgumentNullException(nameof(parserDelegate));
         }
 
 
@@ -41,17 +43,35 @@ namespace Preflight.Services.Implement
         /// <param name="dirtyProperties"></param>
         public bool CheckDirty(DirtyProperties dirtyProperties)
         {
-            _id = dirtyProperties.Id;
-            _fromSave = false;
+            var parserParams = new ContentParserParams
+            {
+                NodeId = dirtyProperties.Id,
+                Culture = dirtyProperties.Culture,
+                FromSave = false,
+            };
 
             var failed = false;
 
             foreach (SimpleProperty prop in dirtyProperties.Properties)
             {
-                string propValue = prop.Value?.ToString();
+                // if the prop is blocklist, the value needs to be modified as front-end
+                // sends an array of BlockItemData, but backend expects a BlockValue
+                // 
+                // bit messy, but prevents circular json errors on client side
+                if (prop.Editor == KnownPropertyAlias.BlockList && prop.Value.HasValue())
+                {
+                    var blockValue = new BlockValue
+                    {
+                        ContentData = JsonConvert.DeserializeObject<List<BlockItemData>>(prop.Value)
+                    };
+
+                    prop.Value = JsonConvert.SerializeObject(blockValue);
+                }
+
+                parserParams.PropertyValue = prop.Value;
 
                 // only continue if the prop has a value
-                if (!propValue.HasValue())
+                if (!parserParams.PropertyValue.HasValue())
                 {
                     _messenger.SendTestResult(new PreflightPropertyResponseModel
                     {
@@ -62,7 +82,10 @@ namespace Preflight.Services.Implement
                     continue;
                 }
 
-                failed = TestAndBroadcast(prop.Name, dirtyProperties.Culture, propValue, prop.Editor) || failed;
+                parserParams.PropertyName = prop.Name;
+                parserParams.PropertyEditorAlias = prop.Editor;
+
+                failed = TestAndBroadcast(parserParams) || failed;
             }
 
             _messenger.PreflightComplete();
@@ -78,7 +101,13 @@ namespace Preflight.Services.Implement
         /// <param name="culture"></param>
         /// <param name="fromSave"></param>
         /// <returns></returns>
-        public bool CheckContent(int id, string culture, bool fromSave) => CheckContent(_contentService.GetById(id), culture, fromSave);
+        public bool CheckContent(int id, string culture, bool fromSave)
+        {
+            var contentToCheck = _contentService.GetById(id);
+            if (contentToCheck == null) return false;
+
+            return CheckContent(contentToCheck, culture, fromSave);
+        }
 
 
         /// <summary>
@@ -90,8 +119,12 @@ namespace Preflight.Services.Implement
         /// <returns></returns>
         public bool CheckContent(IContent content, string culture, bool fromSave)
         {
-            _id = content.Id;
-            _fromSave = fromSave;
+            var parserParams = new ContentParserParams
+            {
+                NodeId = content.Id,
+                Culture = culture,
+                FromSave = fromSave,
+            };
 
             var failed = false;
 
@@ -99,10 +132,10 @@ namespace Preflight.Services.Implement
 
             foreach (IProperty prop in props)
             {
-                string propValue = (prop.GetValue(culture) ?? prop.GetValue())?.ToString();
+                parserParams.PropertyValue = (prop.GetValue(culture) ?? prop.GetValue())?.ToString();
 
                 // only continue if the prop has a value
-                if (!propValue.HasValue())
+                if (!parserParams.PropertyValue.HasValue())
                 {
                     _messenger.SendTestResult(new PreflightPropertyResponseModel
                     {
@@ -113,7 +146,10 @@ namespace Preflight.Services.Implement
                     continue;
                 }
 
-                failed = TestAndBroadcast(prop.PropertyType.Name, culture, propValue, prop.PropertyType.PropertyEditorAlias) || failed;
+                parserParams.PropertyName = prop.PropertyType.Name;
+                parserParams.PropertyEditorAlias = prop.PropertyType.PropertyEditorAlias;
+
+                failed = TestAndBroadcast(parserParams) || failed;
             }
 
             _messenger.PreflightComplete();
@@ -130,29 +166,17 @@ namespace Preflight.Services.Implement
         /// <param name="value"></param>
         /// <param name="alias"></param>
         /// <returns></returns>
-        private bool TestAndBroadcast(string name, string culture, string value, string alias)
+        private bool TestAndBroadcast(ContentParserParams parserParams)
         {
             List<PreflightPropertyResponseModel> testResult = new List<PreflightPropertyResponseModel>();
 
             bool failed = false;
+            ParserType? parserType = EnumExtensions.GetByParsablePropertyAlias<ParserType>(parserParams.PropertyEditorAlias);
 
-            switch (alias)
-            {
-                case KnownPropertyAlias.NestedContent:
-                    testResult = _valueParserService.ParseNestedContent(name, value, culture, _id, _fromSave);
-                    break;
-                case KnownPropertyAlias.Grid:
-                    testResult = _valueParserService.ParseGridContent(name, value, culture, _id, _fromSave);
-                    break;
-                case KnownPropertyAlias.BlockList:
-                    testResult = _valueParserService.ParseBlockListContent(name, value, culture, _id, _fromSave);
-                    break;
-                case KnownPropertyAlias.Rte:
-                case KnownPropertyAlias.Textarea:
-                case KnownPropertyAlias.Textbox:
-                    testResult = new[] { _valueParserService.ParseStringContent(name, value, culture, alias, _id, _fromSave) }.ToList();
-                    break;
-            }
+            if (parserType == null)
+                return true;
+
+            testResult = _parserDelegate(parserType.Value).Parse(parserParams);
 
             // return the results via signalr for perceived perf
             foreach (PreflightPropertyResponseModel result in testResult)

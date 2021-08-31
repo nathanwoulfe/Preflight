@@ -50,7 +50,13 @@ namespace Preflight.Executors
                 { "PropertyTypesToCheck", KnownPropertyAlias.All },
                 { "ApiPath", _linkGenerator.GetUmbracoApiServiceBaseUrl<ApiController>(controller => controller.GetSettings()) },
                 { "DefaultCulture", _localizationService.GetDefaultLanguageIsoCode() },
-                { "Platform", platform }
+                { "Platform", platform },
+                { "SettingsGuid", new Dictionary<string, string>
+                    {
+                        { "BindSaveHandler", KnownSettings.BindSaveHandler },
+                        { "UserGroupOptIn", KnownSettings.UserGroupOptIn },
+                    }
+                }
             };
 
             if (additionalData != null)

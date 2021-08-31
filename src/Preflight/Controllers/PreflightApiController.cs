@@ -109,6 +109,9 @@ namespace Preflight.Controllers
         {
             try
             {
+                if (data.Culture == string.Empty)
+                    data.Culture = _localizationService.GetDefaultLanguageIsoCode();
+
                 return Ok(new
                 {
                     status = HttpStatusCode.OK,

@@ -1,5 +1,6 @@
 ﻿using Preflight.Hubs;
 using Preflight.Models;
+using System;
 #if NETCOREAPP
 using Microsoft.AspNetCore.SignalR;
 #else
@@ -11,21 +12,20 @@ namespace Preflight.Services.Implement
     public class Messenger : IMessenger
     {
 #if NETCOREAPP
-        private readonly IHubContext<PreflightHub, IPreflightHub> _hubContext;
+        private readonly Lazy<IHubContext<PreflightHub, IPreflightHub>> _hubContext;
 
-        public Messenger(IHubContext<PreflightHub, IPreflightHub> hubContext) => _hubContext = hubContext;        
+        public Messenger(Lazy<IHubContext<PreflightHub, IPreflightHub>> hubContext) => _hubContext = hubContext;        
 #else
-        private readonly IHubContext<IPreflightHub> _hubContext;
+        private readonly Lazy<IHubContext<IPreflightHub>> _hubContext;
 
-        public Messenger() => 
-            _hubContext = GlobalHost.ConnectionManager.GetHubContext<PreflightHub, IPreflightHub>();
+        public Messenger(Lazy<IHubContext<IPreflightHub>> hubContext) => _hubContext = hubContext; 
 #endif
 
         public void SendTestResult(PreflightPropertyResponseModel model) =>        
-            _hubContext.Clients.All.preflightTest(model);        
+            _hubContext.Value.Clients.All.preflightTest(model);        
 
         public void PreflightComplete() =>        
-            _hubContext.Clients.All.preflightComplete();
+            _hubContext.Value.Clients.All.preflightComplete();
         
     }
 }

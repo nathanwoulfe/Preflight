@@ -3,6 +3,8 @@ using Preflight.Executors;
 using Preflight.Plugins;
 using Preflight.IO;
 using Preflight.Services.Implement;
+using Preflight.Hubs;
+using System;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 #else
+using Microsoft.AspNet.SignalR;
 using Preflight.Security;
 using Preflight.Logging;
 using System.Web;
@@ -100,6 +103,8 @@ namespace Preflight
                 .Add(() => composition.TypeLoader.GetTypes<IPreflightPlugin>());
 
             composition.Components().Append<PreflightComponent>();
+
+            composition.RegisterUnique(_ => GlobalHost.ConnectionManager.GetHubContext<PreflightHub, IPreflightHub>());
 
             PreflightContext.Set(new HttpContextWrapper(HttpContext.Current));
         }

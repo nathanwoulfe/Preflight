@@ -10,6 +10,8 @@ namespace Preflight.Services.Implement
 {
     public class LinksService : ILinksService
     {
+        private const string _href = "href";
+
         /// <summary>
         /// Return a list of broken links (href and link text)
         /// Checks internal links by node, fails relative internal links, checks external links
@@ -33,14 +35,14 @@ namespace Preflight.Services.Implement
             {
                 linksToCheck = links.Where(l =>
                     safeBrowsingResult.All(m =>
-                        m.Href != l.GetAttributeValue("href", string.Empty)));
+                        m.Href != l.GetAttributeValue(_href, string.Empty)));
             }
 
             if (!linksToCheck.Any()) return response;
 
             foreach (HtmlNode link in linksToCheck)
             {
-                string href = link.GetAttributeValue("href", string.Empty);
+                string href = link.GetAttributeValue(_href, string.Empty);
 
                 var responseItem = new BrokenLinkModel
                 {
@@ -50,28 +52,7 @@ namespace Preflight.Services.Implement
 
                 if (href.HasValue())
                 {
-                    if (Uri.IsWellFormedUriString(href, UriKind.Absolute))
-                    {
-                        var uri = new Uri(href);
-
-                        if (uri.Host == PreflightContext.HostUrl)
-                        {
-                            responseItem.Status = "Invalid internal link";
-                        }
-                        else
-                        {
-                            HttpStatusCode status = GetHeaders(href);
-
-                            if (status != HttpStatusCode.OK)
-                            {
-                                responseItem.Status = $"Broken/unavailable ({(int)status})";
-                            }
-                        }
-                    }
-                    else if (Uri.IsWellFormedUriString(href, UriKind.Relative))
-                    {
-                        responseItem.Status = "Invalid internal link";
-                    }
+                    SetResponseStatusWhenHrefExists(href, responseItem);
                 }
                 else
                 {
@@ -86,6 +67,39 @@ namespace Preflight.Services.Implement
             }
 
             return response;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="href"></param>
+        /// <param name="responseItem"></param>
+        private static void SetResponseStatusWhenHrefExists(string href, BrokenLinkModel responseItem)
+        {
+            if (Uri.IsWellFormedUriString(href, UriKind.Relative))
+            {
+                responseItem.Status = "Invalid internal link";
+                return;
+            }
+
+            if (Uri.IsWellFormedUriString(href, UriKind.Absolute))
+            {
+                var uri = new Uri(href);
+
+                if (uri.Host == PreflightContext.HostUrl)
+                {
+                    responseItem.Status = "Invalid internal link";
+                }
+                else
+                {
+                    HttpStatusCode status = GetHeaders(href);
+
+                    if (status != HttpStatusCode.OK)
+                    {
+                        responseItem.Status = $"Broken/unavailable ({(int)status})";
+                    }
+                }
+            }
         }
 
         /// <summary>

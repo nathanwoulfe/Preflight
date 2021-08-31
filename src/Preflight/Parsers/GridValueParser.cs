@@ -14,24 +14,22 @@ using Umbraco.Core.Configuration.Grid;
 
 namespace Preflight.Parsers
 {
-    public class GridValueParser : IPreflightValueParser
+    public class GridValueParser : PreflightValueParser, IPreflightValueParser
     {
-        private readonly IPluginExecutor _pluginExecutor;
-        private readonly IMessenger _messenger;
-
         private readonly IEnumerable<IGridEditorConfig> _gridEditorConfig;
 
         private const string _gridRteJsonPath = "$..controls[?(@.editor.view == 'rte' || @.editor.view == 'textstring' || @.editor.view == 'textarea' || @.editor.alias == 'rte' || @.editor.alias == 'headline' || @.editor.alias == 'quote')]";
         private const string _gridValueJsonPath = "$..value";
+        private const string _gridRows = "..rows";
+        private const string _gridEditorAlias = "$..editor.alias";
+        private const string _gridName = "name";
 
 #if NETCOREAPP
-        public GridValueParser(IOptions<IGridConfig> gridConfig, IPluginExecutor pluginExecutor, IMessenger messenger)
+        public GridValueParser(IOptions<IGridConfig> gridConfig, IPluginExecutor pluginExecutor, IMessenger messenger) : base(messenger, pluginExecutor)
 #else
-        public GridValueParser(IGridConfig gridConfig, IPluginExecutor pluginExecutor, IMessenger messenger)
+        public GridValueParser(IGridConfig gridConfig, IPluginExecutor pluginExecutor, IMessenger messenger) : base(messenger, pluginExecutor)
 #endif
         {
-            _pluginExecutor = pluginExecutor;
-            _messenger = messenger;
 
 #if NETCOREAPP
             _gridEditorConfig = gridConfig.Value.EditorsConfig.Editors;
@@ -40,55 +38,47 @@ namespace Preflight.Parsers
 #endif
         }
 
-        public List<PreflightPropertyResponseModel> Parse(string propertyName, string propertyValue, string culture, int nodeId, bool fromSave)
+        public List<PreflightPropertyResponseModel> Parse(ContentParserParams parserParams)
         {
-            JObject asJson = JObject.Parse(propertyValue);
+            JObject asJson = JObject.Parse(parserParams.PropertyValue);
             List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
 
-            IEnumerable<JToken> rows = asJson.SelectTokens("..rows");
+            // a single grid row can contain the same editor multiple times
+            // a single grid property can contain the same row multiple times
+            // so we need to track the count and append if > 1
+            var rowLabelDictionary = new Dictionary<string, int>();
+
+            IEnumerable<JToken> rows = asJson.SelectTokens(_gridRows);
             foreach (JToken row in rows)
             {
-                string rowName = row[0].Value<string>("name");
+                string rowName = AddLabelCount(row[0].Value<string>(_gridName), rowLabelDictionary);
+
                 IEnumerable<JToken> editors = row.SelectTokens(_gridRteJsonPath);
+                var editorLabelDictionary = new Dictionary<string, int>();
 
                 foreach (JToken editor in editors)
                 {
                     // this is a bit messy - maps the grid editor view to the knownpropertyalias value
-                    var editorViewAlias = "";
-                    var editorAlias = editor.SelectToken("$..editor.alias")?.ToString();
+                    var editorAlias = editor.SelectToken(_gridEditorAlias)?.ToString();
 
                     var gridEditorConfig = _gridEditorConfig.FirstOrDefault(x => x.Alias == editorAlias);
-                    var gridEditorName = gridEditorConfig.Name;
                     var gridEditorView = gridEditorConfig.View;
 
-                    string label = $"{propertyName} ({rowName} - {gridEditorName})";
+                    var gridEditorName = AddLabelCount(gridEditorConfig.Name, editorLabelDictionary);
+                    
+                    string label = GetLabel(parserParams.PropertyName, gridEditorName, rowName);
 
                     JToken value = editor.SelectToken(_gridValueJsonPath);
                     if (value == null || !value.ToString().HasValue())
                     {
-                        _messenger.SendTestResult(new PreflightPropertyResponseModel
-                        {
-                            Name = gridEditorName,
-                            Label = label,
-                            Remove = true
-                        });
+                        SendRemoveResponse(gridEditorName, label);
                     }
                     else
                     {
-                        if (gridEditorView.HasValue())
-                        {
-                            switch (gridEditorView)
-                            {
-                                case "rte": editorViewAlias = KnownPropertyAlias.Rte; break;
-                                case "textstring": editorViewAlias = KnownPropertyAlias.Textbox; break;
-                                case "textarea": editorViewAlias = KnownPropertyAlias.Textarea; break;
-                            }
-                        }
+                        parserParams.PropertyValue = value.ToString();
+                        parserParams.PropertyEditorAlias = GetGridEditorViewAlias(gridEditorView);
 
-                        PreflightPropertyResponseModel model = _pluginExecutor.Execute(propertyName, culture, value.ToString(), editorViewAlias, nodeId, fromSave, KnownPropertyAlias.Grid);
-
-                        model.Label = label;
-                        model.TotalTests = model.Plugins.Aggregate(0, (acc, x) => acc + x.TotalTests);
+                        var model = ExecutePlugin(parserParams, label, KnownPropertyAlias.Grid);
 
                         response.Add(model);
                     }
@@ -96,6 +86,48 @@ namespace Preflight.Parsers
             }
 
             return response;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="labels"></param>
+        private static string AddLabelCount(string label, Dictionary<string, int> labelDictionary)
+        {
+            if (labelDictionary.ContainsKey(label))
+            {
+                labelDictionary[label] += 1;
+            } else
+            {
+                labelDictionary[label] = 1;
+            }
+
+            if (labelDictionary[label] > 1)
+            {
+                label = label + " " + labelDictionary[label];
+            }
+
+            return label;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gridEditorView"></param>
+        /// <returns></returns>
+        private static string GetGridEditorViewAlias(string gridEditorView)
+        {
+            if (!gridEditorView.HasValue()) return "";
+
+            switch (gridEditorView)
+            {
+                case KnownGridEditorAlias.Rte: return KnownPropertyAlias.Rte;
+                case KnownGridEditorAlias.Textstring: return KnownPropertyAlias.Textbox;
+                case KnownGridEditorAlias.Textarea: return KnownPropertyAlias.Textarea;
+            }
+
+            return "";
         }
     }
 }

@@ -4,7 +4,6 @@ using Preflight.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Preflight.Migrations.Schema;
 using Preflight.Settings;
 #if NETCOREAPP
 using Microsoft.Extensions.Logging;
@@ -42,7 +41,7 @@ namespace Preflight.Services.Implement
             IUserService userService,
             PreflightPluginCollection plugins,
             ICacheManager cacheManager,
-            ILocalizationService localizationService, 
+            ILocalizationService localizationService,
             IScopeProvider scopeProvider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -81,19 +80,20 @@ namespace Preflight.Services.Implement
         public bool Save(PreflightSettings settings)
         {
             try
-            {                
+            {
+                var fromCache = Get();
+
                 _cacheManager.Set(_settingsCacheKey, settings);
 
                 using (var scope = _scopeProvider.CreateScope())
                 {
                     foreach (var setting in settings.Settings)
                     {
-                        scope.Database.Update(new SettingsSchema
-                        {
-                            Id = setting.Id,
-                            Setting = setting.Guid,
-                            Value = setting.Value.ToString(),
-                        });
+                        // only update modified properties
+                        var settingFromCache = fromCache.Settings.First(x => x.Guid == setting.Guid);
+                        if (setting.Equals(settingFromCache)) continue;
+
+                        scope.Database.Update(new SettingDto(setting));
                     }
                     scope.Complete();
                 }
@@ -106,16 +106,18 @@ namespace Preflight.Services.Implement
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private PreflightSettings GetSettings()
         {
-            // not all settings are variant, so use the default culture
-            var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
             var allLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode);
 
-            List<SettingsSchema> schema = new List<SettingsSchema>();
+            List<SettingDto> schema = new List<SettingDto>();
             using (var scope = _scopeProvider.CreateScope())
             {
-                schema = scope.Database.Fetch<SettingsSchema>();
+                schema = scope.Database.Fetch<SettingDto>();
                 scope.Complete();
             }
 
@@ -132,14 +134,21 @@ namespace Preflight.Services.Implement
             // tabs are sorted alpha, with general first
             return new PreflightSettings
             {
-                Settings = settings.DistinctBy(s => (s.Tab, s.Label)).ToList(),
-                Tabs = tabs.GroupBy(x => x.Name)
+                Settings = settings
+                    .DistinctBy(s => (s.Tab, s.Label))
+                    .ToList(),
+                Tabs = tabs
+                    .GroupBy(x => x.Name)
                     .Select(y => y.First())
                     .OrderBy(i => i.Name != SettingsTabNames.General)
                     .ThenBy(i => i.Name).ToList()
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private List<SettingsModel> CollateCoreAndPluginSettings()
         {
             var settings = new CoreSettings().Settings
@@ -147,6 +156,7 @@ namespace Preflight.Services.Implement
 
             var pluginSettings = _plugins.Where(p => p.Settings.Any()).SelectMany(p => p.Settings);
             settings.AddRange(pluginSettings);
+
             return settings;
         }
 
@@ -169,13 +179,12 @@ namespace Preflight.Services.Implement
                     s.View = "views/propertyeditors/" + s.View + "/" + s.View + ".html";
                 }
 
-                if (!tabs.Any(x => x.Name == s.Tab))
+                if (tabs.Any(x => x.Name == s.Tab)) continue;
+
+                tabs.Add(new SettingsTab
                 {
-                    tabs.Add(new SettingsTab
-                    {
-                        Name = s.Tab
-                    });
-                }
+                    Name = s.Tab
+                });
             }
         }
 
@@ -190,14 +199,7 @@ namespace Preflight.Services.Implement
 
             foreach (IPreflightPlugin plugin in _plugins)
             {
-                foreach (SettingsModel setting in plugin.Settings)
-                {
-                    if (!settings.Any(x => x.Alias == setting.Alias))
-                    {
-                        setting.Tab = plugin.Name;
-                        settings.Add(setting);
-                    }
-                }
+                CheckPluginSettingExistsInSettingsCollection(settings, plugin);
 
                 // generate a tab from the plugin if not added already
                 // send back the summary and description for the plugin as part of the tab object for display in the settings view
@@ -213,6 +215,22 @@ namespace Preflight.Services.Implement
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="plugin"></param>
+        private static void CheckPluginSettingExistsInSettingsCollection(List<SettingsModel> settings, IPreflightPlugin plugin)
+        {
+            foreach (SettingsModel setting in plugin.Settings)
+            {
+                if (settings.Any(x => x.Alias == setting.Alias)) continue;
+
+                setting.Tab = plugin.Name;
+                settings.Add(setting);
+            }
+        }
+
+        /// <summary>
         /// populate prevalues for the groups setting
         /// intersect ensures any removed groups aren't kept as settings values
         /// since group name and alias can differ, needs to store both in the prevalue, and manage rebuilding this on the client side
@@ -221,25 +239,24 @@ namespace Preflight.Services.Implement
         private void EnsureGroupsAreStillValid(List<SettingsModel> settings)
         {
             var allGroups = _userService.GetAllUserGroups();
-            var groupSetting = settings.FirstOrDefault(x => string.Equals(x.Label, KnownSettings.UserGroupOptIn, StringComparison.InvariantCultureIgnoreCase));
+            var settingGuid = Guid.Parse(KnownSettings.UserGroupOptIn);
+            var groupSetting = settings.FirstOrDefault(x => x.Guid == settingGuid);
 
-            if (groupSetting != null)
+            if (groupSetting == null) return;
+
+            var groupNames = allGroups.Select(x => new { value = x.Name, key = x.Alias });
+            groupSetting.Prevalues = groupNames;
+
+            if (groupSetting.Value == null) return;
+
+            var newValue = new Dictionary<string, string>();
+            foreach (var variantValue in groupSetting.Value.ToVariantDictionary())
             {
-                var groupNames = allGroups.Select(x => new { value = x.Name, key = x.Alias });
-                groupSetting.Prevalues = groupNames;
-
-                if (groupSetting.Value != null)
-                {
-                    var newValue = new Dictionary<string, string>();
-                    foreach (var variantValue in groupSetting.Value.ToVariantDictionary())
-                    {
-                        var groupSettingValue = variantValue.Value.Split(CharArrays.Comma).Intersect(groupNames.Select(x => x.value));
-                        newValue.Add(variantValue.Key, string.Join(KnownStrings.Comma, groupSettingValue));
-                    }
-
-                    groupSetting.Value = newValue;
-                }
+                var groupSettingValue = variantValue.Value.Split(CharArrays.Comma).Intersect(groupNames.Select(x => x.value));
+                newValue.Add(variantValue.Key, string.Join(KnownStrings.Comma, groupSettingValue));
             }
+
+            groupSetting.Value = newValue;
         }
 
         /// <summary>
@@ -248,7 +265,7 @@ namespace Preflight.Services.Implement
         /// <param name="allLanguages"></param>
         /// <param name="schema"></param>
         /// <param name="settings"></param>
-        private static void MergeSchemaValuesIntoSettings(IEnumerable<string> allLanguages, List<SettingsSchema> schema, List<SettingsModel> settings)
+        private static void MergeSchemaValuesIntoSettings(IEnumerable<string> allLanguages, List<SettingDto> schema, List<SettingsModel> settings)
         {
             foreach (SettingsModel setting in settings)
             {
@@ -262,17 +279,28 @@ namespace Preflight.Services.Implement
 
                 // have new languages been added? better check...
                 // if any are missing, add the default value
-                if (valueDictionary.Count != allLanguages.Count())
-                {
-                    var missingLangs = allLanguages.Except(valueDictionary.Keys);
-                    foreach (var lang in missingLangs)
-                    {
-                        valueDictionary[lang] = setting.Value.ToString();
-                    }
-                }
+                AddMissingLanguagessToValueDictionary(allLanguages, setting, valueDictionary);
 
                 setting.Value = valueDictionary;
                 setting.Id = schemaItem.Id;
+            }
+        }
+
+        /// <summary>
+        /// Adds languages to the value dictionary to ensure all languages have an entry
+        /// Value is set to the setting default value
+        /// </summary>
+        /// <param name="allLanguages"></param>
+        /// <param name="setting"></param>
+        /// <param name="valueDictionary"></param>
+        private static void AddMissingLanguagessToValueDictionary(IEnumerable<string> allLanguages, SettingsModel setting, Dictionary<string, string> valueDictionary)
+        {
+            if (valueDictionary.Count == allLanguages.Count()) return;
+
+            var missingLangs = allLanguages.Except(valueDictionary.Keys);
+            foreach (var lang in missingLangs)
+            {
+                valueDictionary[lang] = setting.Value.ToString();
             }
         }
     }

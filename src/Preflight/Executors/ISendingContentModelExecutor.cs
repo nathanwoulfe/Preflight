@@ -56,7 +56,8 @@ namespace Preflight.Executors
                     bool include = groupSetting.Split(CharArrays.Comma).Intersect(currentUserGroups).Any();
 
                     if (!include)
-                        contentItem.ContentApps = contentItem.ContentApps.Where(x => x.Name != KnownStrings.Name);
+                        contentItem.ContentApps = contentItem.ContentApps
+                            .Where(a => !a.Alias.Equals(KnownStrings.Alias, StringComparison.OrdinalIgnoreCase));
                 }
             }
 
@@ -70,7 +71,8 @@ namespace Preflight.Executors
 
                 if (!isTestable)
                 {
-                    contentItem.ContentApps = contentItem.ContentApps.Where(x => x.Name != KnownStrings.Name);
+                    contentItem.ContentApps = contentItem.ContentApps
+                        .Where(a => !a.Alias.Equals(KnownStrings.Alias, StringComparison.OrdinalIgnoreCase));
                 }
             }
         }
