@@ -23,8 +23,7 @@
     <key alias="saveSettings">Save settings</key>
     <key alias="plusMore">plus %0% more...</key>
 
-    <key alias="presaveIntro">This page is being run through preflight tests to ensure content quality</key>
-    <key alias="presaveText">This may take a few seconds to process</key>
+    <key alias="presaveText">Running tests, this may take a few seconds...</key>
   </area>
 
   <area alias="preflightLinkHealth">

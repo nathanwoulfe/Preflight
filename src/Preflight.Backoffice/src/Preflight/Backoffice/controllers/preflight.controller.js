@@ -20,6 +20,13 @@
         properties: []
     };
 
+    jsonProperties = [
+        'Umbraco.Grid',
+        'Umbraco.NestedContent',
+    ];
+
+    blockListEditorAlias = 'Umbraco.BlockList';
+
     noTests = false;
     percentageDone = 20;
     progressStep = 0;
@@ -128,13 +135,7 @@
 
         this.showSuccessMessage = !this.results.failed && !this.noTests;
         this.done = true;
-    };
-
-    /**
-     * Is the editor param Umbraco.Grid or Umbraco.NestedContent?
-     * @param {any} editor
-     */
-    isJsonProperty = editor => editor === 'Umbraco.Grid' || editor === 'Umbraco.NestedContent';
+    }; 
 
 
     /**
@@ -151,7 +152,7 @@
         if (this.results && this.results.failedCount > 0) {
             this.$scope.model.badge = {
                 count: this.results.failedCount,
-                type: 'alert'
+                type: 'alert --error-badge pf-block'
             };
         } else {
             this.$scope.model.badge = {
@@ -218,7 +219,12 @@
 
         for (let prop of this.propertiesToTrack) {
             let currentValue = this.getProperty(prop.alias).value;
-            currentValue = this.isJsonProperty(prop.editor) ? JSON.stringify(currentValue) : currentValue;
+
+            if (prop.editor === this.blockListEditorAlias) {
+                currentValue = JSON.stringify(currentValue.contentData);
+            } else {
+                currentValue = this.jsonProperties.includes(prop.editor) ? JSON.stringify(currentValue) : currentValue;
+            }
 
             const hash = this.getHash(currentValue);
 
@@ -267,7 +273,7 @@
                 const payload = {
                     properties: this.dirtyProps,
                     culture: this.getCurrentCulture(),
-                    nodeId: this.editorState.current.id
+                    id: this.editorState.current.id
                 };
 
                 this.setBadgeCount(true);
@@ -311,6 +317,8 @@
 
     $onInit() {
         this.activeVariant = this.editorState.current.variants.find(x => x.active);
+        this.propertiesToTrack = [];
+
         if (this.activeVariant) {
             this.activeVariant.tabs.forEach(x => {
                 this.propertiesToTrack = this.propertiesToTrack.concat(x.properties.map(x => {
