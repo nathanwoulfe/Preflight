@@ -10,7 +10,7 @@
     callbacks = [];
 
     starting = false
-    platform = Umbraco.Sys.ServerVariables.Preflight.platform;
+    platform = Umbraco.Sys.ServerVariables.Preflight.Platform;
 
     constructor($rootScope, $q, assetsService) {
         this.$rootScope = $rootScope;

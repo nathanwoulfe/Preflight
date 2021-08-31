@@ -67,14 +67,14 @@ namespace Preflight.Migrations
             // then save the value and guid for each
             var settings = new List<SettingsModel>();
 
-            using (var file = new StreamReader(_ioHelper.MapPath(_settingsFilePath)))
+            if (File.Exists(_ioHelper.MapPath(_settingsFilePath)))
             {
-                string json = file.ReadToEnd();
-                settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json);
+                using (var file = new StreamReader(_ioHelper.MapPath(_settingsFilePath)))
+                {
+                    string json = file.ReadToEnd();
+                    settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json);
+                }
             }
-
-            if (settings == null)
-                return;
 
             // update settings values to variant dictionaries
             var allLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode);
@@ -100,15 +100,31 @@ namespace Preflight.Migrations
             // generate the list of saveable settings
             var settingsToSave = new List<SettingsSchema>();
 
-            foreach (var setting in settings)
+            // new installs will have no settings, but need the defaults stored
+            if (settings.Any())
             {
-                var schema = new SettingsSchema
+                foreach (var setting in settings)
                 {
-                    Value = setting.Value.ToString(),
-                    Setting = allSettings.FirstOrDefault(x => x.Alias == setting.Alias).Guid,
-                };
+                    var schema = new SettingsSchema
+                    {
+                        Value = setting.Value.ToString(),
+                        Setting = allSettings.FirstOrDefault(x => x.Alias == setting.Alias).Guid,
+                    };
 
-                settingsToSave.Add(schema);
+                    settingsToSave.Add(schema);
+                }
+            } else
+            {
+                foreach (var setting in allSettings)
+                {
+                    var schema = new SettingsSchema
+                    {
+                        Value = JsonConvert.SerializeObject(allLanguages.ToDictionary(key => key, value => setting.Value)),
+                        Setting = setting.Guid,
+                    };
+
+                    settingsToSave.Add(schema);
+                }
             }
 
             // finally, persist just the guid and value for each setting

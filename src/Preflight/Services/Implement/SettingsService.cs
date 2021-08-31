@@ -57,8 +57,8 @@ namespace Preflight.Services.Implement
         /// </summary>
         public PreflightSettings Get()
         {
-            if (_cacheManager.TryGet(_settingsCacheKey, out PreflightSettings fromCache))
-                return fromCache;
+            //if (_cacheManager.TryGet(_settingsCacheKey, out PreflightSettings fromCache))
+            //    return fromCache;
 
             PreflightSettings settings = GetSettings();
 

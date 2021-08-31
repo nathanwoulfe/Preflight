@@ -10,7 +10,7 @@ namespace Preflight.Models
         public string Name { get; set; }
 
         [JsonProperty("label")]
-        internal string Label { get; set; }
+        public string Label { get; set; }
 
         [JsonProperty("plugins")]
         public List<PreflightPluginResponseModel> Plugins { get; set; }

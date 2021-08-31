@@ -4,12 +4,10 @@ using Preflight.Plugins;
 using Preflight.IO;
 using Preflight.Services.Implement;
 using Preflight.Hubs;
-using System;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Preflight.Handlers;
-using Preflight.Hubs;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;

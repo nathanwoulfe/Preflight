@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
+using RoutePrefix = Microsoft.AspNetCore.Mvc.RouteAttribute;
 #else
 using System.Web.Http;
 using Umbraco.Core.Services;
@@ -18,6 +19,7 @@ using IActionResult = System.Web.Http.IHttpActionResult;
 
 namespace Preflight.Controllers
 {
+    [RoutePrefix("umbraco/backoffice/preflight/settings")]
     [PluginController("Preflight")]
     public class ApiController : UmbracoAuthorizedApiController
     {
@@ -82,7 +84,7 @@ namespace Preflight.Controllers
         /// <param name="id">Node id</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("Check")]
+        [Route("Check/{id:int}/{culture?}")]
         public IActionResult Check(int id, string culture = "")
         {
             try

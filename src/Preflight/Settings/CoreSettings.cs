@@ -36,7 +36,7 @@ namespace Preflight.Settings
                         Description = "Restrict Preflight to a subset of testable properties.",
                         View = SettingType.CheckboxList,
                         Tab = SettingsTabNames.General,
-                        Value = 0,
+                        Value = string.Join(KnownStrings.Comma, KnownPropertyAlias.All),
                         Prevalues = KnownPropertyAlias.All.Select(x => new { value = x, key = x }),
                         Order = 2,
                         Core = true,

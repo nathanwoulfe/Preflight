@@ -173,7 +173,7 @@
      * @param {object} data - a response model item returned via the signalr hub
      */
     rebindResult = data => {
-
+        console.log(data.label, data);
         let newProp = true;
         let totalTestsRun = 0;
         let existingProp = this.results.properties.find(x => x.label === data.label);

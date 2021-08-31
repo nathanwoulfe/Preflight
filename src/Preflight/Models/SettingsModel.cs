@@ -39,13 +39,13 @@ namespace Preflight.Models
         public Guid Guid { get; set; }
 
         [JsonProperty("id")]
-        internal int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         [JsonProperty("core")]
-        internal bool Core { get; set; }
+        public bool Core { get; set; }
 
         /// <summary>
         /// A UI-friendly label for the setting
@@ -82,13 +82,13 @@ namespace Preflight.Models
         /// Plugins default to the plugin name
         /// </summary>
         [JsonProperty("tab")]
-        internal string Tab { get; set; }
+        public string Tab { get; set; }
 
         /// <summary>
         /// The generated property alias
         /// </summary>
         [JsonProperty("alias")]
-        internal string Alias { get; set; }
+        public string Alias { get; set; }
 
         /// <summary>
         /// Prevalues for the setting
@@ -106,6 +106,12 @@ namespace Preflight.Models
 
             return true;
         }
+
+        /// <summary>
+        /// Stops intellisense complaining
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode() => base.GetHashCode();        
     }
 
 
