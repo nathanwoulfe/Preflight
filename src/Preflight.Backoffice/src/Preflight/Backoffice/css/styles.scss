@@ -12,6 +12,12 @@
 
 .preflight {
 
+    &-app .umb-toggle {
+        position:absolute;
+        bottom:0;
+        right:0;
+    } 
+
     &-alert {
         background: $umbBlue;
         padding-right: 14px;

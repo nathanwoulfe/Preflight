@@ -1,29 +1,46 @@
-<div ng-controller="preflight.controller as vm" class="preflight preflight-app" id="preflight-app" ng-cloak ng-class="{ 'preflight-passed' : !vm.results.failed }">
-    <div ng-show="vm.showSuccessMessage">
-        <h3 class="title"><localize key="preflight_passIntro"></localize></h3>
-        <h4 class="intro-text"><localize key="preflight_passText"></localize></h4>
+<div ng-controller="preflight.controller as vm" 
+     class="preflight preflight-app" 
+     id="preflight-app" 
+     ng-cloak 
+     ng-class="{ 'preflight-passed' : !vm.results.failed }">
+    <div class="relative">
+        <div ng-show="vm.showSuccessMessage">
+            <h3 class="title"><localize key="preflight_passIntro"></localize></h3>
+            <h4 class="intro-text"><localize key="preflight_passText"></localize></h4>
+        </div>
+
+        <div ng-show="vm.noTests">
+            <h3 class="title"><localize key="preflight_noTestsIntro"></localize></h3>
+            <h4 class="intro-text"><localize key="preflight_noTestsText"></localize></h4>
+        </div>
+
+        <div ng-show="vm.results.failed">
+            <h3 class="title"><localize key="preflight_failIntro"></localize></h3>
+            <h4 class="intro-text">
+                <localize ng-if="vm.results.failedCount === 1" key="preflight_failTextSingular"></localize>
+                <localize ng-if="vm.results.failedCount > 1" key="preflight_failTextPlural"></localize>
+            </h4>
+        </div>
+
+        <div ng-show="vm.propsBeingCheckedStr.length && !vm.noTests" ng-if="!vm.done">
+            <h4 class="intro-text"><localize key="preflight_runningChecks"></localize> {{ vm.propsBeingCheckedStr }}</h4>
+        </div>
+
+        <progress-circle size="100" percentage="vm.percentageFailed" foreground="success" background="danger"></progress-circle>
+
+        <umb-toggle checked="vm.showFailedOnly"
+                    id="showFailedOnlyToggle"
+                    on-click="vm.showFailedOnly = !vm.showFailedOnly"
+                    show-labels="true"
+                    label-on="Show failed only"
+                    label-off="Show failed only">
+        </umb-toggle>
     </div>
 
-    <div ng-show="vm.noTests">
-        <h3 class="title"><localize key="preflight_noTestsIntro"></localize></h3>
-        <h4 class="intro-text"><localize key="preflight_noTestsText"></localize></h4>
-    </div>
-
-    <div ng-show="vm.results.failed">
-        <h3 class="title"><localize key="preflight_failIntro"></localize></h3>
-        <h4 class="intro-text">
-            <localize ng-if="vm.results.failedCount === 1" key="preflight_failTextSingular"></localize>
-            <localize ng-if="vm.results.failedCount > 1" key="preflight_failTextPlural"></localize>
-        </h4>
-    </div>
-
-    <div ng-show="vm.propsBeingCheckedStr.length && !vm.noTests" ng-if="!vm.done">
-        <h4 class="intro-text"><localize key="preflight_runningChecks"></localize> {{ vm.propsBeingCheckedStr }}</h4>
-    </div>
-
-    <progress-circle size="100" percentage="vm.percentageFailed" foreground="success" background="danger"></progress-circle>
-
-    <div class="umb-expansion-panel" ng-repeat="prop in vm.results.properties | orderBy: prop.label track by $index" ng-if="vm.results && !vm.noTests" ng-class="{'loading': prop.loading, 'disabled' : prop.disabled }">
+    <div class="umb-expansion-panel"
+         ng-repeat="prop in vm.results.properties | orderBy: prop.label track by $index"
+         ng-if="vm.results && !vm.noTests && (!vm.showFailedOnly || vm.showFailedOnly && prop.failedCount)"
+         ng-class="{'loading': prop.loading, 'disabled' : prop.disabled }">
 
         <button type="button"
                 aria-expanded="{{tab.open}}"

@@ -1,18 +1,18 @@
 ﻿<div class="preflight-cards preflight-readability" ng-controller="readability.plugin.controller as vm">
     <preflight-card tokens="[model.result.targetMin, model.result.targetMax]"
-                    title="@preflightReadability_readingEaseScore"
-                    subtitle="@preflightReadability_readingEaseRange"
+                    title="@preflight-readability_readingEaseScore"
+                    subtitle="@preflight-readability_readingEaseRange"
                     score="model.result.score"
                     failed="model.result.failedReadability">
     </preflight-card>
 
-    <preflight-card title="@preflightReadability_averageSyllables"
-                    subtitle="@preflightReadability_perWord"
+    <preflight-card title="@preflight-readability_averageSyllables"
+                    subtitle="@preflight-readability_perWord"
                     score="model.result.averageSyllables">
     </preflight-card>
 
-    <preflight-card title="@preflightReadability_averageSentence"
-                    subtitle="@preflightReadability_length"
+    <preflight-card title="@preflight-readability_averageSentence"
+                    subtitle="@preflight-readability_length"
                     score="model.result.sentenceLength">
     </preflight-card>
     
@@ -33,8 +33,8 @@
     <preflight-state-icon failed="model.result.longWords.length > 0"></preflight-state-icon>
     <div class="preflight-result">
         <preflight-result-intro tokens="[model.result.longWordSyllables]"
-                                heading="@preflightReadability_longWordsHeading"
-                                pass-text="@preflightReadability_longWordsPassText"
+                                heading="@preflight-readability_longWordsHeading"
+                                pass-text="@preflight-readability_longWordsPassText"
                                 pass="model.result.longWords.length === 0">
         </preflight-result-intro>
         <ul class="badge-list" ng-if="model.result.longWords.length">
@@ -54,8 +54,8 @@
 <div class="flex relative mt4">
     <preflight-state-icon failed="model.result.blacklist.length > 0"></preflight-state-icon>
     <div class="preflight-result">
-        <preflight-result-intro heading="@preflightReadability_blacklistHeading"
-                                pass-text="@preflightReadability_blacklistPassText"
+        <preflight-result-intro heading="@preflight-readability_blacklistHeading"
+                                pass-text="@preflight-readability_blacklistPassText"
                                 pass="model.result.blacklist.length === 0">
         </preflight-result-intro>
         <ul class="badge-list" ng-if="model.result.blacklist.length">

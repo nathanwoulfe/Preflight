@@ -1,8 +1,8 @@
 ﻿<preflight-state-icon failed="model.result.brokenLinks.length > 0"></preflight-state-icon>
 <div class="preflight-result">
     <preflight-result-intro localize="heading,passText"
-                            heading="@preflightLinkHealth_brokenLinksHeading"
-                            pass-text="@preflightLinkHealth_brokenLinksPassText"
+                            heading="@preflight-linkHealth_brokenLinksHeading"
+                            pass-text="@preflight-linkHealth_brokenLinksPassText"
                             pass="model.result.brokenLinks.length === 0">
     </preflight-result-intro>
     <linkhealth-result results="model.result.brokenLinks" ng-if="model.result.brokenLinks.length"></linkhealth-result>
@@ -12,8 +12,8 @@
     <preflight-state-icon failed="model.result.safeBrowsing.length > 0"></preflight-state-icon>
     <div class="preflight-result">
         <preflight-result-intro localize="heading,passText"
-                                heading="@preflightLinkHealth_safeBrowsingHeading"
-                                pass-text="@preflightLinkHealth_safeBrowsingPassText"
+                                heading="@preflight-linkHealth_safeBrowsingHeading"
+                                pass-text="@preflight-linkHealth_safeBrowsingPassText"
                                 pass="model.result.safeBrowsing.length === 0">
         </preflight-result-intro>
         <linkhealth-result results="model.result.safeBrowsing" ng-if="model.result.safeBrowsing.length"></linkhealth-result>

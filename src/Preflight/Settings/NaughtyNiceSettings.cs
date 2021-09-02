@@ -12,7 +12,7 @@ namespace Preflight.Settings
                 return new SettingsModel[] {
                     new GenericSettingModel("Nice words")
                     {
-                        Description = "These words will be excluded from the readability check.",
+                        Description = "These words will be excluded from the readability check",
                         View = SettingType.MultipleTextbox,
                         Tab = SettingsTabNames.NaughtyAndNice,
                         Value = "Umbraco,preflight,hippopotamus",

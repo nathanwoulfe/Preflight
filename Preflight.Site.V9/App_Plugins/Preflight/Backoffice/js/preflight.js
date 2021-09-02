@@ -805,7 +805,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var SettingsController = /*#__PURE__*/function () {
-  function SettingsController($scope, $q, notificationsService, languageResource, preflightService) {
+  function SettingsController($scope, $q, notificationsService, languageResource, localizationService, preflightService) {
     var _this = this;
 
     _classCallCheck(this, SettingsController);
@@ -815,6 +815,8 @@ var SettingsController = /*#__PURE__*/function () {
     _defineProperty(this, "$q", void 0);
 
     _defineProperty(this, "languageResource", void 0);
+
+    _defineProperty(this, "localizationService", void 0);
 
     _defineProperty(this, "notificationsService", void 0);
 
@@ -935,10 +937,8 @@ var SettingsController = /*#__PURE__*/function () {
           }
         });
 
-        _this.preflightService.saveSettings(settingsToSave, _this.tabs).then(function (resp) {
-          resp.data ? _this.notificationsService.success('SUCCESS', 'Settings updated') : _this.notificationsService.error('ERROR', 'Unable to save settings'); // reset dashboard form state
-
-          _this.$scope.preflightSettingsForm.$setPristine();
+        _this.preflightService.saveSettings(settingsToSave, _this.tabs).then(function (_) {
+          return _this.$scope.preflightSettingsForm.$setPristine();
         });
       }
     });
@@ -948,6 +948,7 @@ var SettingsController = /*#__PURE__*/function () {
     this.notificationsService = notificationsService;
     this.preflightService = preflightService;
     this.languageResource = languageResource;
+    this.localizationService = localizationService;
     this.languageChangeWatcher = $scope.$watch(function () {
       return _this.currentLanguage;
     }, function (newLang, oldLang) {
@@ -1238,32 +1239,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var ReadabilityPluginController = function ReadabilityPluginController($scope, editorService) {
+var ReadabilityPluginController = function ReadabilityPluginController($scope, overlayService) {
   var _this = this;
 
   _classCallCheck(this, ReadabilityPluginController);
 
   _defineProperty(this, "$scope", void 0);
 
-  _defineProperty(this, "editorService", void 0);
+  _defineProperty(this, "overlayService", void 0);
 
   _defineProperty(this, "help", function () {
-    var helpOverlay = {
+    var overlay = {
       view: "".concat(Umbraco.Sys.ServerVariables.Preflight.PluginPath, "/plugins/readability/readability.overlay.html"),
-      title: 'Readability',
-      description: 'Why should I care?',
-      size: 'small',
-      text: _this.$scope.model.description,
+      title: _this.$scope.model.name,
+      size: 'medium',
+      content: _this.$scope.model.description,
       close: function close() {
-        return _this.editorService.close();
+        return _this.overlayService.close();
       }
     };
 
-    _this.editorService.open(helpOverlay);
+    _this.overlayService.open(overlay);
   });
 
   this.$scope = $scope;
-  this.editorService = editorService;
+  this.overlayService = overlayService;
 };
 
 exports.ReadabilityPluginController = ReadabilityPluginController;
@@ -1485,10 +1485,6 @@ var PreflightService = function PreflightService($http, umbRequestHelper) {
     });
   });
 
-  _defineProperty(this, "getHelpText", function () {
-    return helpText;
-  });
-
   this.$http = $http;
   this.umbRequestHelper = umbRequestHelper;
 };
@@ -1496,8 +1492,6 @@ var PreflightService = function PreflightService($http, umbRequestHelper) {
 exports.PreflightService = PreflightService;
 
 _defineProperty(PreflightService, "serviceName", 'preflightService');
-
-_defineProperty(PreflightService, "helpText", "\n        <p>If your content is too difficult for your visitors to read, you're all going to have a bad time.</p>\n        <p>The readability test runs your content through the Flesch reading ease algorithm to determine text complexity.</p>\n        <h5>The algorithm</h5>\n        <p><code>RE = 206.835 - (1.015 x ASL) - (84.6 x ASW)</code></p>\n        <p>Where <code>RE</code> is Readability Ease, <code>ASL</code> is Average Sentence Length, and <code>ASW</code> is Average Syllables per Word</p>\n        <p>The result is a number between 0 and 100, where a higher score means better readability, with a score between 60 and 69 largely considered acceptable.</p>\n        <h5>Readability test results</h5>\n        <p>As well as the Flesch score, the readability test returns sentence length; average syllables per word; and long or complex words;</p>");
 
 },{}]},{},[1,7,5,2,9,10,11,8,12,13,17,18,16,3,4,6,14,15])
 

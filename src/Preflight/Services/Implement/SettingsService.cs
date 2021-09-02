@@ -27,6 +27,7 @@ namespace Preflight.Services.Implement
         private readonly IUserService _userService;
         private readonly ICacheManager _cacheManager;
         private readonly ILocalizationService _localizationService;
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IScopeProvider _scopeProvider;
         private readonly PreflightPluginCollection _plugins;
 
@@ -42,7 +43,8 @@ namespace Preflight.Services.Implement
             PreflightPluginCollection plugins,
             ICacheManager cacheManager,
             ILocalizationService localizationService,
-            IScopeProvider scopeProvider)
+            IScopeProvider scopeProvider,
+            ILocalizedTextService localizedTextService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -50,21 +52,23 @@ namespace Preflight.Services.Implement
             _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
+            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
         /// <summary>
-        /// Load the Preflight settings from the JSON file in app_plugins
         /// </summary>
         public PreflightSettings Get()
         {
-            //if (_cacheManager.TryGet(_settingsCacheKey, out PreflightSettings fromCache))
-            //    return fromCache;
-
-            PreflightSettings settings = GetSettings();
+            PreflightSettings settings = _cacheManager.TryGet(_settingsCacheKey, out PreflightSettings fromCache) ? fromCache : GetSettings();
 
             if (settings != null)
             {
                 _cacheManager.Set(_settingsCacheKey, settings);
+
+                // can't cache this, since it would be cached when the user lang changes
+                // which admittedly isn't likely, but is possible
+                LocalizeSettings(settings);
+
                 return settings;
             }
 
@@ -183,7 +187,8 @@ namespace Preflight.Services.Implement
 
                 tabs.Add(new SettingsTab
                 {
-                    Name = s.Tab
+                    Name = s.Tab,
+                    Alias = s.Tab.Camel()
                 });
             }
         }
@@ -206,6 +211,7 @@ namespace Preflight.Services.Implement
                 tabs.Add(new SettingsTab
                 {
                     Name = plugin.Name,
+                    Alias = plugin.Name.Camel(),
                     Description = plugin.Description,
                     Summary = plugin.Summary
                 });
@@ -301,6 +307,57 @@ namespace Preflight.Services.Implement
             foreach (var lang in missingLangs)
             {
                 valueDictionary[lang] = setting.Value.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Updates settings name, summary, tab etc where a value exists
+        /// </summary>
+        /// <param name="settings"></param>
+        private void LocalizeSettings(PreflightSettings settings)
+        {
+            const string prefix = "preflight-";            
+
+            foreach (var tab in settings.Tabs)
+            {
+                var area = prefix + tab.Alias;
+                tab.Name = _localizedTextService.Localize(area, "tabName");
+
+                if (tab.Summary.HasValue())
+                {
+                    tab.Summary = _localizedTextService.Localize(area, "summary");
+                }
+            }
+
+            foreach (var setting in settings.Settings)
+            {
+                var area = prefix + setting.Tab.Camel();
+                var alias = setting.Alias;
+
+                // this is gross, would rather use a switch, but that won't work here
+                // code is using the generic values for translating the default, preflight-added properties
+                if (setting.Alias == setting.Tab.DisabledAlias())
+                {
+                    area = KnownStrings.Alias;
+                    alias = "disabled";
+                }
+                else if (setting.Alias == setting.Tab.OnSaveOnlyAlias())
+                {
+                    area = KnownStrings.Alias;
+                    alias = "onSaveOnly";
+                }
+                else if (setting.Alias == setting.Tab.PropertiesToTestAlias())
+                {
+                    area = KnownStrings.Alias;
+                    alias = "propertiesToTest";
+                }
+
+                setting.Label = _localizedTextService.Localize(area, alias);
+
+                if (setting.Description.HasValue())
+                {
+                    setting.Description = _localizedTextService.Localize(area, alias + "Description");
+                }
             }
         }
     }

@@ -44,6 +44,11 @@
   display: block !important;
 }
 
+.preflight-app .umb-toggle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
 .preflight-alert {
   background: #1b264f;
   padding-right: 14px;

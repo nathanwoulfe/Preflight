@@ -3,23 +3,22 @@
     static controllerName = 'readability.plugin.controller';
 
     $scope;
-    editorService;
+    overlayService;
 
-    constructor($scope, editorService) {
+    constructor($scope, overlayService) {
         this.$scope = $scope;
-        this.editorService = editorService;
+        this.overlayService = overlayService;
     }
 
     help = () => {
-        const helpOverlay = {
+        const overlay = {
             view: `${Umbraco.Sys.ServerVariables.Preflight.PluginPath}/plugins/readability/readability.overlay.html`,
-            title: 'Readability',
-            description: 'Why should I care?',
-            size: 'small',
-            text: this.$scope.model.description,
-            close: () => this.editorService.close()                
+            title: this.$scope.model.name,
+            size: 'medium',
+            content: this.$scope.model.description,
+            close: () => this.overlayService.close(),                
         };
 
-        this.editorService.open(helpOverlay);
+        this.overlayService.open(overlay);
     };
 }

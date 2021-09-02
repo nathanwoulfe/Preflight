@@ -19,6 +19,13 @@ namespace Preflight.Models
     {
         [JsonProperty("name")]
         public string Name { get; set; }
+        
+        /// <summary>
+        /// This must be explicitly set whenever a tab is created, it can't be lazy as it 
+        /// would then change when localizing, which we don't wany
+        /// </summary>
+        [JsonProperty("alias")]
+        public string Alias { get; set; }
 
         [JsonProperty("summary")]
         public string Summary { get; set; }
@@ -137,7 +144,7 @@ namespace Preflight.Models
             Value = val ? KnownStrings.One : KnownStrings.Zero;
             Label = "Disabled";
             Alias = tab.DisabledAlias();
-            Description = $"Disable the {tab} plugin";
+            Description = "Disable this plugin";
             View = SettingType.Boolean;
             Order = -10;
             Core = true;

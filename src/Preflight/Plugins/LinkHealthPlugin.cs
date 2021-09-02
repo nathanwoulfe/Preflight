@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Preflight.Plugins
 {
-    public class LinkCheckerPlugin : IPreflightCorePlugin
+    public class LinkHealthPlugin : IPreflightCorePlugin
     {
         private readonly ILinksService _linksService;
         private readonly ISafeBrowsingService _safeBrowsingService;
@@ -29,7 +29,7 @@ namespace Preflight.Plugins
         public string Summary => "Check links resolve correctly. Optionally check URLs against Google's SafeBrowsing API";
         public string Description { get; set; }
 
-        public LinkCheckerPlugin(ILinksService linksService, ISafeBrowsingService safeBrowsingService)
+        public LinkHealthPlugin(ILinksService linksService, ISafeBrowsingService safeBrowsingService)
         {
             _linksService = linksService;
             _safeBrowsingService = safeBrowsingService;
@@ -41,7 +41,7 @@ namespace Preflight.Plugins
                 settings: new SettingsModel[] {
                     new GenericSettingModel("Ensure safe links")
                     {
-                        Description = "Set to true and Preflight will check links for potential malware and bad actors.",
+                        Description = "Set to true and Preflight will check links for potential malware and bad actors",
                         View = SettingType.Boolean,
                         Value = "0",
                         Order = 1,
@@ -50,7 +50,7 @@ namespace Preflight.Plugins
                     },
                     new GenericSettingModel("Google SafeBrowsing API key")
                     {
-                        Description = "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites.",
+                        Description = "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites",
                         View = SettingType.String,
                         Value = "Get your key from the Google API Console",
                         Order = 2,

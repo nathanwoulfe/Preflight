@@ -3,17 +3,21 @@ using Preflight.Models;
 using Preflight.Services;
 using System;
 using System.Net;
+using System.Collections.Generic;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using RoutePrefix = Microsoft.AspNetCore.Mvc.RouteAttribute;
 #else
 using System.Web.Http;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.Models.ContentEditing;
+using BackOfficeNotification = Umbraco.Web.Models.ContentEditing.Notification;
 using IActionResult = System.Web.Http.IHttpActionResult;
 #endif
 
@@ -46,7 +50,6 @@ namespace Preflight.Controllers
             {
                 return Ok(new
                 {
-                    status = HttpStatusCode.OK,
                     data = _settingsService.Get()
                 });
             }
@@ -68,8 +71,8 @@ namespace Preflight.Controllers
             {
                 return Ok(new
                 {
-                    status = HttpStatusCode.OK,
-                    data = _settingsService.Save(settings)
+                    data = _settingsService.Save(settings),
+                    notifications = ApiSuccessNotification("Settings updated")
                 });
             }
             catch (Exception ex)
@@ -91,7 +94,6 @@ namespace Preflight.Controllers
             {
                 return Ok(new
                 {
-                    status = HttpStatusCode.OK,
                     failed = _contentChecker.CheckContent(id, culture.HasValue() ? culture : _localizationService.GetDefaultLanguageIsoCode())
                 });
             }
@@ -116,7 +118,6 @@ namespace Preflight.Controllers
 
                 return Ok(new
                 {
-                    status = HttpStatusCode.OK,
                     failed = _contentChecker.CheckDirty(data)
                 });
             }
@@ -135,9 +136,31 @@ namespace Preflight.Controllers
         {
             return Ok(new
             {
-                status = HttpStatusCode.InternalServerError,
-                data = message
+                notifications = ApiErrorNotification(message)
             });
+        }
+
+        /// <summary>
+        /// Gets an array of one BackofficeNotification
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private static IEnumerable<WrappedNotification> ApiSuccessNotification(string message) =>
+            ApiNotification(message, "SUCCESS", NotificationStyle.Success);
+        private static IEnumerable<WrappedNotification> ApiErrorNotification(string message) =>
+            ApiNotification(message, "ERROR", NotificationStyle.Error);
+
+        private static IEnumerable<WrappedNotification> ApiNotification(string message, string header, NotificationStyle style)
+        {
+            var notification = new BackOfficeNotification
+            {
+                NotificationType = style,
+                Header = header,
+                Message = message,
+            };
+
+            var wrapped = new WrappedNotification(notification);
+            return new[] { wrapped };
         }
     }
 }

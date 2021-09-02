@@ -7,6 +7,7 @@ export class SettingsController {
     $scope;
     $q;
     languageResource;
+    localizationService;
     notificationsService;
     preflightService;
 
@@ -18,12 +19,14 @@ export class SettingsController {
     languageChangeWatcher;
     testablePropertiesWatcher;
 
-    constructor($scope, $q, notificationsService, languageResource, preflightService) {
+    constructor($scope, $q, notificationsService, languageResource, localizationService, preflightService) {
         this.$scope = $scope;
         this.$q = $q;
+
         this.notificationsService = notificationsService;
         this.preflightService = preflightService;
         this.languageResource = languageResource;
+        this.localizationService = localizationService;
 
         this.languageChangeWatcher = $scope.$watch(() => this.currentLanguage, (newLang, oldLang) => {
             // update settings to only include the current variant
@@ -185,14 +188,7 @@ export class SettingsController {
             });
 
             this.preflightService.saveSettings(settingsToSave, this.tabs)
-                .then(resp => {
-                    resp.data
-                        ? this.notificationsService.success('SUCCESS', 'Settings updated')
-                        : this.notificationsService.error('ERROR', 'Unable to save settings');
-
-                    // reset dashboard form state
-                    this.$scope.preflightSettingsForm.$setPristine();
-                });
+                .then(_ => this.$scope.preflightSettingsForm.$setPristine());
         }
     }
 }
