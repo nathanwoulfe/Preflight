@@ -11,7 +11,7 @@ export const paths = {
     scss: `${backofficePath}/**/*.scss`,
     lang: `./src/Preflight/Lang/*.xml`,
     manifest: './src/Preflight/package.manifest',
-    dest: './App_Plugins/Prefligh/',
+    dest: './App_Plugins/Preflight/',
     site: '../../Preflight.Site.V8/App_Plugins/Preflight/',
     siteNetCore: '../../Preflight.Site.V9/App_Plugins/Preflight/',
 };
