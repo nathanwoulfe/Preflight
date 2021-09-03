@@ -8,7 +8,7 @@
     <PackageIconUrl></PackageIconUrl>
 
     <PackageProjectUrl>https://thisredwolf.com/preflight</PackageProjectUrl>
-    <PackageTags>Umbraco;UmbracoCms;Workflow</PackageTags>
+    <PackageTags>Umbraco;UmbracoCms;</PackageTags>
     <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
 
     <RepositoryUrl>https://github.com/nathanwoulfe/preflight</RepositoryUrl>
