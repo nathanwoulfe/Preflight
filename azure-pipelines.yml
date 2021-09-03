@@ -80,7 +80,7 @@ steps:
     verbosityRestore: Minimal
 
 - task: DotNetCoreCLI@2
-  displayName: 'Pack the Core, Web and Backoffice projects'
+  displayName: 'Pack the Core and Backoffice projects'
   inputs:
     command: 'pack'
     packagesToPack: 'src/Preflight.Backoffice/Preflight.Backoffice.csproj;src/Preflight/Preflight.csproj'
