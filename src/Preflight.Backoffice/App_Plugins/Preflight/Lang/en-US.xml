@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="en" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
+  <area alias="dashboardTabs">
+    <key alias="preflight">Preflight</key>
+  </area>
+  <area alias="preflight">
+    <key alias="passIntro">Content on this page passes all preflight checks</key>
+    <key alias="passText">Good job! Check back after updating the content for fresh test results</key>
+    <key alias="failIntro">That's not great...</key>
+    <key alias="failTextSingular">Content on this page fails one preflight check</key>
+    <key alias="failTextPlural">Content on this page fails multiple preflight checks</key>
+    <key alias="noTestsIntro">No content on this page underwent preflight checks</key>
+    <key alias="noTestsText">Ensure the Preflight settings are including the appropriate property types</key>
+
+    <key alias="runningChecks">Preflight found modified content - testing</key>
+
+    <key alias="failedNoticeTitle">Content on this page has failed the preflight checks</key>
+    <key alias="saveCancelled">The save request has been cancelled</key>
+    <key alias="reviewAndSave">Please review the test results, update the content and re-save</key>
+
+    <key alias="review">Review</key>
+    <key alias="saveSettings">Save settings</key>
+    <key alias="plusMore">plus %0% more...</key>
+
+    <key alias="presaveText">Running tests, this may take a few seconds...</key>
+    <key alias="disabled">Disabled</key>
+    <key alias="disabledDescription">Disable this plugin</key>
+    <key alias="onSaveOnly">On save only</key>
+    <key alias="onSaveOnlyDescription">Restrict this plugin to run only in a save event</key>
+    <key alias="propertiesToTest">Properties to test</key>
+    <key alias="propertiesToTestDescription">Restrict this plugin to run against a subset of testable properties</key>
+  </area>
+
+  <area alias="preflight-general">
+    <key alias="tabName">General</key>
+    <key alias="summary">Generic Preflight settings</key>
+    <key alias="runPreflightOnSave">Run Preflight on save</key>
+    <key alias="runPreflightOnSaveDescription">Set to true and Preflight will run on all saves, and alert users to any errors</key>
+    <key alias="cancelSaveWhenPreflightTestsFail">Cancel save when Preflight tests fail</key>
+    <key alias="cancelSaveWhenPreflightTestsFailDescription">Set to true and Preflight will cancel the save event, if tests fail and Preflight is set to run on save</key>
+    <key alias="propertiesToTest">Properties to test</key>
+    <key alias="propertiesToTestDescription">Restrict Preflight to a subset of testable properties</key>
+    <key alias="userGroupOptInout">User group opt in/out</key>
+    <key alias="userGroupOptInoutDescription">Select user groups to opt in to testing</key>
+  </area>
+
+  <area alias="preflight-linkHealth">
+    <key alias="tabName">Link health</key>
+    <key alias="summary">Check links resolve correctly. Optionally check URLs against Google's SafeBrowsing API</key>
+    <key alias="brokenLinksHeading">Broken links</key>
+    <key alias="brokenLinksPassText">No broken links found for this property</key>
+    <key alias="safeBrowsingHeading">Safe Browsing key value</key>
+    <key alias="safeBrowsingPassText">No unsafe links found for this property</key>
+    <key alias="ensureSafeLinks">Ensure safe links</key>
+    <key alias="ensureSafeLinksDescription">Set to true and Preflight will check links for potential malware and bad actors</key>
+    <key alias="googleSafeBrowsingAPIKey">Google SafeBrowsing API key</key>
+    <key alias="googleSafeBrowsingAPIKeyDescription">If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites</key>
+  </area>
+
+  <area alias="preflight-autocorrect">
+    <key alias="tabName">Autocorrect</key>
+    <key alias="summary">Automatically replace naughty words with less naughty words, or fix common spelling mistakes.</key>
+    <key alias="autocorrectTerms">Autocorrect terms</key>
+    <key alias="autocorrectTermsDescription">Pipe-separated list of terms to autocorrect in Preflight checks - eg 'replace me|new text'.</key>
+  </area>
+
+  <area alias="preflight-naughtyAndNice">
+    <key alias="tabName">Naughty and nice</key>
+    <key alias="niceWords">Nice words</key>
+    <key alias="niceWordsDescription">These words will be excluded from the readability check</key>
+    <key alias="naughtyWords">Naughty words</key>
+    <key alias="naughtyWordsDescription">These words should never be used</key>
+  </area>  
+
+  <area alias="preflight-readability">
+    <key alias="tabName">Readability</key>
+    <key alias="summary">Ensure content meets minimum readability measures, using the Flesch reading ease algorithm</key>
+    <key alias="readingEaseScore">Reading ease score</key>
+    <key alias="readingEaseRange">Target %0%-%1%</key>
+    <key alias="averageSyllables">Average syllables</key>
+    <key alias="perWord">per word</key>
+    <key alias="averageSentence">Average sentence</key>
+    <key alias="length">length</key>
+    <key alias="longWordsPassText">No long words found for this property</key>
+    <key alias="blacklistPassText">No naughty words/phrases for this property</key>
+    <key alias="longWordsHeading">Long words</key>
+    <key alias="blacklistHeading">Naughty words</key>
+    <key alias="readabilityTargetMinimum">Readability target - minimum</key>
+    <key alias="readabilityTargetMinimumDescription">Readability result must be great than this value</key>
+    <key alias="readabilityTargetMaximum">Readability target - maximum</key>
+    <key alias="readabilityTargetMaximumDescription">Readability result must be less than this value</key>
+    <key alias="longWordSyllableCount">Long word syllable count</key>
+    <key alias="longWordSyllableCountDescription">Words in text will be flagged as long, if their syllable count is equal to or greater than this value</key>
+    <key alias="description">
+      <![CDATA[<p>If your content is too difficult for your visitors to read, you're all going to have a bad time.</p>
+          <p>The readability test runs your content through the Flesch reading ease algorithm to determine text complexity.</p>
+          <h5>The algorithm</h5>
+          <p><code>RE = 206.835 - (1.015 x ASL) - (84.6 x ASW)</code></p>
+          <p>Where <code>RE</code> is Readability Ease, <code>ASL</code> is Average Sentence Length, and <code>ASW</code> is Average Syllables per Word</p>
+          <p>The result is a number between 0 and 100, where a higher score means better readability, with a score between 60 and 69 largely considered acceptable.</p>
+          <h5>Readability test results</h5>
+          <p>As well as the Flesch score, the readability test returns sentence length; average syllables per word; and long or complex words;</p>]]></key>
+  </area>
+</language>

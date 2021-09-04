@@ -98,7 +98,7 @@ Umbraco.Cms.Core.Actions.ActionUpdate, Umbraco.Core, Version=9.0.0.0, Culture=ne
 Preflight.PreflightComposer, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
 Preflight.PreflightContentAppComposer, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
 Preflight.Plugins.AutocorrectPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
-Preflight.Plugins.LinkCheckerPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
+Preflight.Plugins.LinkHealthPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
 Preflight.Plugins.ReadabilityPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
 Preflight.Parsers.PreflightParserComposer, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
 Preflight.Migrations.Preflight_TwoZeroZero, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -540,6 +540,6 @@ Umbraco.Cms.Core.Packaging.PackageMigrationPlan
 Preflight.Plugins.IPreflightPlugin
 
 Preflight.Plugins.AutocorrectPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
-Preflight.Plugins.LinkCheckerPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
+Preflight.Plugins.LinkHealthPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
 Preflight.Plugins.ReadabilityPlugin, Preflight, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null
 

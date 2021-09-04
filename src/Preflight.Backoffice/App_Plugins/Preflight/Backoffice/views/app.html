@@ -1,0 +1,66 @@
+<div ng-controller="preflight.controller as vm" 
+     class="preflight preflight-app" 
+     id="preflight-app" 
+     ng-cloak 
+     ng-class="{ 'preflight-passed' : !vm.results.failed }">
+    <div class="relative">
+        <div ng-show="vm.showSuccessMessage">
+            <h3 class="title"><localize key="preflight_passIntro"></localize></h3>
+            <h4 class="intro-text"><localize key="preflight_passText"></localize></h4>
+        </div>
+
+        <div ng-show="vm.noTests">
+            <h3 class="title"><localize key="preflight_noTestsIntro"></localize></h3>
+            <h4 class="intro-text"><localize key="preflight_noTestsText"></localize></h4>
+        </div>
+
+        <div ng-show="vm.results.failed">
+            <h3 class="title"><localize key="preflight_failIntro"></localize></h3>
+            <h4 class="intro-text">
+                <localize ng-if="vm.results.failedCount === 1" key="preflight_failTextSingular"></localize>
+                <localize ng-if="vm.results.failedCount > 1" key="preflight_failTextPlural"></localize>
+            </h4>
+        </div>
+
+        <div ng-show="vm.propsBeingCheckedStr.length && !vm.noTests" ng-if="!vm.done">
+            <h4 class="intro-text"><localize key="preflight_runningChecks"></localize> {{ vm.propsBeingCheckedStr }}</h4>
+        </div>
+
+        <progress-circle size="100" percentage="vm.percentageFailed" foreground="success" background="danger"></progress-circle>
+
+        <umb-toggle checked="vm.showFailedOnly"
+                    id="showFailedOnlyToggle"
+                    on-click="vm.showFailedOnly = !vm.showFailedOnly"
+                    show-labels="true"
+                    label-on="Show failed only"
+                    label-off="Show failed only">
+        </umb-toggle>
+    </div>
+
+    <div class="umb-expansion-panel"
+         ng-repeat="prop in vm.results.properties | orderBy: prop.label track by $index"
+         ng-if="vm.results && !vm.noTests && (!vm.showFailedOnly || vm.showFailedOnly && prop.failedCount)"
+         ng-class="{'loading': prop.loading, 'disabled' : prop.disabled }">
+
+        <button type="button"
+                aria-expanded="{{tab.open}}"
+                class="btn-reset umb-expansion-panel__header"
+                ng-click="prop.open = !prop.open">
+            <span>
+                <span class="count-badge" ng-bind="prop.failedCount" ng-if="prop.failedCount"></span>
+                <span class="count-badge pass" ng-if="prop.failedCount <= 0" ng-class="{'pass' : prop.failedCount === 0, 'pending' : prop.failedCount === -1}">
+                    <umb-icon icon="icon-check" ng-if="prop.failedCount === 0"></umb-icon>
+                </span>
+                {{ prop.label }}
+            </span>
+            <umb-icon icon="{{tab.open ? 'icon-navigation-up' : 'icon-navigation-down'}}"
+                      class="umb-expansion-panel__expand"></umb-icon>
+        </button>
+
+        <div class="umb-expansion-panel__content" ng-show="prop.open">
+            <div class="flex relative mt4" ng-repeat="plugin in prop.plugins">
+                <div ng-include="plugin.viewPath" ng-repeat="model in [plugin]" class="w-100"></div>
+            </div>
+        </div>
+    </div>
+</div>
