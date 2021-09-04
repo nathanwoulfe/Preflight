@@ -9,11 +9,7 @@ Preflight is a pluggable framework for content quality assurance. Out of the box
 Preflight is an Umbraco 8 (8.1+) content app, and supports content in RTEs and textareas, including those nested in the Grid. 
 
 ## Plugins
-Preflight plugins are defined in C# classes deriving the `IPreflightPlugin` interface. All plugins MUST be decorated with an `ExportAttribute` (found in the `System.ComponentModel.Composition` namespace), per the example below:
-
-```csharp
-[Export(typeof(IPreflightPlugin))]
-```
+Preflight plugins are defined in C# classes deriving the `IPreflightPlugin` interface.
 
 The interface requires a range of fields be populated, but the heavy lifting takes place in the `Check()` method:
  - `{string} Name`: displayed in the settings as the name of the collapsable panel (which contains the plugin settings)
@@ -29,6 +25,7 @@ The interface requires a range of fields be populated, but the heavy lifting tak
 ### Settings
 A plugin can have multiple user-editable settings, of type `GenericSettingModel` - these are displayed in the backoffice settings section, and configured in a plugin constructor. Each setting requires: 
  - `{string} Name`: should be obvious?
+ - `{guid} Guid`: a unique identifier for the plugin
  - `{string} Value`: a default value
  - `{string} Description`: a friendly explanation of what the setting controls
  - `{string} View`: a path to an Umbraco property editor view (`SettingType` holds common options)
@@ -39,8 +36,9 @@ To populate the settings on a plugin, use the `PluginSettingsList.Populate()` me
 ### Check()
 `Check` is the method where the magic happens. The only requirement for the method is that it sets the `Failed`, `FailedCount` and `Result` fields on the enclosing class - the content app depends on these values existing. 
 
-The method receives three arguments - `{int} id`, `{string} val` and `{List<SettingsModel> settings}`:
+The method receives three arguments - `{int} id`, `{guid} culture`, `{string} val` and `{List<SettingsModel> settings}`:
  - `id`: the id of the current content item under test
+ - `culture`: the culture of the current property under test
  - `val`: the string value of the current property under test
  - `settings`: a list of settings applied to all existing Preflight plugins (includes the settings for the current plugin, if any have been added)
  
