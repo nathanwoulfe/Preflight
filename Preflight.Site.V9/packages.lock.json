@@ -1983,15 +1983,15 @@
           "Umbraco.Cms.Web.Common": "9.0.0-rc002"
         }
       },
-      "preflight": {
+      "Preflight.Umbraco": {
         "type": "Project",
         "dependencies": {
-          "Preflight.Backoffice": "2.0.0-rc-001",
+          "Preflight.Umbraco.Backoffice": "2.0.0-rc-001",
           "Umbraco.Cms.Web.BackOffice": "9.0.0-rc002",
           "Umbraco.Cms.Web.Website": "9.0.0-rc002"
         }
       },
-      "preflight.backoffice": {
+      "Preflight.Umbraco.Backoffice": {
         "type": "Project"
       }
     }

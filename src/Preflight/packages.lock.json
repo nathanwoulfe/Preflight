@@ -526,7 +526,7 @@
           "Umbraco.SqlServerCE": "[4.0.0.1, 4.999999.0)"
         }
       },
-      "preflight.backoffice": {
+      "Preflight.Umbraco.Backoffice": {
         "type": "Project"
       }
     },
@@ -2482,7 +2482,7 @@
           "Umbraco.Cms.PublishedCache.NuCache": "9.0.0-rc002"
         }
       },
-      "preflight.backoffice": {
+      "Preflight.Umbraco.Backoffice": {
         "type": "Project"
       }
     }

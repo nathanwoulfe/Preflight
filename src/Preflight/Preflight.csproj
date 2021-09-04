@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net50;net472</TargetFrameworks>
     <Id>Preflight.Umbraco</Id>
+    <PackageId>Preflight.Umbraco</PackageId>
     <Title>Preflight.Umbraco</Title>
     <Summary>Add pre-publishing checks to Umbraco CMS</Summary>
 	<AuthorName>Nathan Woulfe</AuthorName>

@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Id>Preflight.Backoffice</Id>
-    <Title>Preflight.Backoffice</Title>
+    <Id>Preflight.Umbraco.Backoffice</Id>
+    <PackageId>Preflight.Umbraco.Backoffice</PackageId>
+    <Title>Preflight.Umbraco.Backoffice</Title>
     <Summary>The backoffice bits - do not install this package directly, install Preflight.Umbraco instead</Summary>    
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
