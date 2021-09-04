@@ -127,10 +127,11 @@ namespace Preflight.Models
     /// </summary>
     public class GenericSettingModel : SettingsModel
     {
-        public GenericSettingModel(string label)
+        public GenericSettingModel(string label, Guid guid)
         {
             Label = label;
             Alias = label.Camel();
+            Guid = guid;
         }
     }
 
@@ -189,48 +190,6 @@ namespace Preflight.Models
             Core = true;
             Tab = tab;
             Guid = guid;
-        }
-    }
-
-    /// <summary>
-    /// Quickly generate settings list with defaults included
-    /// Set the default values for the plugin's disabled and run-on-save states
-    /// </summary>
-    public static class PluginSettingsList
-    {
-        public static IEnumerable<SettingsModel> Populate(
-            string name, 
-            bool disabled, 
-            bool runOnSaveOnly, 
-            string[] defaultSettingsGuids, 
-            string propsToTest = "", 
-            params SettingsModel[] settings)
-        {
-            if (!settings.Any())
-                return new List<SettingsModel>();
-
-            if (defaultSettingsGuids.Length != 3)
-                throw new ArgumentOutOfRangeException(nameof(defaultSettingsGuids));
-
-            if (!propsToTest.HasValue())
-            {
-                propsToTest = string.Join(KnownStrings.Comma, KnownPropertyAlias.All);
-            }
-
-            List<SettingsModel> response = new List<SettingsModel>
-            {
-                new DisabledSettingModel(name, disabled, new Guid(defaultSettingsGuids[0])),
-                new OnSaveOnlySettingModel(name, runOnSaveOnly, new Guid(defaultSettingsGuids[1])),
-                new PropertiesToTestSettingModel(name, propsToTest, new Guid(defaultSettingsGuids[2])),
-            };
-
-            foreach (SettingsModel s in settings)
-            {
-                s.Tab = name;
-                response.Add(s);
-            }
-
-            return response;
         }
     }
 }

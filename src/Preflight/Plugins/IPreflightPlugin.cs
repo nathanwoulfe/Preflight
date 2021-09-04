@@ -85,7 +85,14 @@ namespace Preflight.Plugins
         /// <param name="val">The string value of the current property</param>
         /// <param name="settings">The complete Preflight settings collection</param>
         void Check(int id, string culture, string val, List<SettingsModel> settings);
+
+        string DisabledSettingIdentifier { get; }
+        string OnSaveOnlySettingIdentifier { get; }
+        string PropertiesToTestSettingIdentifier { get; }
+
+
     }
+
 
     /// <summary>
     /// 

@@ -14,6 +14,10 @@ namespace Preflight.Plugins
 {
     public class AutocorrectPlugin : IPreflightCorePlugin
     {
+        public string DisabledSettingIdentifier => "7d34c7dd-0167-42c9-a1a4-f7245d5e555a";
+        public string OnSaveOnlySettingIdentifier => "9665c018-80be-402f-890a-4bb7f56deaac";
+        public string PropertiesToTestSettingIdentifier => "8a567a58-5417-4562-a1b9-12f1e80c8dbb";
+
         public object Result { get; set; }
         public IEnumerable<SettingsModel> Settings { get; set; }
 
@@ -34,19 +38,15 @@ namespace Preflight.Plugins
         /// </summary>
         public AutocorrectPlugin()
         {
-            Settings = PluginSettingsList.Populate(Name,
-                false,
-                true,
-                new[] { "7d34c7dd-0167-42c9-a1a4-f7245d5e555a", "9665c018-80be-402f-890a-4bb7f56deaac", "8a567a58-5417-4562-a1b9-12f1e80c8dbb" },
+            this.GenerateDefaultSettings(false, true,
                 settings: new SettingsModel[] {
-                    new GenericSettingModel("Autocorrect terms")
+                    new GenericSettingModel("Autocorrect terms", new Guid(KnownSettings.AutocorrectTerms))
                     {
                         Description = "Pipe-separated list of terms to autocorrect in Preflight checks - eg 'replace me|new text'",
                         View = SettingType.MultipleTextbox,
                         Value = "replacethis|new term",
                         Order = 1,
                         Core = true,
-                        Guid = new Guid(KnownSettings.AutocorrectTerms),
                     }
                 }
             );

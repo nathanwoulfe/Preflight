@@ -1,6 +1,6 @@
-trigger:
+trigger:   
   - v2/dev
-  - v2/release 
+  - v2/release/* 
 
 pool:
   vmImage: 'windows-latest'

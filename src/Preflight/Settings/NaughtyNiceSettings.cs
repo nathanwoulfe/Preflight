@@ -10,7 +10,7 @@ namespace Preflight.Settings
             get
             {
                 return new SettingsModel[] {
-                    new GenericSettingModel("Nice words")
+                    new GenericSettingModel("Nice words", new Guid(KnownSettings.NiceList))
                     {
                         Description = "These words will be excluded from the readability check",
                         View = SettingType.MultipleTextbox,
@@ -18,9 +18,8 @@ namespace Preflight.Settings
                         Value = "Umbraco,preflight,hippopotamus",
                         Order = 0,
                         Core = true,
-                        Guid = new Guid(KnownSettings.NiceList),
                     },
-                    new GenericSettingModel("Naughty words")
+                    new GenericSettingModel("Naughty words", new Guid(KnownSettings.NaughtyList))
                     {
                         Description = "These words should never be used.",
                         View = SettingType.MultipleTextbox,
@@ -28,7 +27,6 @@ namespace Preflight.Settings
                         Value = "bannedword,never_use_this",
                         Order = 1,
                         Core = true,
-                        Guid = new Guid(KnownSettings.NaughtyList),
                     },
                 };
             }
