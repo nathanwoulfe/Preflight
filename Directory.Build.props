@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <VersionPrefix>2.0.0</VersionPrefix>
-    <VersionSuffix>rc-001</VersionSuffix>
+    <VersionSuffix>rc-004</VersionSuffix>
     <Description>Add pre-publishing checks to Umbraco CMS</Description>
     <Authors>Nathan Woulfe</Authors>
     <Copyright>Nathan Woulfe 2019</Copyright>
