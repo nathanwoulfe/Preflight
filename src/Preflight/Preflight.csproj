@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">  
   <PropertyGroup>
-    <TargetFrameworks>net50;net472</TargetFrameworks>
+    <TargetFrameworks>net5.0;net472</TargetFrameworks>
     <Id>Preflight.Umbraco</Id>
     <PackageId>Preflight.Umbraco</PackageId>
     <Title>Preflight.Umbraco</Title>
@@ -21,9 +21,9 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <PackageReference Include="UmbracoCms.Web" Version="8.15.2" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net50'">
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="9.0.0-rc004" />
-    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="9.0.0-rc004" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="9.0.0" />
+    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Preflight.Backoffice\Preflight.Backoffice.csproj" />

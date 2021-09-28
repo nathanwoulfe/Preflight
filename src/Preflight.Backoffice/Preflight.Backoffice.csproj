@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <ContentTargetFolders>.</ContentTargetFolders>
     <Id>Preflight.Umbraco.Backoffice</Id>
     <PackageId>Preflight.Umbraco.Backoffice</PackageId>
     <Title>Preflight.Umbraco.Backoffice</Title>

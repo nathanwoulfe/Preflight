@@ -27,7 +27,8 @@ steps:
   inputs: 
     targetType: 'inline'
     script: |
-      $configuration = If ($Env:BUILD_SOURCEBRANCH -eq '$(DEV_BRANCH)') { 'DEBUG' } Else { 'RELEASE' }
+      #$configuration = If ($Env:BUILD_SOURCEBRANCH -eq '$(DEV_BRANCH)') { 'DEBUG' } Else { 'RELEASE' }
+      $configuration = 'RELEASE'
       echo "source branch = $Env:BUILD_SOURCEBRANCH"
       echo "configuration = $configuration"
       echo "##vso[task.setvariable variable=CONFIGURATION]$configuration"
@@ -41,12 +42,12 @@ steps:
       $prefix = $xml.Project.PropertyGroup.VersionPrefix
       $suffix = $xml.Project.PropertyGroup.VersionSuffix
    
-      echo "version = $prefix-$suffix.$Env:BUILD_BUILDID"
+      echo "prefix = $prefix | suffix = $suffix | build = $Env:BUILD_BUILDID"
       
-      If ($Env:BUILD_SOURCEBRANCH -eq '$(DEV_BRANCH)') {
+      If (($Env:BUILD_SOURCEBRANCH -eq '$(DEV_BRANCH)') -and $suffix) {
         echo "##vso[task.setvariable variable=VERSION]$prefix-$suffix.$Env:BUILD_BUILDID" } 
       Else { 
-        echo "##vso[task.setvariable variable=VERSION]$prefix-$suffix" }
+        echo "##vso[task.setvariable variable=VERSION]$prefix" }
 
 - task: Cache@2
   inputs:
