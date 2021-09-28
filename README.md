@@ -1,6 +1,5 @@
 # Preflight - Pre-publishing checks for Umbraco
 
-[![Latest build](https://ci.appveyor.com/api/projects/status/mhwi63lfxdqglrlk?svg=true)](https://ci.appveyor.com/project/nathanwoulfe/preflight/build/artifacts)
 [![NuGet release](https://img.shields.io/nuget/dt/Preflight.Umbraco.svg)](https://www.nuget.org/packages/Preflight.Umbraco)
 [![Our Umbraco project page](https://img.shields.io/badge/our-umbraco-brightgreen.svg)](https://our.umbraco.org/projects/backoffice-extensions/preflight)
 
