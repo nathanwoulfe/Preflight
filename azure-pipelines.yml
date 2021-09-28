@@ -1,6 +1,11 @@
 trigger:   
-  - v2/dev
-  - v2/release/* 
+  batch: true
+  branches:
+    include:
+    - v2/dev
+  tags:
+    include:
+    - refs/tags/v* 
 
 pool:
   vmImage: 'windows-latest'
