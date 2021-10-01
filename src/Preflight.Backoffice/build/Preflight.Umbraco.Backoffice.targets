@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <PreflightPackageContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\Preflight\**\*.*</PreflightPackageContentFilesPath>
+    <PreflightPackageContentFilesPath>$(MSBuildThisFileDirectory)..\Content\App_Plugins\Preflight\**\*.*</PreflightPackageContentFilesPath>
   </PropertyGroup>
 
   <Target Name="CopyPreflightPackageAssets" BeforeTargets="Build">

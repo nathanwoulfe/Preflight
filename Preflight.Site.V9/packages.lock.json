@@ -1930,7 +1930,7 @@
       "Preflight.Umbraco": {
         "type": "Project",
         "dependencies": {
-          "Preflight.Umbraco.Backoffice": "2.0.0",
+          "Preflight.Umbraco.Backoffice": "2.0.1",
           "Umbraco.Cms.Web.BackOffice": "9.0.0",
           "Umbraco.Cms.Web.Website": "9.0.0"
         }
