@@ -1,4 +1,3 @@
-﻿#if NETCOREAPP
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -9,28 +8,28 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
-namespace Preflight.Hubs
+namespace Preflight.Hubs;
+
+internal sealed class PreflightHubRoutes : IAreaRoutes
 {
-    public class PreflightHubRoutes : IAreaRoutes
+    private readonly IRuntimeState _runtimeState;
+    private readonly string _umbracoPathSegment;
+
+    public PreflightHubRoutes(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IRuntimeState runtimeState)
     {
-        private readonly IRuntimeState _runtimeState;
-        private readonly string _umbracoPathSegment;
-
-        public PreflightHubRoutes(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IRuntimeState runtimeState)
-        {
-            _runtimeState = runtimeState;
-            _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
-        }
-
-        public void CreateRoutes(IEndpointRouteBuilder endpoints)
-        {
-            if (_runtimeState.Level != RuntimeLevel.Run) return;
-
-            endpoints.MapHub<PreflightHub>(GetPreflightHubRoute());
-        }
-
-        public string GetPreflightHubRoute() => $"/{_umbracoPathSegment}/{nameof(PreflightHub)}";
+        _runtimeState = runtimeState;
+        _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
     }
-}
 
-#endif
+    public void CreateRoutes(IEndpointRouteBuilder endpoints)
+    {
+        if (_runtimeState.Level != RuntimeLevel.Run)
+        {
+            return;
+        }
+
+        _ = endpoints.MapHub<PreflightHub>(GetPreflightHubRoute());
+    }
+
+    public string GetPreflightHubRoute() => $"/{_umbracoPathSegment}/{nameof(PreflightHub)}";
+}

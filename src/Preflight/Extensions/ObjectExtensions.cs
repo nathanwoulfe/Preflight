@@ -1,24 +1,30 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace Preflight.Extensions
+namespace Preflight.Extensions;
+
+public static class ObjectExtensions
 {
-    public static class ObjectExtensions
+    public static Dictionary<string, string>? ToVariantDictionary(this object obj)
     {
-        public static Dictionary<string, string> ToVariantDictionary(this object obj)
+        if (obj is IDictionary<string, string>)
         {
-            if (obj is IDictionary<string, string>)
-                return (Dictionary<string, string>)obj;
-
-            if (obj == null)
-                return new Dictionary<string, string>();
-
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(obj.ToString());
+            return (Dictionary<string, string>)obj;
         }
 
-        public static string ForVariant(this object obj, string culture)
+        if (obj is null)
         {
-            return obj.ToVariantDictionary()[culture].ToString();
+            return new();
         }
+
+        string? objectString = obj.ToString();
+        if (string.IsNullOrEmpty(objectString))
+        {
+            return new();
+        }
+
+        return JsonConvert.DeserializeObject<Dictionary<string, string>>(objectString);
     }
+
+    public static string? ForVariant(this object obj, string culture) =>
+        obj.ToVariantDictionary()?[culture].ToString();
 }

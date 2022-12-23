@@ -1,12 +1,16 @@
-﻿namespace Preflight.Models
+namespace Preflight.Models;
+
+public class ContentParserParams
 {
-    public class ContentParserParams
-    {
-        public string PropertyName { get; set; }
-        public string PropertyValue { get; set; }
-        public string PropertyEditorAlias { get; set; }
-        public string Culture { get; set; }
-        public int NodeId { get; set; }
-        public bool FromSave { get; set; }
-    }
+    public string PropertyName { get; set; } = string.Empty;
+
+    public string PropertyValue { get; set; } = string.Empty;
+
+    public string PropertyEditorAlias { get; set; } = string.Empty;
+
+    public string Culture { get; set; } = string.Empty;
+
+    public int NodeId { get; set; }
+
+    public bool FromSave { get; set; }
 }

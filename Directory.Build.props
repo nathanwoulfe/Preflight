@@ -1,21 +1,34 @@
 <Project>
+	<PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net6.0</TargetFramework>
+		<Authors>Nathan Woulfe</Authors>
+    <Copyright>Copyright © Nathan Woulfe $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/nathanwoulfe/clip</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/nathanwoulfe/clip</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.113" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" PrivateAssets="all" IsImplicitlyDefined="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+  
   <PropertyGroup>
-    <VersionPrefix>2.0.1</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
-    <Description>Add pre-publishing checks to Umbraco CMS</Description>
-    <Authors>Nathan Woulfe</Authors>
-    <Copyright>Nathan Woulfe 2019</Copyright>
-    <PackageIconUrl></PackageIconUrl>
-
-    <PackageProjectUrl>https://thisredwolf.com/preflight</PackageProjectUrl>
-    <PackageTags>Umbraco;UmbracoCms;</PackageTags>
-    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-
-    <RepositoryUrl>https://github.com/nathanwoulfe/preflight</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <RestoreLockedMode>false</RestoreLockedMode>
-    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    <GitVersionBaseDirectory>$(MSBuildThisFileDirectory)</GitVersionBaseDirectory>
   </PropertyGroup>
 </Project>

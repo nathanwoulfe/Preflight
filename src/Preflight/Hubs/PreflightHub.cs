@@ -1,29 +1,18 @@
-﻿using Preflight.Models;
-#if NETCOREAPP
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
-#else
-using Microsoft.AspNet.SignalR;
-#endif
+using Preflight.Models;
 
-namespace Preflight.Hubs
+namespace Preflight.Hubs;
+
+public interface IPreflightHub
 {
-    public interface IPreflightHub
-    {
+    Task refresh();
 
-#if NETCOREAPP
-        Task refresh();
-        Task preflightTest(PreflightPropertyResponseModel model);
-        Task preflightComplete();
-#else
-        void refresh();
-        void preflightTest(PreflightPropertyResponseModel model);
-        void preflightComplete();
-#endif  
-    }
+    Task preflightTest(PreflightPropertyResponseModel model);
 
-    public class PreflightHub : Hub<IPreflightHub>
-    {
+    Task preflightComplete();
+}
 
-    }
+internal sealed class PreflightHub : Hub<IPreflightHub>
+{
+
 }

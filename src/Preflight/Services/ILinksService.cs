@@ -1,10 +1,8 @@
-﻿using Preflight.Models;
-using System.Collections.Generic;
+using Preflight.Models;
 
-namespace Preflight.Services
+namespace Preflight.Services;
+
+public interface ILinksService
 {
-    public interface ILinksService
-    {
-        List<BrokenLinkModel> Check(string text, List<BrokenLinkModel> safeBrowsingResult);
-    }
+    List<BrokenLinkModel> Check(string text, List<BrokenLinkModel> safeBrowsingResult);
 }

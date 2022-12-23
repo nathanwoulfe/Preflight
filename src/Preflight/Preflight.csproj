@@ -1,31 +1,42 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">  
+<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net472</TargetFrameworks>
-    <Id>Preflight.Umbraco</Id>
     <PackageId>Preflight.Umbraco</PackageId>
-    <Title>Preflight.Umbraco</Title>
-    <Summary>Add pre-publishing checks to Umbraco CMS</Summary>
-	<AuthorName>Nathan Woulfe</AuthorName>
-	<AuthorUrl>https://github.com/nathanwoulfe</AuthorUrl>
-	<PackageLicenseName>MIT license</PackageLicenseName>
-	<PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-	<ProjectUrl>https://github.com/nathanwoulfe/Preflight</ProjectUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Title>Preflight</Title>
+    <Description>Add pre-publishing checks to Umbraco CMS</Description>
+    <PackageTags>umbraco umbraco-cms umbraco-marketplace</PackageTags>
+    <IncludeSymbols>false</IncludeSymbols>
+    <StaticWebAssetBasePath>App_Plugins/Preflight</StaticWebAssetBasePath>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
   </PropertyGroup>
-  <Target Name="RemoveLuceneAnalyzer" BeforeTargets="CoreCompile">
-    <ItemGroup>
-      <Analyzer Remove="@(Analyzer)" Condition="%(FileName) == 'Lucene.Net.CodeAnalysis.CSharp'" />
-    </ItemGroup>
-  </Target>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-    <PackageReference Include="UmbracoCms.Web" Version="8.15.2" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="9.0.0" />
-    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="9.0.0" />
-  </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Preflight.Backoffice\Preflight.Backoffice.csproj" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[10.0.0, 11)" />
+    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[10.0.0, 11)" />
+  </ItemGroup>
+
+  <Import Project="build\Microsoft.AspNetCore.ClientAssets.targets" />
+  <Target Name="ClientAssetsBuildOutputPath" AfterTargets="ClientAssetsBuild">
+    <WriteLinesToFile File="Backoffice\gulp\config.outputPath.js" Lines="export const outputPath = '../$(IntermediateOutputPath.Replace('\', '/'))clientassets';" Overwrite="true" />
+  </Target>
+  <ItemGroup>
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\app.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\card\card.component.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\progresscircle\progresscircle.component.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\resultintro.component.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\stateicon\stateicon.component.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\_componentsModule.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\constants.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\notification.controller.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\preflight.controller.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\settings.controller.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\_controllersModule.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\interceptors\preflight.save.interceptor.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\plugins\linkhealth\linkhealth.result.component.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\plugins\readability\readability.plugin.controller.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\plugins\_pluginsModule.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\resources\preflight.hub.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\resources\preflight.service.ts" />
+    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\resources\_servicesModule.ts" />
   </ItemGroup>
 </Project>

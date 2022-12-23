@@ -1,55 +1,32 @@
-﻿using System.Collections.Generic;
-#if NETCOREAPP
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
-#else
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Web;
-#endif
 
-namespace Preflight
+namespace Preflight;
+
+internal sealed class PreflightContentAppComposer : IComposer
 {
-#if NETCOREAPP
-    public class PreflightContentAppComposer : IComposer
-    {
-        public void Compose(IUmbracoBuilder builder)
-        {
-            builder.ContentApps().Append<PreflightContentApp>();
-        }
-    }
-#else
-    public class PreflightContentAppComposer : IUserComposer
-    {
-        public void Compose(Composition composition)
-        {
-            composition.ContentApps().Append<PreflightContentApp>();
-        }
-    }
-#endif
+    public void Compose(IUmbracoBuilder builder) => _ = builder.ContentApps().Append<PreflightContentApp>();
+}
 
-    public class PreflightContentApp : IContentAppFactory
+internal sealed class PreflightContentApp : IContentAppFactory
+{
+    public ContentApp? GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
     {
-        public ContentApp GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
+        if (source is IContent content && !content.ContentType.IsElement)
         {
-            if (source is IContent content && !content.ContentType.IsElement)
+            return new ContentApp
             {
-                var app = new ContentApp
-                {
-                    Alias = KnownStrings.Alias,
-                    Name = KnownStrings.Name,
-                    Icon = KnownStrings.Icon,
-                    View = "/App_Plugins/Preflight/Backoffice/views/app.html",
-                    Weight = 0
-                };
-                return app;
-            }
-            return null;
+                Alias = KnownStrings.Alias,
+                Name = KnownStrings.Name,
+                Icon = KnownStrings.Icon,
+                View = "/App_Plugins/Preflight/Backoffice/views/app.html",
+                Weight = 0,
+            };
         }
+
+        return null;
     }
 }

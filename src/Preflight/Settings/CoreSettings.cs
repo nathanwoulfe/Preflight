@@ -1,55 +1,47 @@
-﻿using Preflight.Models;
-using System;
-using System.Linq;
+using Preflight.Models;
 
-namespace Preflight.Settings
+namespace Preflight.Settings;
+
+public class CoreSettings
 {
-    public class CoreSettings
+    public SettingsModel[] Settings => new SettingsModel[]
     {
-        public SettingsModel[] Settings
+        new GenericSettingModel("Run Preflight on save", new Guid(KnownSettings.BindSaveHandler))
         {
-            get
-            {
-                return new SettingsModel[] {
-                    new GenericSettingModel("Run Preflight on save", new Guid(KnownSettings.BindSaveHandler))
-                    {
-                        Description = "Set to true and Preflight will run on all saves, and alert users to any errors",
-                        View = SettingType.Boolean,
-                        Tab = SettingsTabNames.General,
-                        Value = 0,
-                        Order = 0,
-                        Core = true,
-                    },
-                    new GenericSettingModel("Cancel save when Preflight tests fail", new Guid(KnownSettings.CancelSaveOnFail))
-                    {
-                        Description = "Set to true and Preflight will cancel the save event, if tests fail and Preflight is set to run on save",
-                        View = SettingType.Boolean,
-                        Tab = SettingsTabNames.General,
-                        Value = 0,
-                        Order = 1,
-                        Core = true,
-                    },
-                    new GenericSettingModel("Properties to test", new Guid(KnownSettings.PropertiesToTest))
-                    {
-                        Description = "Restrict Preflight to a subset of testable properties",
-                        View = SettingType.CheckboxList,
-                        Tab = SettingsTabNames.General,
-                        Value = string.Join(KnownStrings.Comma, KnownPropertyAlias.All),
-                        Prevalues = KnownPropertyAlias.All.Select(x => new { value = x, key = x }),
-                        Order = 2,
-                        Core = true,
-                    },
-                    new GenericSettingModel("User group opt in/out", new Guid(KnownSettings.UserGroupOptIn))
-                    {
-                        Description = "Select user groups to opt in to testing",
-                        View = SettingType.CheckboxList,
-                        Tab = SettingsTabNames.General,
-                        Value = "Administrators,Editors",                        
-                        Order = 3,
-                        Core = true,
-                    },
-                };
-            }
-        }
-    }
+            Description = "Set to true and Preflight will run on all saves, and alert users to any errors",
+            View = SettingType.Boolean,
+            Tab = SettingsTabNames.General,
+            Value = 0,
+            Order = 0,
+            Core = true,
+        },
+        new GenericSettingModel("Cancel save when Preflight tests fail", new Guid(KnownSettings.CancelSaveOnFail))
+        {
+            Description = "Set to true and Preflight will cancel the save event, if tests fail and Preflight is set to run on save",
+            View = SettingType.Boolean,
+            Tab = SettingsTabNames.General,
+            Value = 0,
+            Order = 1,
+            Core = true,
+        },
+        new GenericSettingModel("Properties to test", new Guid(KnownSettings.PropertiesToTest))
+        {
+            Description = "Restrict Preflight to a subset of testable properties",
+            View = SettingType.CheckboxList,
+            Tab = SettingsTabNames.General,
+            Value = string.Join(KnownStrings.Comma, KnownPropertyAlias.All),
+            Prevalues = KnownPropertyAlias.All.Select(x => new { value = x, key = x }),
+            Order = 2,
+            Core = true,
+        },
+        new GenericSettingModel("User group opt in/out", new Guid(KnownSettings.UserGroupOptIn))
+        {
+            Description = "Select user groups to opt in to testing",
+            View = SettingType.CheckboxList,
+            Tab = SettingsTabNames.General,
+            Value = "Administrators,Editors",
+            Order = 3,
+            Core = true,
+        },
+    };
 }

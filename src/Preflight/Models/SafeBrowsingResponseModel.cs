@@ -1,60 +1,51 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace Preflight.Models
+namespace Preflight.Models;
+
+public class SafeBrowsingResponseModel
 {
-    public class SafeBrowsingResponseModel
-    {
-        [JsonProperty("matches")]
-        public List<Match> Matches { get; set; }
+    [JsonProperty("matches")]
+    public List<Match> Matches { get; set; } = new();
+}
 
-        public SafeBrowsingResponseModel()
-        {
-            Matches = new List<Match>();
-        }
-    }
+public class Match
+{
+    [JsonProperty("threatType")]
+    public string ThreatType { get; set; } = string.Empty;
 
-    public class Match
-    {
-        [JsonProperty("threatType")]
-        public string ThreatType { get; set; }
+    [JsonProperty("platformType")]
+    public string PlatformType { get; set; } = string.Empty;
 
-        [JsonProperty("platformType")]
-        public string PlatformType { get; set; }
+    [JsonProperty("threatEntryType")]
+    public string ThreatEntryType { get; set; } = string.Empty;
 
-        [JsonProperty("threatEntryType")]
-        public string ThreatEntryType { get; set; }
+    [JsonProperty("threat")]
+    public Threat Threat { get; set; } = new();
 
-        [JsonProperty("threat")]
-        public Threat Threat { get; set; }
+    [JsonProperty("threatEntryMetadata")]
+    public ThreatEntryMetadata ThreatEntryMetadata { get; set; } = new();
 
-        [JsonProperty("threatEntryMetadata")]
-        public ThreatEntryMetadata ThreatEntryMetadata { get; set; }
+    [JsonProperty("cacheDuration")]
+    public string CacheDuration { get; set; } = string.Empty;
+}
 
-        [JsonProperty("cacheDuration")]
-        public string CacheDuration { get; set; }
-    }
+public class Threat
+{
+    [JsonProperty("url")]
+    public string Url { get; set; } = string.Empty;
+}
 
-    public class Threat
-    {
-        [JsonProperty("url")]
-        public string Url { get; set; }
-    }
+public class Entry
+{
+    [JsonProperty("key")]
+    public string Key { get; set; } = string.Empty;
 
-    public class Entry
-    {
-        [JsonProperty("key")]
-        public string Key { get; set; }
+    [JsonProperty("value")]
+    public string Value { get; set; } = string.Empty;
+}
 
-        [JsonProperty("value")]
-        public string Value { get; set; }
-    }
-
-    public class ThreatEntryMetadata
-    {
-        [JsonProperty("entries")]
-        public List<Entry> Entries { get; set; }
-    }
-
-
+public class ThreatEntryMetadata
+{
+    [JsonProperty("entries")]
+    public List<Entry> Entries { get; set; } = new();
 }

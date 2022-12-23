@@ -1,9 +1,0 @@
-{
-  "javascript": [
-    "~/App_Plugins/Preflight/Backoffice/js/preflight.js"
-  ],
-  "css": [
-    "~/App_Plugins/Preflight/Backoffice/css/styles.css"
-  ],
-  "bundleOptions": "None"
-}

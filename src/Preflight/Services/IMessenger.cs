@@ -1,10 +1,10 @@
-﻿using Preflight.Models;
+using Preflight.Models;
 
-namespace Preflight.Services
+namespace Preflight.Services;
+
+public interface IMessenger
 {
-    public interface IMessenger
-    {
-        void SendTestResult(PreflightPropertyResponseModel model);
-        void PreflightComplete();
-    }
+    void SendTestResult(PreflightPropertyResponseModel model);
+
+    void PreflightComplete();
 }

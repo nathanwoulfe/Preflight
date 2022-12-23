@@ -1,31 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31515.178
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33103.201
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{42C19924-0B8A-47D6-A2B6-EDEC68AB73DB}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		.globalconfig = .globalconfig
 		azure-pipelines.yml = azure-pipelines.yml
 		Directory.Build.props = Directory.Build.props
+		global.json = global.json
 		localbuild.ps1 = localbuild.ps1
 		README.md = README.md
+		umbraco-marketplace.json = umbraco-marketplace.json
+		version.json = version.json
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Preflight.Site.V8", "Preflight.Site.V8\Preflight.Site.V8.csproj", "{DF7A4793-44A0-4C53-A328-5A7F95F11891}"
-	ProjectSection(ProjectDependencies) = postProject
-		{A7D0A724-C91F-48C2-86CF-B99BCF251F90} = {A7D0A724-C91F-48C2-86CF-B99BCF251F90}
-		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77} = {FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preflight.Backoffice", "src\Preflight.Backoffice\Preflight.Backoffice.csproj", "{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preflight", "src\Preflight\Preflight.csproj", "{A7D0A724-C91F-48C2-86CF-B99BCF251F90}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preflight.Site.V9", "Preflight.Site.V9\Preflight.Site.V9.csproj", "{43B2FE45-0E45-41D1-B221-D24D718F2FEC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77} = {FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preflight.Site", "Preflight.Site\Preflight.Site.csproj", "{95F2C7A1-B17E-4997-9048-E5E3BD79B949}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,22 +27,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF7A4793-44A0-4C53-A328-5A7F95F11891}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FBB2E3DF-B378-410D-AEC0-A026E3DCFF77}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7D0A724-C91F-48C2-86CF-B99BCF251F90}.Release|Any CPU.Build.0 = Release|Any CPU
-		{43B2FE45-0E45-41D1-B221-D24D718F2FEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43B2FE45-0E45-41D1-B221-D24D718F2FEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43B2FE45-0E45-41D1-B221-D24D718F2FEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43B2FE45-0E45-41D1-B221-D24D718F2FEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95F2C7A1-B17E-4997-9048-E5E3BD79B949}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95F2C7A1-B17E-4997-9048-E5E3BD79B949}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95F2C7A1-B17E-4997-9048-E5E3BD79B949}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95F2C7A1-B17E-4997-9048-E5E3BD79B949}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

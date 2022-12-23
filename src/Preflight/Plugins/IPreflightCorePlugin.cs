@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
-namespace Preflight.Plugins
+namespace Preflight.Plugins;
+
+internal interface IPreflightCorePlugin : IPreflightPlugin
 {
-    internal interface IPreflightCorePlugin : IPreflightPlugin
-    {
-        /// <summary>
-        /// Is this a core plugin, shipped with with package?
-        /// </summary>
-        [JsonProperty("core")]
-        bool Core { get; }
-    }
+    /// <summary>
+    /// Is this a core plugin, shipped with with package?
+    /// </summary>
+    [JsonProperty("core")]
+    bool Core { get; }
 }

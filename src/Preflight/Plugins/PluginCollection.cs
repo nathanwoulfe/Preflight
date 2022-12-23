@@ -1,24 +1,16 @@
-﻿using System.Collections.Generic;
-#if NETCOREAPP
-using System;
 using Umbraco.Cms.Core.Composing;
-#else
-using Umbraco.Core.Composing;
-#endif
 
-namespace Preflight.Plugins
+namespace Preflight.Plugins;
+
+public class PreflightPluginCollectionBuilder : LazyCollectionBuilderBase<PreflightPluginCollectionBuilder, PreflightPluginCollection, IPreflightPlugin>
 {
-    public class PreflightPluginCollectionBuilder : LazyCollectionBuilderBase<PreflightPluginCollectionBuilder, PreflightPluginCollection, IPreflightPlugin>
-    {
-        protected override PreflightPluginCollectionBuilder This => this;
-    }
+    protected override PreflightPluginCollectionBuilder This => this;
+}
 
-    public class PreflightPluginCollection : BuilderCollectionBase<IPreflightPlugin>
+public class PreflightPluginCollection : BuilderCollectionBase<IPreflightPlugin>
+{
+    public PreflightPluginCollection(Func<IEnumerable<IPreflightPlugin>> plugins)
+        : base(plugins)
     {
-#if NETCOREAPP
-        public PreflightPluginCollection(Func<IEnumerable<IPreflightPlugin>> plugins) : base(plugins) { }
-#else
-        public PreflightPluginCollection(IEnumerable<IPreflightPlugin> plugins) : base(plugins) {}
-#endif
     }
 }
