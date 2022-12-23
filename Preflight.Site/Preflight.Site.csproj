@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="C:\Users\natha\source\repos\Preflight-10\icon.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="clean" Version="2.1.6" />

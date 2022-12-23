@@ -18,25 +18,5 @@
   <Import Project="build\Microsoft.AspNetCore.ClientAssets.targets" />
   <Target Name="ClientAssetsBuildOutputPath" AfterTargets="ClientAssetsBuild">
     <WriteLinesToFile File="Backoffice\gulp\config.outputPath.js" Lines="export const outputPath = '../$(IntermediateOutputPath.Replace('\', '/'))clientassets';" Overwrite="true" />
-  </Target>
-  <ItemGroup>
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\app.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\card\card.component.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\progresscircle\progresscircle.component.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\resultintro.component.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\stateicon\stateicon.component.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\components\_componentsModule.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\constants.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\notification.controller.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\preflight.controller.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\settings.controller.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\controllers\_controllersModule.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\interceptors\preflight.save.interceptor.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\plugins\linkhealth\linkhealth.result.component.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\plugins\readability\readability.plugin.controller.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\plugins\_pluginsModule.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\resources\preflight.hub.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\resources\preflight.service.ts" />
-    <ClientAssetsInputs Remove="Backoffice\app\Backoffice\resources\_servicesModule.ts" />
-  </ItemGroup>
+  </Target> 
 </Project>
