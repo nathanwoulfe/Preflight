@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Preflight.Models;
+namespace Preflight.Plugins.LinkHealth.Models;
 
 public class BrokenLinkModel
 {

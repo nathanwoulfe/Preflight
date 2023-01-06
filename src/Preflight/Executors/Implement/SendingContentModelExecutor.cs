@@ -1,10 +1,10 @@
 using Preflight.Extensions;
-using Preflight.Models;
 using Preflight.Services;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
+using Preflight.Models.Settings;
 
 namespace Preflight.Executors.Implement;
 

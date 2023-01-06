@@ -1,9 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
   <area alias="dashboardTabs">
     <key alias="preflight">Preflight</key>
   </area>
   <area alias="preflight">
+    <key alias="settingsIntro">
+      <![CDATA[
+        <p>Preflight provides a pluggable framework for adding pre-publishing checks to your content.</p>
+        <p>Out of the box, Preflight provides plugins for general readability (reading level, sentence length, blacklisting words), link health and text autocorrect.</p>
+        <p>Settings are language-specific, so can be configured (or disabled) for different languages where grammar rules differ.</p>
+      ]]>
+    </key>
+    
     <key alias="passIntro">Content on this page passes all preflight checks</key>
     <key alias="passText">Good job! Check back after updating the content for fresh test results</key>
     <key alias="failIntro">That's not great...</key>
@@ -11,6 +19,8 @@
     <key alias="failTextPlural">Content on this page fails multiple preflight checks</key>
     <key alias="noTestsIntro">No content on this page underwent preflight checks</key>
     <key alias="noTestsText">Ensure the Preflight settings are including the appropriate property types</key>
+    <key alias="notCreatedIntro">No tests run as this variant has not been created</key>
+    <key alias="notCreatedText">Save the new variant to run initial preflight testing</key>
 
     <key alias="runningChecks">Preflight found modified content - testing</key>
 
@@ -40,8 +50,8 @@
     <key alias="cancelSaveWhenPreflightTestsFailDescription">Set to true and Preflight will cancel the save event, if tests fail and Preflight is set to run on save</key>
     <key alias="propertiesToTest">Properties to test</key>
     <key alias="propertiesToTestDescription">Restrict Preflight to a subset of testable properties</key>
-    <key alias="userGroupOptInout">User group opt in/out</key>
-    <key alias="userGroupOptInoutDescription">Select user groups to opt in to testing</key>
+    <key alias="userGroupOptInOut">User group opt in/out</key>
+    <key alias="userGroupOptInOutDescription">Select user groups to opt in to testing</key>
   </area>
 
   <area alias="preflight-linkHealth">
@@ -66,6 +76,7 @@
 
   <area alias="preflight-naughtyAndNice">
     <key alias="tabName">Naughty and nice</key>
+    <key alias="summary">Set words for inclusion/exclusion in other tests</key>
     <key alias="niceWords">Nice words</key>
     <key alias="niceWordsDescription">These words will be excluded from the readability check</key>
     <key alias="naughtyWords">Naughty words</key>

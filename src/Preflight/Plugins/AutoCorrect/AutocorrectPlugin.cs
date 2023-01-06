@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
 using Preflight.Extensions;
-using Preflight.Models;
+using Preflight.Models.Settings;
 using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
 
-namespace Preflight.Plugins;
+namespace Preflight.Plugins.AutoCorrect;
 
 public class AutocorrectPlugin : IPreflightCorePlugin
 {
@@ -29,7 +29,7 @@ public class AutocorrectPlugin : IPreflightCorePlugin
 
     public string ViewPath => string.Empty;
 
-    public string Summary => "Automatically replace naughty words with less naughty words, or fix common spelling mistakes.";
+    public string Summary => string.Empty;
 
     public string Description { get; set; } = string.Empty;
 
@@ -43,11 +43,10 @@ public class AutocorrectPlugin : IPreflightCorePlugin
         true,
         settings: new SettingsModel[]
         {
-            new GenericSettingModel("Autocorrect terms", new Guid(KnownSettings.AutocorrectTerms))
+            new GenericSettingModel("autocorrectTerms", new Guid(KnownSettings.AutocorrectTerms))
             {
-                Description = "Pipe-separated list of terms to autocorrect in Preflight checks - eg 'replace me|new text'",
                 View = SettingType.MultipleTextbox,
-                Value = "replacethis|new term",
+                DefaultValue = "replacethis|new term",
                 Order = 1,
                 Core = true,
             },

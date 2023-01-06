@@ -1,10 +1,9 @@
 using System.Text.RegularExpressions;
 using Preflight.Extensions;
-using Preflight.Models;
+using Preflight.Models.Settings;
 using CharArrays = Umbraco.Cms.Core.Constants.CharArrays;
-using Readability = Preflight.Constants.Readability;
 
-namespace Preflight.Services.Implement;
+namespace Preflight.Plugins.Readability;
 
 internal sealed class ReadabilityService : IReadabilityService
 {
@@ -41,12 +40,12 @@ internal sealed class ReadabilityService : IReadabilityService
         List<string> longWords = new();
         List<string> blacklisted = new();
 
-        text = Regex.Replace(text, Readability.ClosingHtmlTags, Readability.Period);
-        text = text.Replace(Environment.NewLine, Readability.Space);
-        text = Regex.Replace(text, Readability.CharsToRemove, string.Empty).Replace(Readability.AmpersandEntity, Readability.Ampersand);
-        text = Regex.Replace(text, Readability.DuplicateSpaces, Readability.Space);
+        text = Regex.Replace(text, Constants.ClosingHtmlTags, Constants.Period);
+        text = text.Replace(Environment.NewLine, Constants.Space);
+        text = Regex.Replace(text, Constants.CharsToRemove, string.Empty).Replace(Constants.AmpersandEntity, Constants.Ampersand);
+        text = Regex.Replace(text, Constants.DuplicateSpaces, Constants.Space);
 
-        var sentences = text.Split(Readability.WordDelimiters).Where(s => s.HasValue() && s.Length > 3).ToList();
+        var sentences = text.Split(Constants.WordDelimiters).Where(s => s.HasValue()).ToList();
 
         // calc words/sentence
         double totalWords = 0;
@@ -119,7 +118,7 @@ internal sealed class ReadabilityService : IReadabilityService
         {
             bool foundVowel = false;
 
-            foreach (char vowel in Constants.Readability.Vowels)
+            foreach (char vowel in Constants.Vowels)
             {
                 // don't count diphthongs
                 if (vowel == character && lastWasVowel)
@@ -151,8 +150,8 @@ internal sealed class ReadabilityService : IReadabilityService
         string lastTwoChars = currentWord[^2..].ToLower();
         string lastThreeChars = currentWord[^3..].ToLower();
 
-        if ((Readability.Endings.Contains(lastTwoChars) && lastThreeChars != Readability.Ied)
-            || (lastTwoChars.First() != Readability.l && lastTwoChars.Last() == Readability.e))
+        if ((Constants.Endings.Contains(lastTwoChars) && lastThreeChars != Constants.Ied)
+            || (lastTwoChars.First() != Constants.l && lastTwoChars.Last() == Constants.e))
         {
             numVowels--;
         }

@@ -1,6 +1,6 @@
-using Preflight.Models;
+using Preflight.Plugins.LinkHealth.Models;
 
-namespace Preflight.Services;
+namespace Preflight.Plugins.LinkHealth.Services;
 
 public interface ILinksService
 {

@@ -1,7 +1,9 @@
+using Newtonsoft.Json;
 using NPoco;
+using Preflight.Models.Settings;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Preflight.Models;
+namespace Preflight.Models.Dtos;
 
 [TableName(KnownStrings.SettingsTable)]
 [ExplicitColumns]
@@ -33,6 +35,6 @@ public class SettingDto
 
         Id = model.Id;
         Setting = model.Guid;
-        Value = model.Value?.ToString() ?? string.Empty;
+        Value = JsonConvert.SerializeObject(model.Value);
     }
 }

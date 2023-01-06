@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Preflight.Extensions;
 using Preflight.Models;
+using Preflight.Models.Settings;
 using Preflight.Services;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
@@ -51,7 +52,7 @@ public class PreflightApiController : UmbracoAuthorizedApiController
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    public IActionResult SaveSettings(PreflightSettings settings)
+    public IActionResult SaveSettings(PreflightSettingsModel settings)
     {
         try
         {

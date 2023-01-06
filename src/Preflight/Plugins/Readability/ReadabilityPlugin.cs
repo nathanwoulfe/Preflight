@@ -1,8 +1,7 @@
 using Preflight.Extensions;
-using Preflight.Models;
-using Preflight.Services;
+using Preflight.Models.Settings;
 
-namespace Preflight.Plugins;
+namespace Preflight.Plugins.Readability;
 
 public class ReadabilityPlugin : IPreflightCorePlugin
 {
@@ -32,7 +31,7 @@ public class ReadabilityPlugin : IPreflightCorePlugin
 
     public string Name => "Readability";
 
-    public string Summary => "Ensure content meets minimum readability measures, using the Flesch reading ease algorithm.";
+    public string Summary => string.Empty;
 
     public string ViewPath => "/App_Plugins/Preflight/Backoffice/plugins/readability/readability.html";
 
@@ -49,41 +48,28 @@ public class ReadabilityPlugin : IPreflightCorePlugin
             false,
             settings: new SettingsModel[]
             {
-                new GenericSettingModel("Readability target - minimum", new Guid(KnownSettings.ReadabilityMin))
+                new GenericSettingModel("readabilityTargetMinimum", new Guid(KnownSettings.ReadabilityMin))
                 {
-                    Value = "60",
-                    Description = "Readability result must be great than this value",
+                    DefaultValue = 60,
                     View = SettingType.Slider,
                     Order = 1,
                     Core = true,
                 },
-                new GenericSettingModel("Readability target - maximum", new Guid(KnownSettings.ReadabilityMax))
+                new GenericSettingModel("readabilityTargetMaximum", new Guid(KnownSettings.ReadabilityMax))
                 {
-                    Value = "100",
-                    Description = "Readability result must be less than this value",
+                    DefaultValue = 100,
                     View = SettingType.Slider,
                     Order = 2,
                     Core = true,
                 },
-                new GenericSettingModel("Long word syllable count", new Guid(KnownSettings.LongWordSyllables))
+                new GenericSettingModel("longWordSyllableCount", new Guid(KnownSettings.LongWordSyllables))
                 {
-                    Value = "5",
-                    Description =
-                        "Words in text will be flagged as long, if their syllable count is equal to or greater than this value",
+                    DefaultValue = 5,
                     View = SettingType.Slider,
                     Order = 3,
                     Core = true,
                 },
             });
-
-        Description = @"<p>If your content is too difficult for your visitors to read, you're all going to have a bad time.</p>
-                <p>The readability test runs your content through the Flesch reading ease algorithm to determine text complexity.</p>
-                <h5>The algorithm</h5>
-                <p><code>RE = 206.835 - (1.015 x ASL) - (84.6 x ASW)</code></p>
-                <p>Where <code>RE</code> is Readability Ease, <code>ASL</code> is Average Sentence Length, and <code>ASW</code> is Average Syllables per Word</p>
-                <p>The result is a number between 0 and 100, where a higher score means better readability, with a score between 60 and 69 largely considered acceptable.</p>
-                <h5>Readability test results</h5>
-                <p>As well as the Flesch score, the readability test returns sentence length; average syllables per word; and long or complex words.</p>";
     }
 
     public void Check(int id, string culture, string val, List<SettingsModel> settings)

@@ -1,5 +1,8 @@
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Preflight.Extensions;
 using Preflight.Models;
+using Preflight.Models.Settings;
 using Umbraco.Cms.Core.Composing;
 
 namespace Preflight.Plugins;
@@ -86,4 +89,12 @@ public interface IPreflightPlugin : IDiscoverable
     string OnSaveOnlySettingIdentifier { get; }
 
     string PropertiesToTestSettingIdentifier { get; }
+
+    bool IsTestableProperty(ContentParserParams parserParams, string? parentAlias)
+    {
+        string propsToTest = Settings.FirstOrDefault(x => x.Alias.EndsWith(KnownStrings.PropertiesToTestSuffix))?
+            .Value?[parserParams.Culture]?.ToString() ?? string.Join(KnownStrings.Comma, KnownPropertyAlias.All);
+
+        return propsToTest.Contains(parserParams.PropertyEditorAlias) || (parentAlias.HasValue() && propsToTest.Contains(parentAlias));    }
+
 }

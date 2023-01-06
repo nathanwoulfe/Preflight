@@ -1,8 +1,12 @@
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Preflight.Extensions;
 using Preflight.Models;
+using Preflight.Models.Dtos;
+using Preflight.Models.Settings;
 using Preflight.Plugins;
 using Preflight.Settings;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -52,69 +56,55 @@ public class SettingsService : ISettingsService
 
     /// <summary>
     /// </summary>
-    public PreflightSettings Get()
+    public PreflightSettingsModel Get()
     {
-        PreflightSettings settings = _cacheManager.TryGet(SettingsCacheKey, out PreflightSettings fromCache) ? fromCache : GetSettings();
+        PreflightSettingsModel settings = /*_cacheManager.TryGet(SettingsCacheKey, out PreflightSettingsModel fromCache) ? fromCache :*/ GetSettings();
 
-        if (settings is not null)
+        if (settings is null)
         {
-            _cacheManager.Set(SettingsCacheKey, settings);
-
-            // can't cache this, since it would be cached when the user lang changes
-            // which admittedly isn't likely, but is possible
-            LocalizeSettings(settings);
-
-            return settings;
+            return new();
         }
 
-        return new();
+        _cacheManager.Set(SettingsCacheKey, settings);
+
+        // can't cache this, since it would be cached when the user lang changes
+        // which admittedly isn't likely, but is possible
+        LocalizeSettings(settings);
+
+        return settings;
     }
 
     /// <summary>
     /// Save the Preflight settings to the JSON file in app_plugins and update cache
     /// </summary>
-    public bool Save(PreflightSettings settings)
+    public bool Save(PreflightSettingsModel settings)
     {
         try
         {
-            PreflightSettings fromCache = Get();
-
-            _cacheManager.Set(SettingsCacheKey, settings);
-
-            using (IScope scope = _scopeProvider.CreateScope())
+            using IScope scope = _scopeProvider.CreateScope();
+            foreach (SettingsModel setting in settings.Settings)
             {
-                foreach (SettingsModel setting in settings.Settings)
-                {
-                    // only update modified properties
-                    SettingsModel settingFromCache = fromCache.Settings.First(x => x.Guid == setting.Guid);
-                    if (setting.Equals(settingFromCache))
-                    {
-                        continue;
-                    }
-
-                    _ = scope.Database.Update(new SettingDto(setting));
-                }
-
-                _ = scope.Complete();
+                scope.Database.Save(new SettingDto(setting));
             }
 
-            return true;
+            _ = scope.Complete();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not save Preflight settings: {Message}", ex.Message);
             return false;
         }
+
+        _cacheManager.Set(SettingsCacheKey, settings);
+        return true;
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    private PreflightSettings GetSettings()
+    private PreflightSettingsModel GetSettings()
     {
-        IEnumerable<string> allLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode);
-
         List<SettingDto> schema = new();
         using (IScope scope = _scopeProvider.CreateScope())
         {
@@ -124,19 +114,19 @@ public class SettingsService : ISettingsService
 
         List<SettingsModel> settings = CollateCoreAndPluginSettings();
 
-        MergeSchemaValuesIntoSettings(allLanguages, schema, settings);
+        MergeSchemaValuesIntoSettings(schema, settings);
 
         EnsureGroupsAreStillValid(settings);
 
-        List<SettingsTab> tabs = GenerateTabsFromSettings(settings);
+        List<SettingsTabModel> tabs = GenerateTabsFromSettings(settings);
 
         FinaliseSettings(tabs, settings);
 
         // tabs are sorted alpha, with general first
-        return new PreflightSettings
+        return new PreflightSettingsModel
         {
             Settings = settings
-                .DistinctBy(s => (s.Tab, s.Label))
+                .DistinctBy(s => (s.Tab, s.Alias))
                 .ToList(),
             Tabs = tabs
                 .GroupBy(x => x.Name)
@@ -166,15 +156,10 @@ public class SettingsService : ISettingsService
     /// </summary>
     /// <param name="tabs"></param>
     /// <param name="settings"></param>
-    private static void FinaliseSettings(List<SettingsTab> tabs, List<SettingsModel> settings)
+    private static void FinaliseSettings(List<SettingsTabModel> tabs, List<SettingsModel> settings)
     {
         foreach (SettingsModel s in settings)
         {
-            if (!s.Alias.HasValue())
-            {
-                s.Alias = s.Label.Camel();
-            }
-
             if (!s.View.Contains(".html"))
             {
                 s.View = "views/propertyeditors/" + s.View + "/" + s.View + ".html";
@@ -185,7 +170,7 @@ public class SettingsService : ISettingsService
                 continue;
             }
 
-            tabs.Add(new SettingsTab
+            tabs.Add(new SettingsTabModel
             {
                 Name = s.Tab,
                 Alias = s.Tab.Camel(),
@@ -197,9 +182,9 @@ public class SettingsService : ISettingsService
     /// 
     /// </summary>
     /// <param name="settings"></param>
-    private List<SettingsTab> GenerateTabsFromSettings(List<SettingsModel> settings)
+    private List<SettingsTabModel> GenerateTabsFromSettings(List<SettingsModel> settings)
     {
-        List<SettingsTab> tabs = new();
+        List<SettingsTabModel> tabs = new();
 
         foreach (IPreflightPlugin plugin in _plugins)
         {
@@ -207,7 +192,7 @@ public class SettingsService : ISettingsService
 
             // generate a tab from the plugin if not added already
             // send back the summary and description for the plugin as part of the tab object for display in the settings view
-            tabs.Add(new SettingsTab
+            tabs.Add(new SettingsTabModel
             {
                 Name = plugin.Name,
                 Alias = plugin.Name.Camel(),
@@ -246,11 +231,11 @@ public class SettingsService : ISettingsService
     /// <param name="settings"></param>
     private void EnsureGroupsAreStillValid(List<SettingsModel> settings)
     {
-        IEnumerable<Umbraco.Cms.Core.Models.Membership.IUserGroup> allGroups = _userService.GetAllUserGroups();
+        IEnumerable<IUserGroup> allGroups = _userService.GetAllUserGroups();
         var settingGuid = Guid.Parse(KnownSettings.UserGroupOptIn);
         SettingsModel? groupSetting = settings.FirstOrDefault(x => x.Guid == settingGuid);
 
-        if (groupSetting == null)
+        if (groupSetting is null)
         {
             return;
         }
@@ -258,22 +243,22 @@ public class SettingsService : ISettingsService
         var groupNames = allGroups.Select(x => new { value = x.Name, key = x.Alias });
         groupSetting.Prevalues = groupNames;
 
-        if (groupSetting.Value == null)
+        if (groupSetting.Value is null)
         {
             return;
         }
 
-        var newValue = new Dictionary<string, string>();
-        Dictionary<string, string>? variantDictionary = groupSetting.Value.ToVariantDictionary();
+        CaseInsensitiveValueDictionary newValue = new();
 
-        if (variantDictionary is null)
+        if (groupSetting.Value is null)
         {
             return;
         }
 
-        foreach (KeyValuePair<string, string> variantValue in variantDictionary)
+        foreach (KeyValuePair<string, object?> variantValue in groupSetting.Value)
         {
-            IEnumerable<string?> groupSettingValue = variantValue.Value.Split(CharArrays.Comma).Intersect(groupNames.Select(x => x.value));
+            string valueString = variantValue.Value?.ToString() ?? string.Empty;
+            IEnumerable<string?> groupSettingValue = valueString.Split(CharArrays.Comma).Intersect(groupNames.Select(x => x.value));
             newValue.Add(variantValue.Key, string.Join(KnownStrings.Comma, groupSettingValue));
         }
 
@@ -283,11 +268,12 @@ public class SettingsService : ISettingsService
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="allLanguages"></param>
     /// <param name="schema"></param>
     /// <param name="settings"></param>
-    private static void MergeSchemaValuesIntoSettings(IEnumerable<string> allLanguages, List<SettingDto> schema, List<SettingsModel> settings)
+    private void MergeSchemaValuesIntoSettings(List<SettingDto> schema, List<SettingsModel> settings)
     {
+        IEnumerable<string> allLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode);
+
         foreach (SettingsModel setting in settings)
         {
             SettingDto? schemaItem = schema.FirstOrDefault(s => s.Setting == setting.Guid);
@@ -297,16 +283,15 @@ public class SettingsService : ISettingsService
                 continue;
             }
 
-            string value = schemaItem.Value;
-
             // if no value came from the db, assume it's a new plugin and use the default
-            Dictionary<string, string>? valueDictionary = value.HasValue() ?
-                value.ToVariantDictionary() :
-                allLanguages.ToDictionary(k => k, v => setting.Value?.ToString() ?? string.Empty);
+            // dict is case-insensitive as culture casing seems to vary...
+            var valueDictionary = (CaseInsensitiveValueDictionary?)(schemaItem.Value.HasValue() ?
+                JsonConvert.DeserializeObject<CaseInsensitiveValueDictionary>(schemaItem.Value) :
+                allLanguages.ToDictionary(k => k, v => setting.Value?[v]));
 
             // have new languages been added? better check...
             // if any are missing, add the default value
-            AddMissingLanguagessToValueDictionary(allLanguages, setting, valueDictionary);
+            AddMissingLanguagesToValueDictionary(allLanguages, setting, valueDictionary);
 
             setting.Value = valueDictionary;
             setting.Id = schemaItem.Id;
@@ -320,7 +305,7 @@ public class SettingsService : ISettingsService
     /// <param name="allLanguages"></param>
     /// <param name="setting"></param>
     /// <param name="valueDictionary"></param>
-    private static void AddMissingLanguagessToValueDictionary(IEnumerable<string> allLanguages, SettingsModel setting, Dictionary<string, string>? valueDictionary)
+    private static void AddMissingLanguagesToValueDictionary(IEnumerable<string> allLanguages, SettingsModel setting, CaseInsensitiveValueDictionary? valueDictionary)
     {
         if (valueDictionary is null || valueDictionary.Count == allLanguages.Count())
         {
@@ -330,7 +315,7 @@ public class SettingsService : ISettingsService
         IEnumerable<string> missingLangs = allLanguages.Except(valueDictionary.Keys);
         foreach (string? lang in missingLangs)
         {
-            valueDictionary[lang] = setting.Value?.ToString() ?? string.Empty;
+            valueDictionary[lang] = setting.Value?[lang];
         }
     }
 
@@ -338,19 +323,15 @@ public class SettingsService : ISettingsService
     /// Updates settings name, summary, tab etc where a value exists
     /// </summary>
     /// <param name="settings"></param>
-    private void LocalizeSettings(PreflightSettings settings)
+    private void LocalizeSettings(PreflightSettingsModel settings)
     {
         const string prefix = "preflight-";
 
-        foreach (SettingsTab tab in settings.Tabs)
+        foreach (SettingsTabModel tab in settings.Tabs)
         {
             string area = prefix + tab.Alias;
             tab.Name = _localizedTextService.Localize(area, "tabName");
-
-            if (tab.Summary.HasValue())
-            {
-                tab.Summary = _localizedTextService.Localize(area, "summary");
-            }
+            tab.Summary = _localizedTextService.Localize(area, "summary");
         }
 
         foreach (SettingsModel setting in settings.Settings)
@@ -377,11 +358,7 @@ public class SettingsService : ISettingsService
             }
 
             setting.Label = _localizedTextService.Localize(area, alias);
-
-            if (setting.Description.HasValue())
-            {
-                setting.Description = _localizedTextService.Localize(area, alias + "Description");
-            }
+            setting.Description = _localizedTextService.Localize(area, alias + "Description");
         }
     }
 }

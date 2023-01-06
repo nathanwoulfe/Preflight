@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Preflight.Models;
+namespace Preflight.Plugins.Readability;
 
 public class ReadabilityResponseModel
 {

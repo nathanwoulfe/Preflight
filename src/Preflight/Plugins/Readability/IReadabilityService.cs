@@ -1,6 +1,6 @@
-using Preflight.Models;
+using Preflight.Models.Settings;
 
-namespace Preflight.Services;
+namespace Preflight.Plugins.Readability;
 
 public interface IReadabilityService
 {

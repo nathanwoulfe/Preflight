@@ -1,4 +1,4 @@
-using Preflight.Models;
+using Preflight.Models.Settings;
 using Preflight.Plugins;
 
 namespace Preflight.Extensions;
@@ -32,7 +32,7 @@ public static class PreflightPluginExtensions
     /// <param name="settingAlias"></param>
     /// <returns></returns>
     private static bool True(IEnumerable<SettingsModel> settings, string culture, string settingAlias) =>
-        settings.Any(s => s.Alias == settingAlias && s.Value?.ForVariant(culture) == KnownStrings.One);
+        settings.Any(s => s.Alias == settingAlias && s.Value?[culture]?.ToString() == KnownStrings.One);
 
     /// <summary>
     /// Generates the default settings (disabled, onSaveOnly, propertiesToTest) for the given plugin,

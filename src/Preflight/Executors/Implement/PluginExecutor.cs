@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using NPoco.fastJSON;
 using Preflight.Extensions;
 using Preflight.Models;
+using Preflight.Models.Settings;
 using Preflight.Parsers;
 using Preflight.Plugins;
 using Preflight.Services;
@@ -28,8 +31,6 @@ internal sealed class PluginExecutor : IPluginExecutor
     /// </summary>
     /// <param name="parserParams"></param>
     /// <param name="parentAlias"></param>
-    /// <param name="name"></param>
-    /// <param name="val"></param>
     /// <returns></returns>
     public PreflightPropertyResponseModel Execute(ContentParserParams parserParams, string parentAlias = "")
     {
@@ -65,11 +66,8 @@ internal sealed class PluginExecutor : IPluginExecutor
                 continue;
             }
 
-            string propsValue = plugin.Settings.FirstOrDefault(x => x.Alias.EndsWith(KnownStrings.PropertiesToTestSuffix))?.Value?.ForVariant(parserParams.Culture) ?? string.Empty;
-            string propsToTest = propsValue ?? string.Join(KnownStrings.Comma, KnownPropertyAlias.All);
-
             // only continue if the field alias is include for testing, or the parent alias has been set, and is included for testing
-            if (!propsToTest.Contains(parserParams.PropertyEditorAlias) || (parentAlias.HasValue() && !propsToTest.Contains(parentAlias)))
+            if (!plugin.IsTestableProperty(parserParams, parentAlias))
             {
                 continue;
             }
@@ -77,7 +75,7 @@ internal sealed class PluginExecutor : IPluginExecutor
             try
             {
                 Type pluginType = plugin.GetType();
-                if (pluginType.GetMethod("Check") == null)
+                if (pluginType.GetMethod("Check") is null)
                 {
                     continue;
                 }
@@ -85,7 +83,7 @@ internal sealed class PluginExecutor : IPluginExecutor
                 plugin.Result = null;
                 plugin.Check(parserParams.NodeId, parserParams.Culture, parserParams.PropertyValue, _settings);
 
-                if (plugin.Result != null)
+                if (plugin.Result is not null)
                 {
                     // must be a new object, otherwise returns the plugin instance from the collection
                     var resultModel = new PreflightPluginResponseModel(plugin);

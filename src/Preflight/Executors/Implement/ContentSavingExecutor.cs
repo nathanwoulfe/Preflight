@@ -1,5 +1,5 @@
 using Preflight.Extensions;
-using Preflight.Models;
+using Preflight.Models.Settings;
 using Preflight.Services;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;

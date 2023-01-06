@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Preflight.Models.Settings;
 using Preflight.Plugins;
 
 namespace Preflight.Models;

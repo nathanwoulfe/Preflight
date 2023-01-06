@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Preflight.Extensions;
 using Preflight.Migrations.Schema;
 using Preflight.Models;
+using Preflight.Models.Settings;
 using Preflight.Plugins;
 using Preflight.Settings;
 using Umbraco.Cms.Core.IO;
@@ -65,14 +66,7 @@ public class Preflight_TwoZeroZero : MigrationBase
         foreach (SettingsModel setting in settings)
         {
             // if not a dictionary, make it one
-            try
-            {
-                _ = setting.Value?.ToVariantDictionary();
-            }
-            catch
-            {
-                setting.Value = allLanguages.ToDictionary(key => key, value => setting.Value);
-            }
+            setting.Value ??= (CaseInsensitiveValueDictionary?)allLanguages.ToDictionary(k => k, v => setting.Value?[v]);
         }
 
         // mash all known settings into a common object

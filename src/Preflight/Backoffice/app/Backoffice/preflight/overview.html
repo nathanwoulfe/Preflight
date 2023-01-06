@@ -1,4 +1,4 @@
-﻿<div ng-controller="preflight.settings.controller as vm" class="umb-panel preflight preflight-settings">
+<div ng-controller="preflight.settings.controller as vm" class="umb-panel preflight preflight-settings">
     <form name="preflightSettingsForm"
           ng-submit="vm.saveSettings()"
           novalidate
@@ -13,8 +13,7 @@
             <umb-editor-container>
                 <umb-box>
                     <umb-box-content>
-                        <p>Preflight provides a pluggable framework for adding pre-publishing checks to your content.</p>
-                        <p>Out of the box, Preflight provides plugins for general readability (reading level, sentence length, blacklisting words), link health and text autocorrect.</p>
+                        <localize key="preflight_settingsIntro"></localize> 
                         <select id="groupLanguage"
                                 ng-options="l.culture as l.name for l in vm.languages"
                                 ng-disabled="vm.languages.length === 1"

@@ -1,8 +1,9 @@
 using Preflight.Extensions;
-using Preflight.Models;
-using Preflight.Services;
+using Preflight.Models.Settings;
+using Preflight.Plugins.LinkHealth.Models;
+using Preflight.Plugins.LinkHealth.Services;
 
-namespace Preflight.Plugins;
+namespace Preflight.Plugins.LinkHealth;
 
 public class LinkHealthPlugin : IPreflightCorePlugin
 {
@@ -33,7 +34,7 @@ public class LinkHealthPlugin : IPreflightCorePlugin
 
     public string ViewPath => "/App_Plugins/Preflight/Backoffice/plugins/linkhealth/linkhealth.html";
 
-    public string Summary => "Check links resolve correctly. Optionally check URLs against Google's SafeBrowsing API";
+    public string Summary => string.Empty;
 
     public string Description { get; set; } = string.Empty;
 
@@ -47,19 +48,17 @@ public class LinkHealthPlugin : IPreflightCorePlugin
             true,
             settings: new SettingsModel[]
             {
-                new GenericSettingModel("Ensure safe links", new Guid(KnownSettings.EnsureSafeLinks))
+                new GenericSettingModel("ensureSafeLinks", new Guid(KnownSettings.EnsureSafeLinks))
                 {
-                    Description = "Set to true and Preflight will check links for potential malware and bad actors",
                     View = SettingType.Boolean,
-                    Value = "0",
+                    DefaultValue = KnownStrings.Zero,
                     Order = 1,
                     Core = true,
                 },
-                new GenericSettingModel("Google SafeBrowsing API key", new Guid(KnownSettings.GoogleApiKey))
+                new GenericSettingModel("googleSafeBrowsingAPIKey", new Guid(KnownSettings.GoogleApiKey))
                 {
-                    Description = "If set, links will be scanned by the SafeBrowsing API to check for malware and unsafe sites",
                     View = SettingType.String,
-                    Value = "Get your key from the Google API Console",
+                    DefaultValue = "Get your key from the Google API Console",
                     Order = 2,
                     Core = true,
                 },

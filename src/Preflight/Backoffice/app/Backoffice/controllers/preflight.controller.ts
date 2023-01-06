@@ -1,4 +1,4 @@
-import { IRootElementService, IRootScopeService, ITimeoutService } from "angular";
+import { ITimeoutService } from "angular";
 
 export class PreflightController {
 
@@ -35,6 +35,7 @@ export class PreflightController {
   blockListEditorAlias = 'Umbraco.BlockList';
 
   noTests = false;
+  notCreated = false;
   percentageDone = 20;
   progressStep = 0;
   activeVariant;
@@ -107,6 +108,7 @@ export class PreflightController {
   onComplete = () => {
     // it's possible no tests ran, in which case results won't exist
     this.noTests = this.results.properties.every(x => !x.plugins.length);
+
     if (this.noTests) {
       this.$scope.model.badge = undefined;
     }
@@ -115,7 +117,7 @@ export class PreflightController {
       p.disabled = p.failedCount === -1;
     }
 
-    this.showSuccessMessage = !this.results.failed && !this.noTests;
+    this.showSuccessMessage = !this.results.failed && !this.noTests && !this.notCreated;
     this.done = true;
   };
 
@@ -333,6 +335,8 @@ export class PreflightController {
     this.propertiesToTrack = [];
 
     if (this.activeVariant) {
+      this.notCreated = this.activeVariant.state === 'NotCreated';
+
       this.activeVariant.tabs.forEach(x => {
         this.propertiesToTrack = this.propertiesToTrack.concat(x.properties.map(x => {
           if (this.validPropTypes.includes(x.editor)) {

@@ -1,4 +1,4 @@
-﻿<div ng-controller="preflight.controller as vm" 
+<div ng-controller="preflight.controller as vm" 
      class="preflight preflight-app" 
      id="preflight-app" 
      ng-cloak 
@@ -9,7 +9,12 @@
             <h4 class="intro-text"><localize key="preflight_passText"></localize></h4>
         </div>
 
-        <div ng-show="vm.noTests">
+        <div ng-show="vm.notCreated">
+            <h3 class="title"><localize key="preflight_notCreatedIntro"></localize></h3>
+            <h4 class="intro-text"><localize key="preflight_notCreatedText"></localize></h4>
+        </div>
+
+        <div ng-show="vm.noTests && !vm.notCreated">
             <h3 class="title"><localize key="preflight_noTestsIntro"></localize></h3>
             <h4 class="intro-text"><localize key="preflight_noTestsText"></localize></h4>
         </div>

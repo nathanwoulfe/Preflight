@@ -13,7 +13,7 @@ export class PreflightService implements IPreflightService {
       'Something broke'
     );
 
-  check = (id, culture) => this.request('GET', `Check/${id}/${culture} `);
+  check = (id, culture) => this.request('GET', `Check?id=${id}&culture=${culture}`);
 
   checkDirty = data => this.request('POST', `CheckDirty`, data);
 

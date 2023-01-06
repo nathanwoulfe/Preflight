@@ -1,10 +1,10 @@
-using Preflight.Models;
+using Preflight.Models.Settings;
 
 namespace Preflight.Services;
 
 public interface ISettingsService
 {
-    PreflightSettings Get();
+    PreflightSettingsModel Get();
 
-    bool Save(PreflightSettings settings);
+    bool Save(PreflightSettingsModel settings);
 }

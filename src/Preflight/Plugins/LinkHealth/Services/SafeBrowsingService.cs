@@ -2,11 +2,11 @@ using System.Net;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Preflight.Extensions;
-using Preflight.Models;
+using Preflight.Plugins.LinkHealth.Models;
+using Preflight.Services;
 using Umbraco.Extensions;
 
-
-namespace Preflight.Services.Implement;
+namespace Preflight.Plugins.LinkHealth.Services;
 
 public class SafeBrowsingService : ISafeBrowsingService
 {
@@ -95,19 +95,19 @@ public class SafeBrowsingService : ISafeBrowsingService
             string result;
             string url = SafeBrowsingUrl + apiKey;
 
-            ThreatEntry[] threatEntries = urls.Select(u => new ThreatEntry { Url = u }).ToArray();
+            ThreatEntryModel[] threatEntries = urls.Select(u => new ThreatEntryModel { Url = u }).ToArray();
 
             var requestModel = new SafeBrowsingRequestModel
             {
-                Client = new Client
+                Client = new ClientModel
                 {
                     ClientId = "preflight-test",
                     ClientVersion = "0.0.0",
                 },
-                ThreatInfo = new ThreatInfo
+                ThreatInfo = new ThreatInfoModel
                 {
                     ThreatTypes = new[] { "MALWARE", "SOCIAL_ENGINEERING" },
-                    PlatformTypes = new[] { "WINDOWS" },
+                    PlatformTypes = new[] { "ANY_PLATFORM" },
                     ThreatEntryTypes = new[] { "URL" },
                     ThreatEntries = threatEntries,
                 },

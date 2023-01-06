@@ -1,4 +1,4 @@
-using Preflight.Models;
+using Preflight.Models.Settings;
 
 namespace Preflight.Extensions;
 
@@ -8,7 +8,7 @@ public static class SettingsModelListExtensions
         where T : IConvertible
     {
         var guidGuid = new Guid(guid);
-        string? stringValue = settings.FirstOrDefault(x => x.Guid == guidGuid)?.Value?.ForVariant(culture);
+        string? stringValue = settings.FirstOrDefault(x => x.Guid == guidGuid)?.Value?[culture]?.ToString();
 
         return ConvertObject<T>(stringValue);
     }

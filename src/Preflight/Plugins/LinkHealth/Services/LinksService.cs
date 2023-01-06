@@ -2,9 +2,10 @@ using System.Net;
 using HtmlAgilityPack;
 using Preflight.Extensions;
 using Preflight.Models;
+using Preflight.Plugins.LinkHealth.Models;
 using Umbraco.Cms.Core.Hosting;
 
-namespace Preflight.Services.Implement;
+namespace Preflight.Plugins.LinkHealth.Services;
 
 internal sealed class LinksService : ILinksService
 {

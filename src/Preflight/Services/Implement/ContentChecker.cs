@@ -152,10 +152,6 @@ internal sealed class ContentChecker : IContentChecker
     /// 
     /// </summary>
     /// <param name="parserParams"></param>
-    /// <param name="name"></param>
-    /// <param name="culture"></param>
-    /// <param name="value"></param>
-    /// <param name="alias"></param>
     /// <returns></returns>
     private bool TestAndBroadcast(ContentParserParams parserParams)
     {
