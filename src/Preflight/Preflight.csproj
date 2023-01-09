@@ -12,8 +12,8 @@
 
   <ItemGroup>
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[10.0.0, 11)" />
-    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[10.0.0, 11)" />
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[10.4.0-rc, 11)" />
+    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="[10.4.0-rc, 11)" />
   </ItemGroup>
 
   <Import Project="build\Microsoft.AspNetCore.ClientAssets.targets" />
