@@ -1,17 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="C:\Users\natha\source\repos\Preflight-10\icon.png" />
+    <Content Remove="C:\Users\natha\source\repos\Preflight-11\icon.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="clean" Version="2.1.6" />
-    <PackageReference Include="Umbraco.Cms" Version="10.3.2" />
+    <PackageReference Include="Umbraco.Cms" Version="[11.0.0, 12)" />
   </ItemGroup>
 
   <ItemGroup>
