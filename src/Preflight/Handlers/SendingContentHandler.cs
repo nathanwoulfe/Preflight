@@ -13,6 +13,13 @@ internal sealed class SendingContentHandler : INotificationHandler<SendingConten
         _executor = executor ?? throw new ArgumentNullException(nameof(executor));
     }
 
-    public void Handle(SendingContentNotification notification) =>
+    public void Handle(SendingContentNotification notification)
+    {
+        if (notification.Content.Id == 0)
+        {
+            return;
+        }
+
         _executor.Execute(notification.Content);
+    }
 }

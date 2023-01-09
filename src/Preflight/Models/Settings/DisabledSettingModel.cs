@@ -3,7 +3,7 @@ using Preflight.Extensions;
 namespace Preflight.Models.Settings;
 
 /// <summary>
-/// Defines the Preflight setting for the disable/enable setting 
+/// Defines the Preflight setting for the disable/enable setting
 /// </summary>
 internal class DisabledSettingModel : SettingsModel
 {

@@ -8,7 +8,7 @@ public class SettingsTabModel
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// This must be explicitly set whenever a tab is created, it can't be lazy as it 
+    /// This must be explicitly set whenever a tab is created, it can't be lazy as it
     /// would then change when localizing, which we don't wany
     /// </summary>
     [JsonProperty("alias")]

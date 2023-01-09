@@ -116,7 +116,7 @@ public class PreflightApiController : UmbracoAuthorizedApiController
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>

@@ -11,7 +11,7 @@ namespace Preflight.Models.Settings;
 public class SettingsModel
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [JsonProperty("guid")]
     public Guid Guid { get; set; }
@@ -20,7 +20,7 @@ public class SettingsModel
     public int Id { get; set; }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [JsonProperty("core")]
     public bool Core { get; set; }

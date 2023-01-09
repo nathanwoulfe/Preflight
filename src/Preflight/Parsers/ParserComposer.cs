@@ -7,14 +7,13 @@ namespace Preflight.Parsers;
 
 public class PreflightParserComposer : IComposer
 {
-    public void Compose(IUmbracoBuilder builder)
-    {
-        _ = builder.Services.AddTransient<NestedContentValueParser>();
-        _ = builder.Services.AddTransient<GridValueParser>();
-        _ = builder.Services.AddTransient<BlockListValueParser>();
-        _ = builder.Services.AddTransient<StringValueParser>();
-        _ = builder.Services.AddTransient<Func<ParserType, IPreflightValueParser>>(serviceProvider => key => GetServiceInstance(serviceProvider, key));
-    }
+    public void Compose(IUmbracoBuilder builder) =>
+        _ = builder.Services
+            .AddTransient<NestedContentValueParser>()
+            .AddTransient<GridValueParser>()
+            .AddTransient<BlockValueParser>()
+            .AddTransient<StringValueParser>()
+            .AddTransient<Func<ParserType, IPreflightValueParser>>(serviceProvider => key => GetServiceInstance(serviceProvider, key));
 
     public IPreflightValueParser GetServiceInstance(IServiceProvider serviceProvider, ParserType key)
     {
