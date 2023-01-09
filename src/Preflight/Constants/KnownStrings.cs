@@ -21,8 +21,3 @@ public static class KnownStrings
     public const string PropertiesToTestSuffix = "PropertiesToTest";
     public const string Disabled = "disabled";
 }
-
-public static partial class Constants
-{
-
-}

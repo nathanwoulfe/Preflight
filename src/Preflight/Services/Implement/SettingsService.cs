@@ -329,7 +329,7 @@ public class SettingsService : ISettingsService
 
         foreach (SettingsTabModel tab in settings.Tabs)
         {
-            string area = prefix + tab.Alias;
+            string area = $"{KnownStrings.Alias}-{tab.Alias}";
             tab.Name = _localizedTextService.Localize(area, "tabName");
             tab.Summary = _localizedTextService.Localize(area, "summary");
         }
