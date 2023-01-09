@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Preflight.Extensions;
 using Preflight.Migrations.Schema;
 using Preflight.Models;
 using Preflight.Models.Settings;
@@ -92,36 +91,33 @@ public class Preflight_TwoZeroZero : MigrationBase
                     continue;
                 }
 
-                var schema = new SettingsSchema
+                settingsToSave.Add(new()
                 {
-                    Value = setting.Value?.ToString() ?? string.Empty,
+                    Value = JsonConvert.SerializeObject(setting.Value ?? settingObject.Value),
                     Setting = settingObject.Guid,
-                };
-
-                settingsToSave.Add(schema);
+                });
             }
         }
         else
         {
             foreach (SettingsModel? setting in allSettings)
             {
-                var schema = new SettingsSchema
+                settingsToSave.Add(new()
                 {
-                    Value = JsonConvert.SerializeObject(allLanguages.ToDictionary(key => key, value => setting.Value)),
+                    Value = JsonConvert.SerializeObject(setting.Value),
                     Setting = setting.Guid,
-                };
-
-                settingsToSave.Add(schema);
+                });
             }
+        }
+
+        if (!settingsToSave.Any())
+        {
+            return;
         }
 
         // finally, persist just the guid and value for each setting
         using IScope scope = _scopeProvider.CreateScope();
-        foreach (SettingsSchema setting in settingsToSave)
-        {
-            _ = scope.Database.Insert(setting);
-        }
-
+        scope.Database.InsertBulk(settingsToSave);
         _ = scope.Complete();
     }
 }
