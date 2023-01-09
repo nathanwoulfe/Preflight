@@ -325,8 +325,6 @@ public class SettingsService : ISettingsService
     /// <param name="settings"></param>
     private void LocalizeSettings(PreflightSettingsModel settings)
     {
-        const string prefix = "preflight-";
-
         foreach (SettingsTabModel tab in settings.Tabs)
         {
             string area = $"{KnownStrings.Alias}-{tab.Alias}";
@@ -336,7 +334,7 @@ public class SettingsService : ISettingsService
 
         foreach (SettingsModel setting in settings.Settings)
         {
-            string area = prefix + setting.Tab.Camel();
+            string area = $"{KnownStrings.Alias}-{setting.Tab.Camel()}";
             string alias = setting.Alias;
 
             // this is gross, would rather use a switch, but that won't work here
