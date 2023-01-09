@@ -28,7 +28,7 @@ internal sealed class ContentChecker : IContentChecker
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="dirtyProperties"></param>
     public bool CheckDirty(DirtyProperties dirtyProperties)
@@ -46,7 +46,7 @@ internal sealed class ContentChecker : IContentChecker
         {
             // if the prop is blocklist, the value needs to be modified as front-end
             // sends an array of BlockItemData, but backend expects a BlockValue
-            // 
+            //
             // bit messy, but prevents circular json errors on client side
             if (prop.Editor == KnownPropertyAlias.BlockList && prop.Value.HasValue())
             {
@@ -84,7 +84,7 @@ internal sealed class ContentChecker : IContentChecker
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="id"></param>
     /// <param name="culture"></param>
@@ -149,7 +149,7 @@ internal sealed class ContentChecker : IContentChecker
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="parserParams"></param>
     /// <returns></returns>

@@ -32,7 +32,10 @@ export class PreflightController {
     'Umbraco.NestedContent',
   ];
 
-  blockListEditorAlias = 'Umbraco.BlockList';
+  blockProperties = [
+    'Umbraco.BlockList',
+    'Umbraco.BlockGrid',
+  ];
 
   noTests = false;
   notCreated = false;
@@ -209,10 +212,10 @@ export class PreflightController {
 
       let currentValue = property.value;
 
-      if (prop.editor === this.blockListEditorAlias) {
+      if (this.blockProperties.includes(prop.editor)) {
         currentValue = JSON.stringify(currentValue.contentData);
-      } else {
-        currentValue = this.jsonProperties.includes(prop.editor) ? JSON.stringify(currentValue) : currentValue;
+      } else if (this.jsonProperties.includes(prop.editor)) {
+        currentValue = JSON.stringify(currentValue);
       }
 
       const hash = this.getHash(currentValue);

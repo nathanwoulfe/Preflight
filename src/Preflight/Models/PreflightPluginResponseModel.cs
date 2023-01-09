@@ -5,7 +5,7 @@ using Preflight.Plugins;
 namespace Preflight.Models;
 
 /// <summary>
-/// 
+///
 /// </summary>
 public class PreflightPluginResponseModel
 {

@@ -3,7 +3,7 @@ using Preflight.Extensions;
 namespace Preflight.Models.Settings;
 
 /// <summary>
-/// 
+///
 /// </summary>
 internal class PropertiesToTestSettingModel : SettingsModel
 {

@@ -79,7 +79,7 @@ internal sealed class LinksService : ILinksService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="href"></param>
     /// <param name="responseItem"></param>
@@ -112,7 +112,7 @@ internal sealed class LinksService : ILinksService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="url"></param>
     /// <returns></returns>

@@ -27,7 +27,7 @@ public class SettingsService : ISettingsService
     private const string SettingsCacheKey = "Preflight_Settings_";
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="userService"></param>
@@ -100,7 +100,7 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     private PreflightSettingsModel GetSettings()
@@ -137,7 +137,7 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     private List<SettingsModel> CollateCoreAndPluginSettings()
@@ -152,7 +152,7 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="tabs"></param>
     /// <param name="settings"></param>
@@ -179,7 +179,7 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="settings"></param>
     private List<SettingsTabModel> GenerateTabsFromSettings(List<SettingsModel> settings)
@@ -205,7 +205,7 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="settings"></param>
     /// <param name="plugin"></param>
@@ -266,7 +266,7 @@ public class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="schema"></param>
     /// <param name="settings"></param>

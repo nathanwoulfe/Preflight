@@ -16,7 +16,7 @@ public class PreflightValueParserBase
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="innerPropertyName"></param>
@@ -28,7 +28,7 @@ public class PreflightValueParserBase
             $"{propertyName} ({rowName} - {innerPropertyName})";
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="name"></param>
     /// <param name="label"></param>
@@ -40,7 +40,7 @@ public class PreflightValueParserBase
     });
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="parserParams"></param>
     /// <param name="label"></param>

@@ -36,7 +36,7 @@ public class AutocorrectPlugin : IPreflightCorePlugin
     public int TotalTests => 1;
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public AutocorrectPlugin() => this.GenerateDefaultSettings(
         false,

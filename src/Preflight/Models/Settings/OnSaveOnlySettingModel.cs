@@ -3,7 +3,7 @@ using Preflight.Extensions;
 namespace Preflight.Models.Settings;
 
 /// <summary>
-/// Defines the Preflight setting for the on-save-only setting 
+/// Defines the Preflight setting for the on-save-only setting
 /// </summary>
 internal class OnSaveOnlySettingModel : SettingsModel
 {

@@ -10,6 +10,7 @@ public static class KnownPropertyAlias
     public const string Textbox = UmbConstants.PropertyEditors.Aliases.TextBox;
     public const string NestedContent = UmbConstants.PropertyEditors.Aliases.NestedContent;
     public const string BlockList = UmbConstants.PropertyEditors.Aliases.BlockList;
+    public const string BlockGrid = UmbConstants.PropertyEditors.Aliases.BlockGrid;
 
     public static IEnumerable<string?> All => typeof(KnownPropertyAlias).GetFields()
             .Where(x => x.IsLiteral).Select(x => x.GetRawConstantValue()?.ToString());

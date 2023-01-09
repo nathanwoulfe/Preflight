@@ -90,11 +90,11 @@ export class SettingsController {
         this.settingsSyncModel.forEach(v => {
           if (v.view.includes(constants.multipletextbox) && v.value) {
             for (let [key, value] of Object.entries(v.value)) {
-              v.value[key] = value.split(',').map(val => ({ value: val })).sort((a, b) => a < b ? -1 : 1);
+              v.value[key] = value ? value.split(',').map(val => ({ value: val })).sort((a, b) => a < b ? -1 : 1) : { value: null };
             }
           } else if (v.view.includes(constants.checkboxlist) && v.value) {
             for (let [key, value] of Object.entries(v.value)) {
-              v.value[key] = value.split(',');
+              v.value[key] = value ? value.split(',') : [];
             }
           }
         })

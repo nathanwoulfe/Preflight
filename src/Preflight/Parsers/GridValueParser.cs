@@ -97,7 +97,7 @@ public class GridValueParser : PreflightValueParserBase, IPreflightValueParser
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="label"></param>
     /// <param name="labelDictionary"></param>
@@ -121,7 +121,7 @@ public class GridValueParser : PreflightValueParserBase, IPreflightValueParser
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="gridEditorView"></param>
     /// <returns></returns>

@@ -8,20 +8,20 @@ namespace Preflight.Plugins.Readability;
 internal sealed class ReadabilityService : IReadabilityService
 {
     ///  <summary>
-    ///  the formula is: RE = 206.835 – (1.015 x ASL) – (84.6 x ASW) 
+    ///  the formula is: RE = 206.835 – (1.015 x ASL) – (84.6 x ASW)
     ///  where RE = the readability ease
     ///  and ASL = average sentence length
     ///  and ASW = average syllables per word
-    /// 
+    ///
     ///  aiming for a score of 60-70
-    /// 
+    ///
     ///  /li, /ol, closing headings should be treated as sentences
     ///  strip all HTML tags
     ///  split on delimiters to count sentences
-    ///  split on spaces to count words                   
-    ///  count worth length 
+    ///  split on spaces to count words
+    ///  count worth length
     ///  split on vowels to count syllables and adjust for endings etc
-    /// 
+    ///
     ///  three or fewer letters are single syllable
     ///  </summary>
     ///  <param name="text">The string to parse</param>
@@ -99,7 +99,7 @@ internal sealed class ReadabilityService : IReadabilityService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="word"></param>
     /// <returns></returns>

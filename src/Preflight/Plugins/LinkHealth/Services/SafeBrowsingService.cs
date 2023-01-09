@@ -17,7 +17,7 @@ public class SafeBrowsingService : ISafeBrowsingService
     public SafeBrowsingService(ICacheManager cacheManager) => _cacheManager = cacheManager;
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="text"></param>
     /// <param name="apiKey"></param>
@@ -84,7 +84,7 @@ public class SafeBrowsingService : ISafeBrowsingService
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="urls"></param>
     /// <param name="apiKey"></param>

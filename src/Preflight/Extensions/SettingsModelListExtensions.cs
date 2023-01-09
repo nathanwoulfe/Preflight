@@ -7,10 +7,24 @@ public static class SettingsModelListExtensions
     public static T? GetValue<T>(this IEnumerable<SettingsModel> settings, string guid, string culture)
         where T : IConvertible
     {
-        var guidGuid = new Guid(guid);
-        string? stringValue = settings.FirstOrDefault(x => x.Guid == guidGuid)?.Value?[culture]?.ToString();
+        if (Guid.TryParse(guid, out Guid guidGuid) == false)
+        {
+            return default;
+        }
 
-        return ConvertObject<T>(stringValue);
+        SettingsModel? setting = settings.FirstOrDefault(x => x.Guid == guidGuid);
+
+        if (setting?.Value is null)
+        {
+            return default;
+        }
+
+        if (setting.Value.TryGetValue(culture, out object? value))
+        {
+            return ConvertObject<T>(value?.ToString());
+        }
+
+        return default;
     }
 
     private static T? ConvertObject<T>(object? obj)

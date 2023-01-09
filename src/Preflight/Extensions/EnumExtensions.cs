@@ -5,7 +5,7 @@ namespace Preflight.Extensions;
 public static class EnumExtensions
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <typeparam name="TAttribute"></typeparam>
     /// <param name="value"></param>

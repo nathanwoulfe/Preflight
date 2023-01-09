@@ -36,7 +36,7 @@ public class ReadabilityPlugin : IPreflightCorePlugin
     public string ViewPath => "/App_Plugins/Preflight/Backoffice/plugins/readability/readability.html";
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="readabilityService"></param>
     public ReadabilityPlugin(IReadabilityService readabilityService)

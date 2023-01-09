@@ -9,11 +9,11 @@ using Umbraco.Cms.Core.Services;
 
 namespace Preflight.Parsers;
 
-public class BlockListValueParser : PreflightValueParserBase, IPreflightValueParser
+public class BlockValueParser : PreflightValueParserBase, IPreflightValueParser
 {
     private readonly IContentTypeService _contentTypeService;
 
-    public BlockListValueParser(IContentTypeService contentTypeService, IPluginExecutor pluginExecutor, IMessenger messenger)
+    public BlockValueParser(IContentTypeService contentTypeService, IPluginExecutor pluginExecutor, IMessenger messenger)
         : base(messenger, pluginExecutor)
     {
         _contentTypeService = contentTypeService;
@@ -21,8 +21,8 @@ public class BlockListValueParser : PreflightValueParserBase, IPreflightValuePar
 
     public List<PreflightPropertyResponseModel> Parse(ContentParserParams parserParams)
     {
-        Dictionary<Guid, IContentType> cache = new Dictionary<Guid, IContentType>();
-        List<PreflightPropertyResponseModel> response = new List<PreflightPropertyResponseModel>();
+        Dictionary<Guid, IContentType> cache = new();
+        List<PreflightPropertyResponseModel> response = new();
 
         BlockValue? blockValue = JsonConvert.DeserializeObject<BlockValue>(parserParams.PropertyValue);
         int index = 1;
@@ -35,7 +35,7 @@ public class BlockListValueParser : PreflightValueParserBase, IPreflightValuePar
         foreach (BlockItemData blockItem in blockValue.ContentData)
         {
             Guid typeAlias = blockItem.ContentTypeKey;
-            IContentType? type = cache.ContainsKey(typeAlias) ? cache[typeAlias] : _contentTypeService.Get(typeAlias);
+            IContentType? type = cache.TryGetValue(typeAlias, out IContentType? value) ? value : _contentTypeService.Get(typeAlias);
 
             if (type is null)
             {
