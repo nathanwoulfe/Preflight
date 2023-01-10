@@ -1,0 +1,11 @@
+<svg width="239.99999999999997" height="239.99999999999997" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw">
+ <g id="Layer_1">
+  <title>Layer 1</title>
+  <ellipse stroke-width="6" ry="110" rx="110" id="svg_1" cy="119.45946" cx="120" stroke="#1b264f" fill="#f5c1bc"/>
+  <g stroke-width="6" stroke="null">
+   <line fill="none" stroke="#1b264f" y2="131.9" x2="101.1" y1="56" x1="177"/>
+   <polygon fill="none" stroke="#1b264f" points="177,56.000003814697266 128.6999969482422,194 101.10000610351562,131.89999389648438 39,104.30000305175781 177,56.000003814697266 "/>
+  </g>
+ </g>
+
+</svg>
