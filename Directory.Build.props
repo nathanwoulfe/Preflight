@@ -6,8 +6,8 @@
     <Copyright>Copyright © Nathan Woulfe $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
     <PackageIcon>preflight.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>https://github.com/nathanwoulfe/clip</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/nathanwoulfe/clip</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/nathanwoulfe/preflight</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/nathanwoulfe/preflight</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Nullable>enable</Nullable>
