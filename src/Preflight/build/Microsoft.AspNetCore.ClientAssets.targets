@@ -9,7 +9,7 @@
   <PropertyGroup>
     <ClientAssetsDirectory Condition="'$(ClientAssetsDirectory)' == ''">Backoffice\app\</ClientAssetsDirectory>
     <ClientAssetsRestoreInputs Condition="'$(ClientAssetsRestoreInputs)' == ''">package-lock.json;package.json</ClientAssetsRestoreInputs>
-    <ClientAssetsRestoreOutputs Condition="'$(ClientAssetsRestoreOutputs)' == ''">Backoffice\node_modules\.package-lock.json</ClientAssetsRestoreOutputs>
+    <ClientAssetsRestoreOutputs Condition="'$(ClientAssetsRestoreOutputs)' == ''">node_modules\.package-lock.json</ClientAssetsRestoreOutputs>
     <ClientAssetsRestoreCommand Condition="'$(ClientAssetsRestoreCommand)' == ''">npm ci --no-fund --no-audit --prefer-offline</ClientAssetsRestoreCommand>
     <ClientAssetsBuildCommand Condition="'$(ClientAssetsBuildCommand)' == ''">npm run build --prefix ./Backoffice</ClientAssetsBuildCommand>
     <ClientAssetsBuildOutputParameter Condition="'$(ClientAssetsBuildOutputParameter)' == ''">--output-path=</ClientAssetsBuildOutputParameter>
@@ -31,14 +31,15 @@
     <Exec Command="$(ClientAssetsRestoreCommand)" WorkingDirectory="Backoffice" />
   </Target>
 
-  <Target Name="ClientAssetsBuild" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
+  <Target Name="ClientAssetsBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
     <PropertyGroup>
       <_ClientAssetsOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)clientassets'))</_ClientAssetsOutputFullPath>
     </PropertyGroup>
 
     <Message Text="Executing NPM build script" Importance="High" />
+
     <MakeDir Directories="$(_ClientAssetsOutputFullPath)" />
-    <Exec Command="$(ClientAssetsBuildCommand) $(ClientAssetsBuildOutputParameter)&quot;$(_ClientAssetsOutputFullPath)&quot;" />
+    <Exec Command="$(ClientAssetsBuildCommand) -- $(ClientAssetsBuildOutputParameter)&quot;$(_ClientAssetsOutputFullPath)&quot;" />
 
     <ItemGroup>
       <_ClientAssetsBuildOutput Include="$(IntermediateOutputPath)clientassets\**"></_ClientAssetsBuildOutput>
@@ -61,7 +62,6 @@
             the ability to consume them from project references. As a workaround, we are using the Task directly on this package, to make sure this scenario works. In a future
             release we will address this by aligning DiscoverStaticWebAssets behavior with DefineStaticWebAssets to follow the same heuristics for determining the content root.
         -->
-
     <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'" CandidateAssets="@(_ClientAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_ClientAssetsOutputFullPath)" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
