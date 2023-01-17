@@ -40,7 +40,7 @@ dotnet_naming_rule.stylecop_local_fields_must_be_camel_case_rule.style       = c
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers
 ##########################################
 
-dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = none
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.ReadabilityRules.severity = suggestion
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.NamingRules.severity = suggestion
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.SpacingRules.severity = suggestion
@@ -82,3 +82,4 @@ dotnet_diagnostic.SA1209.severity = warning # UsingAliasDirectivesMustBePlacedAf
 dotnet_diagnostic.SA1216.severity = warning # UsingStaticDirectivesMustBePlacedAtTheCorrectLocation
 dotnet_diagnostic.SA1133.severity = warning # DoNotCombineAttributes
 dotnet_diagnostic.SA1135.severity = warning # UsingDirectivesMustBeQualified
+dotnet_diagnostic.CS1591.severity = none # MissingXmlComment

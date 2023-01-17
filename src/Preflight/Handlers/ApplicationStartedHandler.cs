@@ -31,7 +31,7 @@ internal sealed class ApplicationStartedHandler : INotificationHandler<UmbracoAp
 
     public void Handle(UmbracoApplicationStartingNotification notification)
     {
-        if (notification.RuntimeLevel < RuntimeLevel.Run)
+        if (notification.RuntimeLevel != RuntimeLevel.Run)
         {
             _logger.LogInformation("Umbraco is not in run mode, Preflight will not run");
             return;
