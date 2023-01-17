@@ -1,16 +1,28 @@
-# Preflight - Pre-publishing checks for Umbraco
-
-[![NuGet release](https://img.shields.io/nuget/dt/Preflight.Umbraco.svg)](https://www.nuget.org/packages/Preflight.Umbraco)
-[![Our Umbraco project page](https://img.shields.io/badge/our-umbraco-brightgreen.svg)](https://our.umbraco.org/projects/backoffice-extensions/preflight)
-
 Preflight is a pluggable framework for content quality assurance. Out of the box, Preflight tests general readability (including Flesch reading level; sentence length; and word length and complexity), checks links, and provides a text replacement mechanism.
 
-Preflight is an Umbraco 8 (8.1+) content app, and supports content in RTEs and textareas, including those nested in the Grid, Nested Content and Block List. 
+Preflight is an Umbraco content app, and supports content in RTEs and textareas, including those nested in the Block List, Block Grid, Grid and Nested Content. 
+
+Please note the Preflight versions supporting Umbraco 8, 9 and 10 are considered feature complete, all future development effort will target Umbraco 11+. Bug fixes targeting earlier versions will be considered where required.
+
+Note also Preflight 10 requires Umbraco 10.4.0 as a minimum dependency (as Block Grid was introduced in this version).
+
+## Getting started
+Install Preflight via your CLI of choice => `Install-Package Preflight.Umbraco`
+
+After installing, you'll find a new tree in the settings section, from which you can manage generic Preflight settings and all active plugins.
+
+When navigating the content tree, Preflight will run when a content node is loaded, and reports test findings in the Preflight content app. The app shows a summary of executed tests and their results.
+
+## Generic settings
+
+Preflight is variant-friendly, and provides variant-specific settings as not all tests are relevant to all cultures (eg comprehension rules for English will differ to those for German).
+ - **Run Preflight on save**: set to true to run tests when a content node is saved
+ - **Cancel save when Preflight tests fail**: set to true to cancel save events, if run on save is true and any tests fail
+ - **Properties to test**: set the property types to include in test runs (eg only test changes in TinyMCE and Block Grid properties)
+ - **User group opt in/out**: set the user groups to include in test runs (eg only test changes from members of the Editors group)
 
 ## Plugins
 Preflight plugins are defined in C# classes deriving the `IPreflightPlugin` interface.
-
-Note: v2 has breaking changes in the plugin interface - if you're running custom plugins, these must be resolved before running the v2 migration (your site likely won't build if the breaking changes aren't resolved, so this warning may be moot).
 
 The interface requires a range of fields be populated, but the heavy lifting takes place in the `Check()` method:
  - `{string} Name`: displayed in the settings as the name of the collapsable panel (which contains the plugin settings)
@@ -27,12 +39,19 @@ The interface requires a range of fields be populated, but the heavy lifting tak
 A plugin can have multiple user-editable settings, of type `GenericSettingModel` - these are displayed in the backoffice settings section, and configured in a plugin constructor. Each setting requires: 
  - `{string} Name`: should be obvious?
  - `{guid} Guid`: a unique identifier for the plugin
- - `{string} Value`: a default value
+ - `{Dictionary<string, object>} Value`: a value dictionary, where the key is the variant culture code
+ - `{object} DefaultValue`: an optional default value applied to all variants when the setting is first registered
  - `{string} Description`: a friendly explanation of what the setting controls
  - `{string} View`: a path to an Umbraco property editor view (`SettingType` holds common options)
  - `{int} Order`: the order for display on the settings tab
- 
-To populate the settings on a plugin, use the `PluginSettingsList.Populate()` method - it adds a couple of common default settings (disabled, and run on save only) by default, to save some boilerplate.
+ - `{object} Prevalues`: an optional object to provide property editor prevalues for use in the setting UI (eg a list of checkbox values)
+
+The following settings are added by default to all plugins
+ - **Properties to test**: allows subsetting properties per test (eg Plugin 1 should run on all Block Grid properties, Plugin 2 should only run on TextBox) 
+ - **Disabled**: set to true to exclude the plugin from test runs
+ - **On save only**: only run the plugin on save events, not when loading the content app
+
+To populate the settings on a plugin, use the `PluginSettingsList.Populate()` method.
 
 ### Check()
 `Check` is the method where the magic happens. The only requirement for the method is that it sets the `Failed`, `FailedCount` and `Result` fields on the enclosing class - the content app depends on these values existing. 
@@ -44,3 +63,8 @@ The method receives three arguments - `{int} id`, `{guid} culture`, `{string} va
  - `settings`: a list of settings applied to all existing Preflight plugins (includes the settings for the current plugin, if any have been added)
  
 Use those argument to determine the result for your test - how you do that is entirely up to you, so long as the aforementioned fields are set.
+
+For implementation examples, refer to the core plugins in `Preflight.Plugins` eg `Preflight.Plugins.Readability`.
+
+## Credits
+Icon sourced from [Feather Icons](https://feathericons.com/)
