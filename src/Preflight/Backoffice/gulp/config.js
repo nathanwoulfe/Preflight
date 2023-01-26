@@ -1,7 +1,5 @@
 const backofficePath = './app';
 
-// temp => include UI component from Workflow.Core.LicensesValidation.Client
-
 function getOutputPath() {
   var argv = require('minimist')(process.argv.slice(2));
 
@@ -14,14 +12,11 @@ function getOutputPath() {
 }
 
 export const paths = {
-  js: [`${backofficePath}/**/*.ts`, `../Umbraco.Workflow.Core/LicenseValidation/Client/src/**/*.ts`, `!${backofficePath}/**/offline/**/*.ts`],
-  offline: [`${backofficePath}/**/offline/**/*.ts`, `!${backofficePath}/**/offline/offline.loader.ts`],
-  offlineLoader: `${backofficePath}/**/offline/offline.loader.ts`,
+  js: [`${backofficePath}/**/*.ts`,],
   viewsDev: [`${backofficePath}/**/*.html`],
   viewsProd: [`${backofficePath}/**/*.html`, `!${backofficePath}/**/components/**/*.html`],
   scss: `${backofficePath}/**/*.scss`,
   lang: `${backofficePath}/Lang/*.xml`,
-  manifest: `${backofficePath}/**/package.manifest`,
   dest: getOutputPath()
 };
 
