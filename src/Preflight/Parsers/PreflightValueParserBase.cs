@@ -32,7 +32,8 @@ public class PreflightValueParserBase
     /// </summary>
     /// <param name="name"></param>
     /// <param name="label"></param>
-    public void SendRemoveResponse(string name, string label) => _messenger.SendTestResult(new PreflightPropertyResponseModel
+    /// <param name="nodeId"></param>
+    public void SendRemoveResponse(string name, string label, int nodeId) => _messenger.SendTestResult(new PreflightPropertyResponseModel(nodeId)
     {
         Name = name,
         Label = label,

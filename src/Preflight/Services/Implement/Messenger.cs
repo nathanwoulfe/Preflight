@@ -13,6 +13,6 @@ internal sealed class Messenger : IMessenger
     public void SendTestResult(PreflightPropertyResponseModel model) =>
         _hubContext.Value.Clients.All.preflightTest(model);
 
-    public void PreflightComplete() =>
-        _hubContext.Value.Clients.All.preflightComplete();
+    public void PreflightComplete(int nodeId) =>
+        _hubContext.Value.Clients.All.preflightComplete(nodeId);
 }

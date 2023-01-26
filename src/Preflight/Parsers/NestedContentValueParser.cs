@@ -64,7 +64,7 @@ public class NestedContentValueParser : PreflightValueParserBase, IPreflightValu
 
                 if (!propertyValue.HasValue())
                 {
-                    SendRemoveResponse(property.Name, label);
+                    SendRemoveResponse(property.Name, label, parserParams.NodeId);
                 }
                 else
                 {

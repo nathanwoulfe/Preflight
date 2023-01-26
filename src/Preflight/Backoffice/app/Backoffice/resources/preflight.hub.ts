@@ -1,51 +1,52 @@
-import { IQService, IRootScopeService } from 'angular';
+import { IRootScopeService } from 'angular';
 
 export class PreflightHub {
 
   public static serviceName = 'preflightHub';
 
-  scripts: Array<string> = [];
   callbacks: Array<any> = [];
-  starting: boolean = false
+  starting: boolean = false;
+  hubStarted: boolean = false;
+  hub = {};
 
-  constructor(private $rootScope: IRootScopeService, private $q: IQService, private assetsService: IAssetsService) {
-    this.scripts = [Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/lib/signalr/signalr.min.js'];
+  constructor(private $rootScope: IRootScopeService, private assetsService: IAssetsService) {
   }
 
   setupHub = callback => {
-    let hub = {};
 
-    $.connection = new signalR.HubConnectionBuilder()
-      .withUrl(Umbraco.Sys.ServerVariables.Preflight.signalRHub, {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets
-      })
+    // process callbacks every time the hub is re-initialized
+    // but only create the connection the first time.
+    if ($.preflightHubConnection !== undefined || this.hubStarted) {
+      return callback(this.hub);
+    }
+
+    $.preflightHubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(Umbraco.Sys.ServerVariables.Preflight.signalRHub)
+      .configureLogging(Umbraco.Sys.ServerVariables.isDebuggingEnabled ? signalR.LogLevel.Debug : signalR.LogLevel.None)
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Warning)
       .build();
 
-    hub = {
-      active: true,
+    this.hub = {
       start: async (callback) => {
+        if (this.hubStarted) {
+          return callback(this.hub);
+        }
+
         try {
-          const result = await $.connection.start();
+          const result = await $.preflightHubConnection.start();
           this.executeCallback(callback, result);
+          this.hubStarted = true;
         } catch (e) {
           console.warn('Could not setup signalR connection', e);
         }
 
       },
       on: (eventName, callback) => {
-        $.connection.on(eventName, result => this.executeCallback(callback, result));
+        $.preflightHubConnection.on(eventName, result => this.executeCallback(callback, result));
       },
-
-      invoke: (methodName, callback) => {
-        $.connection.invoke(methodName)
-          .done(result => this.executeCallback(callback, result));
-      }
     };
 
-    return callback(hub);
+    return callback(this.hub);
   }
 
   executeCallback = (cb, result) =>
@@ -64,14 +65,13 @@ export class PreflightHub {
     this.callbacks.push(callback);
 
     if (!this.starting) {
-      if ($.connection === undefined) {
+      if ($.workflowHubConnection === undefined) {
         this.starting = true;
 
-        const promises: Array<Promise<any>> = [];
-        this.scripts.forEach(script => promises.push(this.assetsService.loadJs(script)));
-
-        this.$q.all(promises).then(() => this.processCallbacks());
-      } else {
+        this.assetsService.loadJs(Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/lib/signalr/signalr.min.js')
+          .then(() => this.processCallbacks());
+      }
+      else {
         this.processCallbacks();
       }
     }

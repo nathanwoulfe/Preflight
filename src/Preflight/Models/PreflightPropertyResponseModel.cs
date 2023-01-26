@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using Preflight.Plugins;
 
 namespace Preflight.Models;
 
@@ -28,4 +27,12 @@ public class PreflightPropertyResponseModel
 
     [JsonProperty("remove")]
     public bool Remove { get; set; } = false;
+
+    [JsonProperty("nodeId")]
+    public int NodeId { get; set; }
+
+    public PreflightPropertyResponseModel(int nodeId)
+    {
+        NodeId = nodeId;
+    }
 }

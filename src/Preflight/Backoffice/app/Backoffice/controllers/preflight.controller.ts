@@ -283,15 +283,22 @@ export class PreflightController {
   initSignalR = () => {
 
     this.preflightHub.initHub(hub => {
+      const currentId = this.editorState.current.id;
 
       hub.on('preflightTest',
         e => {
-          this.rebindResult(e);
-          this.setBadgeCount();
+          if (e.nodeId === currentId) {
+            this.rebindResult(e);
+            this.setBadgeCount();
+          }
         });
 
       hub.on('preflightComplete',
-        () => this.onComplete()
+        e => {
+          if (e === currentId) {
+            this.onComplete();
+          }
+        }
       );
 
       hub.start(() => {

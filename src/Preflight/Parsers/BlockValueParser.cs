@@ -62,7 +62,7 @@ public class BlockValueParser : PreflightValueParserBase, IPreflightValueParser
 
                 if (!propertyValue.HasValue())
                 {
-                    SendRemoveResponse(property.Name, label);
+                    SendRemoveResponse(property.Name, label, parserParams.NodeId);
                 }
                 else
                 {

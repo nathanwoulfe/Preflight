@@ -1,16 +1,22 @@
-﻿@import '_variables';
+@import '_variables';
 
 [data-element="sub-view-preflight"] .badge {
-    transition: background-color ease-in-out .5s;
+  transition: background-color ease-in-out .5s;
 
-    &.-type-success {
-        background-color: $green;
+  &.-type-success {
+    background-color: $green;
 
-        &::before {
-            transform: translateY(-2px);
-            content: '\e165';
-        }
+    &::before {
+      transform: translateY(-2px);
+      content: '\e165';
     }
+  }
+
+  // overrides annoying validation styles
+  // which were setting to warning rather than error
+  &.--error-badge {
+      background: $red !important;
+  }
 }
 
 .preflight {
