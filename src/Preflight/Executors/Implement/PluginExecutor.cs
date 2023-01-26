@@ -35,7 +35,7 @@ internal sealed class PluginExecutor : IPluginExecutor
         _settings = _settingsService.Get().Settings;
         _testableProperties = _settings.GetValue<string>(KnownSettings.PropertiesToTest, parserParams.Culture) ?? string.Empty;
 
-        var model = new PreflightPropertyResponseModel
+        var model = new PreflightPropertyResponseModel(parserParams.NodeId)
         {
             Label = parserParams.PropertyName,
             Name = parserParams.PropertyName,

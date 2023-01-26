@@ -79,7 +79,7 @@ public class GridValueParser : PreflightValueParserBase, IPreflightValueParser
                 JToken? value = editor.SelectToken(GridValueJsonPath);
                 if (value is null || !value.ToString().HasValue())
                 {
-                    SendRemoveResponse(gridEditorName, label);
+                    SendRemoveResponse(gridEditorName, label, parserParams.NodeId);
                 }
                 else
                 {

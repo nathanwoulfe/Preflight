@@ -9,7 +9,7 @@ public interface IPreflightHub
 
     Task preflightTest(PreflightPropertyResponseModel model);
 
-    Task preflightComplete();
+    Task preflightComplete(int nodeId);
 }
 
 internal sealed class PreflightHub : Hub<IPreflightHub>

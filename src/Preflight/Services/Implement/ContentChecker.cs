@@ -63,7 +63,7 @@ internal sealed class ContentChecker : IContentChecker
             // only continue if the prop has a value
             if (!parserParams.PropertyValue.HasValue())
             {
-                _messenger.SendTestResult(new PreflightPropertyResponseModel
+                _messenger.SendTestResult(new PreflightPropertyResponseModel(parserParams.NodeId)
                 {
                     Name = prop.Name,
                     Remove = true,
@@ -78,7 +78,7 @@ internal sealed class ContentChecker : IContentChecker
             failed = TestAndBroadcast(parserParams) || failed;
         }
 
-        _messenger.PreflightComplete();
+        _messenger.PreflightComplete(parserParams.NodeId);
 
         return failed;
     }
@@ -128,7 +128,7 @@ internal sealed class ContentChecker : IContentChecker
             // only continue if the prop has a value
             if (!parserParams.PropertyValue.HasValue())
             {
-                _messenger.SendTestResult(new PreflightPropertyResponseModel
+                _messenger.SendTestResult(new PreflightPropertyResponseModel(parserParams.NodeId)
                 {
                     Name = prop.PropertyType.Name,
                     Remove = true,
@@ -143,7 +143,7 @@ internal sealed class ContentChecker : IContentChecker
             failed = TestAndBroadcast(parserParams) || failed;
         }
 
-        _messenger.PreflightComplete();
+        _messenger.PreflightComplete(parserParams.NodeId);
 
         return failed;
     }

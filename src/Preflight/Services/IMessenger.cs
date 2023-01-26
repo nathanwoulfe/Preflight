@@ -6,5 +6,5 @@ public interface IMessenger
 {
     void SendTestResult(PreflightPropertyResponseModel model);
 
-    void PreflightComplete();
+    void PreflightComplete(int nodeId);
 }
