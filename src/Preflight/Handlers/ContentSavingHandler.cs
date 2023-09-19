@@ -8,10 +8,7 @@ internal sealed class ContentSavingHandler : INotificationHandler<ContentSavingN
 {
     private readonly IContentSavingExecutor _executor;
 
-    public ContentSavingHandler(IContentSavingExecutor executor)
-    {
-        _executor = executor ?? throw new System.ArgumentNullException(nameof(executor));
-    }
+    public ContentSavingHandler(IContentSavingExecutor executor) => _executor = executor ?? throw new ArgumentNullException(nameof(executor));
 
     public void Handle(ContentSavingNotification notification)
     {
