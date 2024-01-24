@@ -120,7 +120,7 @@ public class PreflightApiController : UmbracoAuthorizedApiController
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
-    private IActionResult Error(string message) =>
+    private OkObjectResult Error(string message) =>
         Ok(new
         {
             notifications = ApiErrorNotification(message),
@@ -131,20 +131,19 @@ public class PreflightApiController : UmbracoAuthorizedApiController
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
-    private static IEnumerable<BackOfficeNotification> ApiSuccessNotification(string message) =>
+    private static BackOfficeNotification[] ApiSuccessNotification(string message) =>
         ApiNotification(message, "SUCCESS", NotificationStyle.Success);
 
-    private static IEnumerable<BackOfficeNotification> ApiErrorNotification(string message) =>
+    private static BackOfficeNotification[] ApiErrorNotification(string message) =>
         ApiNotification(message, "ERROR", NotificationStyle.Error);
 
-    private static IEnumerable<BackOfficeNotification> ApiNotification(string message, string header, NotificationStyle style) =>
-        new[]
-        {
-            new BackOfficeNotification
+    private static BackOfficeNotification[] ApiNotification(string message, string header, NotificationStyle style) =>
+        [
+            new()
             {
                 NotificationType = style,
                 Header = header,
                 Message = message,
             },
-        };
+        ];
 }

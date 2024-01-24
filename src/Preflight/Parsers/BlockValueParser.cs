@@ -21,8 +21,8 @@ public class BlockValueParser : PreflightValueParserBase, IPreflightValueParser
 
     public List<PreflightPropertyResponseModel> Parse(ContentParserParams parserParams)
     {
-        Dictionary<Guid, IContentType> cache = new();
-        List<PreflightPropertyResponseModel> response = new();
+        Dictionary<Guid, IContentType> cache = [];
+        List<PreflightPropertyResponseModel> response = [];
 
         BlockValue? blockValue = JsonConvert.DeserializeObject<BlockValue>(parserParams.PropertyValue);
         int index = 1;
@@ -42,11 +42,7 @@ public class BlockValueParser : PreflightValueParserBase, IPreflightValueParser
                 continue;
             }
 
-            if (!cache.ContainsKey(typeAlias))
-            {
-                cache.Add(typeAlias, type);
-            }
-
+            _ = cache.TryAdd(typeAlias, type);
             IEnumerable<IPropertyType> propsFromType = type.GetPreflightProperties();
 
             foreach (IPropertyType property in propsFromType)

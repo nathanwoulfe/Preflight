@@ -27,7 +27,7 @@ public class GridValueParser : PreflightValueParserBase, IPreflightValueParser
     public List<PreflightPropertyResponseModel> Parse(ContentParserParams parserParams)
     {
         var asJson = JObject.Parse(parserParams.PropertyValue);
-        List<PreflightPropertyResponseModel> response = new();
+        List<PreflightPropertyResponseModel> response = [];
 
         // a single grid row can contain the same editor multiple times
         // a single grid property can contain the same row multiple times

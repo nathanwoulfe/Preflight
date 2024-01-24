@@ -5,8 +5,8 @@ namespace Preflight.Models.Settings;
 public class PreflightSettingsModel
 {
     [JsonProperty("settings")]
-    public List<SettingsModel> Settings { get; set; } = new();
+    public List<SettingsModel> Settings { get; set; } = [];
 
     [JsonProperty("tabs")]
-    public List<SettingsTabModel> Tabs { get; set; } = new();
+    public List<SettingsTabModel> Tabs { get; set; } = [];
 }

@@ -105,7 +105,7 @@ public class SettingsService : ISettingsService
     /// <returns></returns>
     private PreflightSettingsModel GetSettings()
     {
-        List<SettingDto> schema = new();
+        List<SettingDto> schema = [];
         using (IScope scope = _scopeProvider.CreateScope())
         {
             schema = scope.Database.Fetch<SettingDto>();
@@ -184,7 +184,7 @@ public class SettingsService : ISettingsService
     /// <param name="settings"></param>
     private List<SettingsTabModel> GenerateTabsFromSettings(List<SettingsModel> settings)
     {
-        List<SettingsTabModel> tabs = new();
+        List<SettingsTabModel> tabs = [];
 
         foreach (IPreflightPlugin plugin in _plugins)
         {
@@ -248,7 +248,7 @@ public class SettingsService : ISettingsService
             return;
         }
 
-        CaseInsensitiveValueDictionary newValue = new();
+        CaseInsensitiveValueDictionary newValue = [];
 
         if (groupSetting.Value is null)
         {

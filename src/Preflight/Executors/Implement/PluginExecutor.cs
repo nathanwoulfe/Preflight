@@ -15,7 +15,7 @@ internal sealed class PluginExecutor : IPluginExecutor
     private readonly PreflightPluginCollection _plugins;
 
     private string? _testableProperties;
-    private List<SettingsModel> _settings = new();
+    private List<SettingsModel> _settings = [];
 
     public PluginExecutor(PreflightPluginCollection plugins, ISettingsService settingsService, ILogger<IPreflightValueParser> logger)
     {
@@ -51,7 +51,7 @@ internal sealed class PluginExecutor : IPluginExecutor
         foreach (IPreflightPlugin plugin in _plugins)
         {
             // settings on the plugin are the defaults - set to correct values from _settings
-            plugin.Settings = _settings.Where(s => s.Tab == plugin.Name)?.ToList() ?? new();
+            plugin.Settings = _settings.Where(s => s.Tab == plugin.Name)?.ToList() ?? [];
 
             // ignore disabled plugins
             if (plugin.IsDisabled(parserParams.Culture))
@@ -98,7 +98,7 @@ internal sealed class PluginExecutor : IPluginExecutor
         model.FailedCount = model.Plugins.Sum(x => x.FailedCount);
         model.Failed = model.FailedCount > 0;
 
-        model.Plugins = model.Plugins.OrderBy(p => p.SortOrder).ToList();
+        model.Plugins = [.. model.Plugins.OrderBy(p => p.SortOrder)];
         model.TotalTests = model.Plugins.Aggregate(0, (acc, x) => acc + x.TotalTests);
 
         return model;

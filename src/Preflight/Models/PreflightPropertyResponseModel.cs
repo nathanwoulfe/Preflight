@@ -11,7 +11,7 @@ public class PreflightPropertyResponseModel
     public string Label { get; set; } = string.Empty;
 
     [JsonProperty("plugins")]
-    public List<PreflightPluginResponseModel> Plugins { get; set; } = new();
+    public List<PreflightPluginResponseModel> Plugins { get; set; } = [];
 
     [JsonProperty("open")]
     public bool Open { get; set; } = false;

@@ -18,5 +18,5 @@ public class DirtyProperties
 
     public string Culture { get; set; } = string.Empty;
 
-    public List<SimpleProperty> Properties { get; set; } = new();
+    public List<SimpleProperty> Properties { get; set; } = [];
 }

@@ -61,7 +61,7 @@ public static class PreflightPluginExtensions
             propsToTest = string.Join(KnownStrings.Comma, KnownPropertyAlias.All);
         }
 
-        List<SettingsModel> response = new();
+        List<SettingsModel> response = [];
 
         if (Guid.TryParse(plugin.DisabledSettingIdentifier, out Guid disabledGuid))
         {

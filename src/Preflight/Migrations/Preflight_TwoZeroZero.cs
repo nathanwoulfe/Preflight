@@ -51,13 +51,13 @@ public class Preflight_TwoZeroZero : MigrationBase
 
         // get all settings, update the value to a variant dictionary,
         // then save the value and guid for each
-        List<SettingsModel> settings = new();
+        List<SettingsModel> settings = [];
 
         if (File.Exists(_ioHelper.MapPath(SettingsFilePath)))
         {
             using var file = new StreamReader(_ioHelper.MapPath(SettingsFilePath));
             string json = file.ReadToEnd();
-            settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json) ?? new();
+            settings = JsonConvert.DeserializeObject<List<SettingsModel>>(json) ?? [];
         }
 
         // update settings values to variant dictionaries

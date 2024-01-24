@@ -16,8 +16,7 @@ public class StringValueParser : IPreflightValueParser
     /// <param name="parserParams"></param>
     /// <returns></returns>
     public List<PreflightPropertyResponseModel> Parse(ContentParserParams parserParams) =>
-        new()
-        {
+        [
             _pluginExecutor.Execute(parserParams),
-        };
+        ];
 }

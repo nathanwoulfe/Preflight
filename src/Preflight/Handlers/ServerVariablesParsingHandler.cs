@@ -12,8 +12,8 @@ internal sealed class ServerVariablesParsingHandler : INotificationHandler<Serve
 
     public ServerVariablesParsingHandler(IServerVariablesParsingExecutor executor, PreflightHubRoutes preflightHubRoutes)
     {
-        _executor = executor ?? throw new System.ArgumentNullException(nameof(executor));
-        _preflightHubRoutes = preflightHubRoutes ?? throw new System.ArgumentNullException(nameof(preflightHubRoutes));
+        _executor = executor;
+        _preflightHubRoutes = preflightHubRoutes;
     }
 
     public void Handle(ServerVariablesParsingNotification notification) =>

@@ -22,8 +22,8 @@ public class NestedContentValueParser : PreflightValueParserBase, IPreflightValu
 
     public List<PreflightPropertyResponseModel> Parse(ContentParserParams parserParams)
     {
-        Dictionary<string, IContentType> cache = new();
-        List<PreflightPropertyResponseModel> response = new();
+        Dictionary<string, IContentType> cache = [];
+        List<PreflightPropertyResponseModel> response = [];
 
         var asJson = JArray.Parse(parserParams.PropertyValue);
         int index = 1;

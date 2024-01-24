@@ -52,7 +52,7 @@ internal sealed class ContentChecker : IContentChecker
             {
                 var blockValue = new BlockValue
                 {
-                    ContentData = JsonConvert.DeserializeObject<List<BlockItemData>>(prop.Value) ?? new(),
+                    ContentData = JsonConvert.DeserializeObject<List<BlockItemData>>(prop.Value) ?? [],
                 };
 
                 prop.Value = JsonConvert.SerializeObject(blockValue);
@@ -155,7 +155,7 @@ internal sealed class ContentChecker : IContentChecker
     /// <returns></returns>
     private bool TestAndBroadcast(ContentParserParams parserParams)
     {
-        List<PreflightPropertyResponseModel> testResult = new();
+        List<PreflightPropertyResponseModel> testResult = [];
 
         bool failed = false;
         ParserType? parserType = EnumExtensions.GetByParsablePropertyAlias<ParserType>(parserParams.PropertyEditorAlias);

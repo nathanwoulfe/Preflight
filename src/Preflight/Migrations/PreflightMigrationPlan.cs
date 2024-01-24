@@ -1,16 +1,19 @@
-using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Core.Packaging;
 
 namespace Preflight.Migrations;
 
-public class PreflightMigrationPlan : MigrationPlan
+public sealed class PreflightMigrationPlan : PackageMigrationPlan
 {
     public PreflightMigrationPlan()
-        : base(KnownStrings.Name) => DefinePlan();
+        : base(KnownStrings.Name)
+    {
+    }
 
     /// <inheritdoc/>
     public override string InitialState => "Preflight_ZeroZeroZero";
 
     /// <inheritdoc/>
-    protected void DefinePlan() => _ = From(InitialState)
+    protected override void DefinePlan() =>
+        From(InitialState)
             .To<Preflight_TwoZeroZero>(nameof(Preflight_TwoZeroZero));
 }

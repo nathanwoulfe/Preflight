@@ -26,7 +26,7 @@ internal sealed class ServerVariablesParsingExecutor : IServerVariablesParsingEx
             return;
         }
 
-        Dictionary<string, object> umbracoSettings = dictionary["umbracoSettings"] as Dictionary<string, object> ?? new Dictionary<string, object>();
+        Dictionary<string, object> umbracoSettings = dictionary["umbracoSettings"] as Dictionary<string, object> ?? [];
         string pluginPath = $"{umbracoSettings["appPluginsPath"]}/Preflight/Backoffice";
 
         var preflightDictionary = new Dictionary<string, object>

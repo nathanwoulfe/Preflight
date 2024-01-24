@@ -23,7 +23,7 @@ internal sealed class LinksService : ILinksService
     /// <param name="safeBrowsingResult"></param>
     public List<BrokenLinkModel> Check(string text, List<BrokenLinkModel> safeBrowsingResult)
     {
-        List<BrokenLinkModel> response = new();
+        List<BrokenLinkModel> response = [];
 
         var doc = new HtmlDocument();
         doc.LoadHtml(text);

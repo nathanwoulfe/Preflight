@@ -14,10 +14,10 @@ public class ReadabilityResponseModel
     public double SentenceLength { get; set; }
 
     [JsonProperty("longWords")]
-    public List<string> LongWords { get; set; } = new();
+    public List<string> LongWords { get; set; } = [];
 
     [JsonProperty("blacklist")]
-    public List<string> Blacklist { get; set; } = new();
+    public List<string> Blacklist { get; set; } = [];
 
     [JsonProperty("targetMin")]
     public int TargetMin { get; set; }

@@ -33,6 +33,9 @@ csharp_style_expression_bodied_accessors = true:suggestion
 csharp_style_expression_bodied_lambdas = true:suggestion
 csharp_style_expression_bodied_local_functions = true:suggestion
 csharp_indent_labels = no_change
+csharp_style_prefer_primary_constructors = true:none
+csharp_style_allow_embedded_statements_on_same_line_experimental = true:silent
+dotnet_diagnostic.SA1010.severity = none
 
 ##########################################
 # File Extension Settings
@@ -415,3 +418,6 @@ end_of_line = crlf
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 ##########################################
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = none

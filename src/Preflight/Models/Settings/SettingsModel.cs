@@ -114,7 +114,7 @@ public class SettingsModel
 
     private void SetValueDictionary(object? val = null)
     {
-        CaseInsensitiveValueDictionary dict = new();
+        CaseInsensitiveValueDictionary dict = [];
 
         foreach (string lang in GetAllLanguages())
         {

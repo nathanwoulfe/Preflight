@@ -37,8 +37,8 @@ internal sealed class ReadabilityService : IReadabilityService
         IEnumerable<string> whitelist = settings.GetValue<string>(KnownSettings.NiceList, culture)?.Split(CharArrays.Comma) ?? Enumerable.Empty<string>();
         IEnumerable<string> blacklist = settings.GetValue<string>(KnownSettings.NaughtyList, culture)?.Split(CharArrays.Comma) ?? Enumerable.Empty<string>();
 
-        List<string> longWords = new();
-        List<string> blacklisted = new();
+        List<string> longWords = [];
+        List<string> blacklisted = [];
 
         text = Regex.Replace(text, Constants.ClosingHtmlTags, Constants.Period);
         text = text.Replace(Environment.NewLine, Constants.Space);

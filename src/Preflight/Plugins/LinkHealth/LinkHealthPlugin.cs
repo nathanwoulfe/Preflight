@@ -71,7 +71,7 @@ public class LinkHealthPlugin : IPreflightCorePlugin
         bool checkSafeBrowsing = settings.GetValue<bool>(KnownSettings.EnsureSafeLinks, culture);
 
         // check safebrowsing first to avoid double processing of links
-        List<BrokenLinkModel> safeBrowsingResult = checkSafeBrowsing && apiKey.HasValue() ? _safeBrowsingService.Check(val, apiKey) : new();
+        List<BrokenLinkModel> safeBrowsingResult = checkSafeBrowsing && apiKey.HasValue() ? _safeBrowsingService.Check(val, apiKey) : [];
         List<BrokenLinkModel> brokenLinksResult = _linksService.Check(val, safeBrowsingResult);
 
         // then set Failed

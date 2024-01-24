@@ -24,7 +24,7 @@ public class SafeBrowsingService : ISafeBrowsingService
     /// <returns></returns>
     public List<BrokenLinkModel> Check(string text, string apiKey)
     {
-        List<BrokenLinkModel> response = new();
+        List<BrokenLinkModel> response = [];
 
         if (!apiKey.HasValue())
         {
@@ -45,7 +45,7 @@ public class SafeBrowsingService : ISafeBrowsingService
             .Where(l => l.StartsWith("http")).ToArray();
 
         // check for cached responses - avoids request when page is being resaved
-        List<BrokenLinkModel> fromCache = new();
+        List<BrokenLinkModel> fromCache = [];
 
         foreach (string href in hrefs)
         {

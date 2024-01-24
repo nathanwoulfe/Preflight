@@ -1,17 +1,17 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Preflight.Executors;
+using Preflight.Executors.Implement;
+using Preflight.Handlers;
 using Preflight.Hubs;
+using Preflight.Plugins;
 using Preflight.Plugins.LinkHealth.Services;
 using Preflight.Plugins.Readability;
-using Preflight.Services.Implement;
 using Preflight.Services;
+using Preflight.Services.Implement;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Web.Common.ApplicationBuilder;
-using Microsoft.AspNetCore.Builder;
-using Preflight.Plugins;
-using Preflight.Executors.Implement;
-using Preflight.Executors;
-using Preflight.Handlers;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Preflight.Extensions;
 
@@ -43,8 +43,7 @@ internal static class UmbracoBuilderExtensions
         _ = builder
             .AddNotificationHandler<ServerVariablesParsingNotification, ServerVariablesParsingHandler>()
             .AddNotificationHandler<ContentSavingNotification, ContentSavingHandler>()
-            .AddNotificationHandler<SendingContentNotification, SendingContentHandler>()
-            .AddNotificationHandler<UmbracoApplicationStartingNotification, ApplicationStartedHandler>();
+            .AddNotificationHandler<SendingContentNotification, SendingContentHandler>();
 
         return builder;
     }
@@ -70,10 +69,8 @@ internal static class UmbracoBuilderExtensions
             .AddSignalR();
 
         _ = builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new UmbracoPipelineFilter(
-               "Preflight",
-               applicationBuilder => { },
-               applicationBuilder => { },
-               applicationBuilder => _ = applicationBuilder.UseEndpoints(e =>
+               KnownStrings.Name,
+               endpoints: applicationBuilder => _ = applicationBuilder.UseEndpoints(e =>
                {
                    PreflightHubRoutes hubRoutes = applicationBuilder.ApplicationServices.GetRequiredService<PreflightHubRoutes>();
                    hubRoutes.CreateRoutes(e);
